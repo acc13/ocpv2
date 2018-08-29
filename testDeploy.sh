@@ -1,3 +1,24 @@
 #!/bin/bash
-aws s3 sync ./web s3://test.yetanotherwhatever.io --content-type "text/html" --acl public-read
+bucketname=test.yetanotherwhatever.io
 
+# idiomatic parameter and option handling in sh
+while test $# -gt 0
+do
+    case "$1" in
+        --clean) clean="true"
+            ;;
+        --*) echo "argument $1"
+            ;;
+    esac
+    shift
+done
+
+if [[ $clean = "true" ]]
+then
+	aws s3 rm s3://$bucketname --recursive
+fi
+
+aws s3 sync ./web s3://$bucketname --content-type "text/html" --acl public-read --delete
+
+echo
+echo Deployment ended.
