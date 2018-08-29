@@ -1,0 +1,84 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Resources:
+
+  S3Web:
+    Type: 'AWS::S3::Bucket'
+    Properties: 
+      AccessControl: PublicRead
+      BucketName: test.yetanotherwhatever.io
+      WebsiteConfiguration:
+        ErrorDocument: error.html
+        IndexDocument: index.html
+
+  LambdaRegisterUser:
+    Type: "AWS::Lambda::Function"
+    Properties: 
+      Code: 
+        ZipFile: >
+          exports.handler = function(event, context) {};
+      Description: register candidate, create dynamic, temporary coding exercise page.
+      FunctionName: Ocpv2RegisterCandidate
+      Handler: index.handler
+      #TODO create lambda role using CF
+      Role: arn:aws:iam::229763884986:role/CodingProblemRegistration
+      Runtime: nodejs8.10
+      Timeout: 10
+  LambdaRegisterUserAliasProd:
+    Type: AWS::Lambda::Alias
+    Properties:     
+      FunctionName: 
+          Fn::GetAtt: [ LambdaRegisterUser, Arn ]
+      FunctionVersion: $LATEST
+      Name: Ocpv2RegisterCandidateProd
+  LambdaRegisterUserAliasTest:
+    Type: AWS::Lambda::Alias
+    Properties:     
+      FunctionName: 
+          Fn::GetAtt: [ LambdaRegisterUser, Arn ]
+      FunctionVersion: $LATEST
+      Name: Ocpv2RegisterCandidateTest
+
+  OCPv2API:
+    Type: "AWS::ApiGateway::RestApi"
+    Properties:
+      Name: "OCPv2"
+      FailOnWarnings: "true"
+  RegistrationResource:
+    Type: "AWS::ApiGateway::Resource"
+    Properties:
+      ParentId:
+        Fn::GetAtt:
+          - "OCPv2API"
+          - "RootResourceId"
+      PathPart: "registration"
+      RestApiId:
+        Ref: OCPv2API
+  RegisterCandidateMethod:
+    Type: "AWS::ApiGateway::Method"
+    Properties:
+      HttpMethod: "POST"
+      AuthorizationType: "NONE"
+      ResourceId:
+        Ref: RegistrationResource
+      RestApiId:
+        Ref: OCPv2API
+      Integration:
+        Type: "AWS_PROXY"
+        Uri:
+          Fn::Join:
+            - ""
+            - - "arn:aws:apigateway:"
+              - !Ref "AWS::Region"
+              - ":lambda:path/"
+              - "/2015-03-31/functions/"
+              - Fn::GetAtt:
+                - LambdaRegisterUserAliasTest
+                - Arn
+              - "/invocations"
+        IntegrationHttpMethod: "POST"
+
+Outputs:
+  WebsiteURL:
+    Value: !GetAtt [S3Web, WebsiteURL]
+    Description: URL for website hosted on S3
