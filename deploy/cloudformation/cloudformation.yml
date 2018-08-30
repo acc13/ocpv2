@@ -11,60 +11,63 @@ Resources:
         ErrorDocument: error.html
         IndexDocument: index.html
 
-  LambdaRegisterUser:
+  LambdaInviteUser:
     Type: "AWS::Lambda::Function"
     Properties: 
       Code: 
         ZipFile: >
           exports.handler = function(event, context) {};
-      Description: register candidate, create dynamic, temporary coding exercise page.
-      FunctionName: Ocpv2RegisterCandidate
+      Description: invite candidate, create dynamic, temporary coding exercise page.
+      FunctionName: Ocpv2InviteCandidate
       Handler: index.handler
       #TODO create lambda role using CF
       Role: arn:aws:iam::229763884986:role/CodingProblemRegistration
       Runtime: nodejs8.10
       Timeout: 10
-  LambdaRegisterUserAliasProd:
+  LambdaInviteUserAliasProd:
     Type: AWS::Lambda::Alias
     Properties:     
       FunctionName: 
-          Fn::GetAtt: [ LambdaRegisterUser, Arn ]
+          Fn::GetAtt: [ LambdaInviteUser, Arn ]
       FunctionVersion: $LATEST
-      Name: Ocpv2RegisterCandidateProd
-  LambdaRegisterUserAliasTest:
+      Name: Ocpv2InviteCandidateProd
+  LambdaInviteUserAliasTest:
     Type: AWS::Lambda::Alias
     Properties:     
       FunctionName: 
-          Fn::GetAtt: [ LambdaRegisterUser, Arn ]
+          Fn::GetAtt: [ LambdaInviteUser, Arn ]
       FunctionVersion: $LATEST
-      Name: Ocpv2RegisterCandidateTest
+      Name: Ocpv2InviteCandidateTest
 
+  #
+  # API Gateway settings
+  #
   OCPv2API:
     Type: "AWS::ApiGateway::RestApi"
     Properties:
       Name: "OCPv2"
       FailOnWarnings: "true"
-  RegistrationResource:
+  InvitationResource:
     Type: "AWS::ApiGateway::Resource"
     Properties:
       ParentId:
         Fn::GetAtt:
           - "OCPv2API"
           - "RootResourceId"
-      PathPart: "registration"
+      PathPart: "invitation"
       RestApiId:
         Ref: OCPv2API
-  RegisterCandidateMethod:
+  InviteCandidateMethod:
     Type: "AWS::ApiGateway::Method"
     Properties:
       HttpMethod: "POST"
       AuthorizationType: "NONE"
       ResourceId:
-        Ref: RegistrationResource
+        Ref: InvitationResource
       RestApiId:
         Ref: OCPv2API
       Integration:
-        Type: "AWS_PROXY"
+        Type: "AWS"
         Uri:
           Fn::Join:
             - ""
@@ -72,11 +75,45 @@ Resources:
               - !Ref "AWS::Region"
               - ":lambda:path/"
               - "/2015-03-31/functions/"
-              - Fn::GetAtt:
-                - LambdaRegisterUserAliasTest
-                - Arn
+              - !GetAtt [LambdaInviteUser, Arn]
+              - ":${stageVariables.LambdaAlias}"
               - "/invocations"
         IntegrationHttpMethod: "POST"
+
+  RedirectPermissions:
+    Type: 'AWS::Lambda::Permission'
+    Properties:
+      FunctionName: !Ref LambdaInviteUserAliasTest
+      Action: 'lambda:InvokeFunction'
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${OCPv2API}/*
+
+  # API gateway stage and deployment configuration. We use a new logical ID for the deployment each time we update the
+  # CF template; this is because the deployment captures the current state of the resource and method tree at the time
+  # it is created, so to reflect any changes it needs to be recreated and the new deployment bound to the stage.
+  OCPv2APIStage:
+    Type: 'AWS::ApiGateway::Stage'
+    Properties:
+      RestApiId: !Ref OCPv2API
+      DeploymentId: !Ref OCPv2APIDeployment3
+      StageName: test
+      MethodSettings:
+          - ResourcePath: /*
+            HttpMethod: '*'
+            DataTraceEnabled: true
+            LoggingLevel: INFO
+            MetricsEnabled: true          
+      Variables:
+        LambdaAlias: !Ref LambdaInviteUserAliasTest
+
+  OCPv2APIDeploymentStage:
+    Type: 'AWS::ApiGateway::Deployment'
+    Properties:
+      RestApiId: !Ref OCPv2API
+    DependsOn:
+    # This DependsOn relation ensures that we don't create the deployment before we finish configuring the resources;
+    # otherwise the deployment might capture an incomplete configuration.
+      - InviteCandidateMethod
 
 Outputs:
   WebsiteURL:

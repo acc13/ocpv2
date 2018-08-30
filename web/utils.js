@@ -289,14 +289,14 @@ function getAndValidateEmail()
 
 
 //Cookie management and page property methods
-function createVariable(name,value) {
+function setCookie(name,value) {
     var date = new Date();
     date.setFullYear(date.getFullYear() + 1);
     var expires = ";expires="+date.toGMTString();
     document.cookie = name+"="+value+expires+";path=/";
 }
 
-function readVariable(name) {
+function getCookie(name) {
     var nameEQ = name + "=";
     var ca = document.cookie.split(";");
     var c;
@@ -321,7 +321,7 @@ function setLLS()
   if (!LLS)
   {
     var uuid = Math.uuid();
-    createVariable("LLS", uuid);
+    setCookie("LLS", uuid);
   }
 
 }
@@ -331,7 +331,7 @@ setLLS();
 
 function getLLS()
 {
-    return readVariable("LLS");
+    return getCookie("LLS");
 }
 
 function cleanLocation()
@@ -342,7 +342,7 @@ function cleanLocation()
 
 function getHome()
 {
-  return readVariable("home");
+  return getCookie("home");
 }
 
 function getParameterByName(name, url) {
@@ -375,10 +375,8 @@ function setTopic()
 
   if (topic)
   {
-    createVariable("topic", topic);
+    setCookie("topic", topic);
   }
-
-  debug("Topic:" + topic);
 }
 
 setTopic();
@@ -386,7 +384,7 @@ setTopic();
 
 function getTopic()
 {
-  var topic = readVariable("topic");
+  var topic = getCookie("topic");
   if(!topic)
   {
     topic = "none";

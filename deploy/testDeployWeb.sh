@@ -19,9 +19,9 @@ then
 fi
 
 #copy web content first
-aws s3 sync ./web s3://$bucketname --content-type "text/html" --acl public-read --exclude "problems/inputs/*" --exclude "problems/outputs/*"
+aws s3 sync ../web s3://$bucketname --content-type "text/html" --acl public-read --exclude "problems/inputs/*" --exclude "problems/outputs/*"
 #copy files for download
-aws s3 sync ./web/problems s3://$bucketname --acl public-read --exclude "*" --include "inputs/*"
+aws s3 sync ../web/problems s3://$bucketname --acl public-read --exclude "*" --include "inputs/*"
 
 echo
 echo Deployment ended.
