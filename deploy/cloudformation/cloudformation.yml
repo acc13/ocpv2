@@ -57,6 +57,7 @@ Resources:
       PathPart: "invitation"
       RestApiId:
         Ref: OCPv2API
+    DependsOn : OCPv2API
   InviteCandidateMethod:
     Type: "AWS::ApiGateway::Method"
     Properties:
@@ -79,6 +80,11 @@ Resources:
               - ":${stageVariables.LambdaAlias}"
               - "/invocations"
         IntegrationHttpMethod: "POST"
+        IntegrationResponses: 
+        - StatusCode : 200
+      MethodResponses:
+      - StatusCode: 200 
+    DependsOn : InvitationResource
 
   RedirectPermissions:
     Type: 'AWS::Lambda::Permission'
@@ -95,7 +101,7 @@ Resources:
     Type: 'AWS::ApiGateway::Stage'
     Properties:
       RestApiId: !Ref OCPv2API
-      DeploymentId: !Ref OCPv2APIDeployment3
+      DeploymentId: !Ref OCPv2APIDeploymentStage
       StageName: test
       MethodSettings:
           - ResourcePath: /*
@@ -104,13 +110,14 @@ Resources:
             LoggingLevel: INFO
             MetricsEnabled: true          
       Variables:
-        LambdaAlias: !Ref LambdaInviteUserAliasTest
+        LambdaAlias: Ocpv2InviteCandidateTest
+    DependsOn : OCPv2APIDeploymentStage
 
   OCPv2APIDeploymentStage:
     Type: 'AWS::ApiGateway::Deployment'
     Properties:
       RestApiId: !Ref OCPv2API
-    DependsOn:
+    DependsOn :
     # This DependsOn relation ensures that we don't create the deployment before we finish configuring the resources;
     # otherwise the deployment might capture an incomplete configuration.
       - InviteCandidateMethod
@@ -119,3 +126,6 @@ Outputs:
   WebsiteURL:
     Value: !GetAtt [S3Web, WebsiteURL]
     Description: URL for website hosted on S3
+  RestAPIID:
+    Value: !Ref OCPv2API
+    Description: root resource ID of the REST API
