@@ -1,11 +1,11 @@
 package com.yetanotherwhatever.ocpv2.lambdas;
 
 
+import com.amazonaws.regions.Region;
 import com.amazonaws.regions.Regions;
+import com.amazonaws.services.simpleemail.AmazonSimpleEmailServiceClient;
+import com.amazonaws.services.simpleemail.model.*;
 
-import javax.print.attribute.standard.Destination;
-
-import static sun.security.x509.X509CertInfo.SUBJECT;
 
 /**
  * Created by achang on 9/3/2018.
@@ -17,35 +17,27 @@ public class EmailHelper {
 
     }
 
-    public void sendEmail(String sub, String body)
-    {
+    private AmazonSimpleEmailServiceClient client;
+    private final String SENDER = "noreply@yetanotherwhatever.io>";
 
-        try {
-            AmazonSimpleEmailService client =
-                    AmazonSimpleEmailServiceClientBuilder.standard()
-                            // Replace US_WEST_2 with the AWS Region you're using for
-                            // Amazon SES.
-                            .withRegion(Regions.US_WEST_2).build();
-            SendEmailRequest request = new SendEmailRequest()
-                    .withDestination(
-                            new Destination().withToAddresses(TO))
-                    .withMessage(new Message()
-                            .withBody(new Body()
-                                    .withHtml(new Content()
-                                            .withCharset("UTF-8").withData(HTMLBODY))
-                                    .withText(new Content()
-                                            .withCharset("UTF-8").withData(TEXTBODY)))
-                            .withSubject(new Content()
-                                    .withCharset("UTF-8").withData(SUBJECT)))
-                    .withSource(FROM)
-                    // Comment or remove the next line if you are not using a
-                    // configuration set
-                    .withConfigurationSetName(CONFIGSET);
-            client.sendEmail(request);
-            System.out.println("Email sent!");
-        } catch (Exception ex) {
-            System.out.println("The email was not sent. Error message: "
-                    + ex.getMessage());
+    public void sendEmail(String email, String sub, String text)
+    {
+        if (client == null) {
+            client = new AmazonSimpleEmailServiceClient();
         }
+
+        Destination destination = new Destination().withToAddresses(new String[]{email});
+        Content subject = new Content().withData(sub);
+        Content textContent = new Content().withData(text);
+        Body body = new Body().withText(textContent);
+        Message message = new Message()
+                .withSubject(subject)
+                .withBody(body);
+        SendEmailRequest request = new SendEmailRequest()
+                .withSource(SENDER)
+                .withDestination(destination)
+                .withMessage(message);
+
+        client.sendEmail(request);
     }
 }
