@@ -1,8 +1,11 @@
 package com.yetanotherwhatever.ocpv2.lambdas;
 
 
+import com.amazonaws.services.kinesis.model.InvalidArgumentException;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
+
+import java.io.IOException;
 
 /**
  * Created by achang on 9/3/2018.
@@ -13,14 +16,16 @@ public class InviteCandidateHandler implements RequestHandler<Invitation, String
     @Override
     public String handleRequest(Invitation invitation, Context context) {
 
-        String err = Inviter.isValid(invitation);
-        if (null == err)
-        {
-            return new Inviter(new DynamoDB()).invite(invitation);
+        try {
+            new Inviter().setDB(new DynamoDB()).sendInvitation(invitation);
+
+            return "SUCCESS";
         }
-        else
+        catch(IOException | InvalidArgumentException e)
         {
-            return err;
+            return "ERROR: " + e.getMessage();
         }
+
+
     }
 }

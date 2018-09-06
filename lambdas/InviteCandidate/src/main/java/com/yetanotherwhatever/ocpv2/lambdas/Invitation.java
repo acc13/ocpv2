@@ -7,44 +7,58 @@ import java.util.Date;
  */
 public class Invitation {
 
-    private String first;
-    private String last;
-    private String email;
+    private String candidateFirstName;
+    private String candidateLastName;
+    private String candidateEmail;
     private String managerEmail;
     private Date date;
 
-    public String getFirst() {
-        return first;
+    public String getCandidateFirstName() {
+        return candidateFirstName;
     }
 
-    public String getLast() {
-        return last;
+    public Invitation setCandidateFirstName(String candidateFirstName) {
+        this.candidateFirstName = candidateFirstName;
+
+        return this;
     }
 
-    public String getEmail() {
-        return email;
+    public String getCandidateLastName() {
+        return candidateLastName;
+    }
+
+    public Invitation setCandidateLastName(String candidateLastName) {
+        this.candidateLastName = candidateLastName;
+
+        return this;
+    }
+
+    public String getCandidateEmail() {
+        return candidateEmail;
+    }
+
+    public Invitation setCandidateEmail(String candidateEmail) {
+        this.candidateEmail = candidateEmail;
+
+        return this;
     }
 
     public String getManagerEmail() {
         return managerEmail;
     }
 
+    public Invitation setManagerEmail(String managerEmail) {
+        this.managerEmail = managerEmail;
+
+        return this;
+    }
+
     public Date getDate() {
         return date;
     }
 
-    public Invitation (String first, String last,
-                       String email, String managerEmail)
+    public Invitation ()
     {
-        this.first = first;
-        this.last = last;
-        this.email = email;
-        this.managerEmail = managerEmail;
         date = new Date();
-    }
-
-    public String getValidationError()
-    {
-        return "";
     }
 }

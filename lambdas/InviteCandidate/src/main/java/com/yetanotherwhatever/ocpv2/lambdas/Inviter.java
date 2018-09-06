@@ -1,5 +1,7 @@
 package com.yetanotherwhatever.ocpv2.lambdas;
 
+import com.amazonaws.services.kinesis.model.InvalidArgumentException;
+
 import java.io.IOException;
 
 /**
@@ -8,74 +10,75 @@ import java.io.IOException;
 public class Inviter {
 
     private IOcpV2DB db;
+    private IEmailer emailer;
 
-    public Inviter(IOcpV2DB db)
+    public Inviter(){}
+
+    public Inviter setDB(IOcpV2DB db)
     {
         this.db = db;
+
+        return this;
+    }
+
+    public Inviter setEmailer(IEmailer emailer)
+    {
+        this.emailer = emailer;
+
+        return this;
     }
 
     //null means valid
     //String return val describes error
-    static String isValid(Invitation invite)
+    public static String validate(Invitation invite) throws InvalidArgumentException
     {
         //TODO
 
         if (!invite.getManagerEmail().endsWith("@symantec.com"))
         {
-            return "Manager email must come from symantec.com";
+            throw new InvalidArgumentException("Manager must have a symantec.com email address");
         }
 
         return null;
     }
 
-    public String invite(Invitation invite)
+    public void sendInvitation(Invitation invite) throws InvalidArgumentException, IOException
     {
+        validate(invite);
 
-        try {
-
-            //save invitation to DB
+        if (db != null) {
             db.write(invite);
+        }
 
-            //generate temporary problem page
-            CodingProblemPage problem = new CodingProblemPage();
-            problem.generate();
+        CodingProblemPage problem = new CodingProblemPage();
+        problem.generate();
 
-            //notify candidate and manager
-            emailCandidate(invite, problem);
+        if (null != emailer) {
+            emailCandidate(invite.getCandidateEmail(), problem.getUrl());
             emailManager(invite, problem);
-
         }
-        catch (IOException e)
-        {
-            //roll back if failed?
-
-            return "Error: " + e.getMessage();
-        }
-
-
-        return "Success";
     }
 
-    private void emailCandidate(Invitation invite, CodingProblemPage problem)
+    private void emailCandidate(String destEmailAddress, String url)
     {
-        String emailSub = "";
+        String emailSubject = "";
         String  emailBody = "Thank you for your interest in Symantec.\n\n" +
                 "Here is your unique link to the online coding problem: " +
-                problem.getUrl();
+                url;
 
-
+        emailer.sendEmail(destEmailAddress, emailSubject, emailBody);
     }
 
     private void emailManager(Invitation invite, CodingProblemPage problem)
     {
         //notify manager
-        String mgrSub =  "New coding problem registration: " +
-                invite.getFirst() + " " +
-                invite.getLast()+ ", " +
-                invite.getEmail();
-        String mgrBody = "Candidate link: " + problem.getUrl();
+        String emailSubject =  "New coding problem registration: " +
+                invite.getCandidateFirstName() + " " +
+                invite.getCandidateLastName()+ ", " +
+                invite.getCandidateEmail();
+        String emailBody = "Candidate link: " + problem.getUrl();
 
-
+        emailer.sendEmail(invite.getManagerEmail(), emailSubject, emailBody);
     }
 
 

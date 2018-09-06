@@ -6,6 +6,7 @@ import com.amazonaws.AmazonServiceException;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
+import com.amazonaws.services.dynamodbv2.model.PutItemResult;
 import com.amazonaws.services.dynamodbv2.model.ResourceNotFoundException;
 import java.util.HashMap;
 
@@ -36,9 +37,9 @@ public class DynamoDB implements IOcpV2DB {
         HashMap<String,AttributeValue> item_values =
                 new HashMap<>();
 
-        item_values.put(FIRST, new AttributeValue(i.getFirst()));
-        item_values.put(LAST, new AttributeValue(i.getLast()));
-        item_values.put(EMAIL, new AttributeValue(i.getEmail()));
+        item_values.put(FIRST, new AttributeValue(i.getCandidateFirstName()));
+        item_values.put(LAST, new AttributeValue(i.getCandidateLastName()));
+        item_values.put(EMAIL, new AttributeValue(i.getCandidateEmail()));
         item_values.put(MGR_EMAIL, new AttributeValue(i.getManagerEmail()));
         item_values.put(DATE, new AttributeValue(i.getDate().toString()));
 

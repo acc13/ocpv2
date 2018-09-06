@@ -10,15 +10,10 @@ import com.amazonaws.services.simpleemail.model.*;
 /**
  * Created by achang on 9/3/2018.
  */
-public class EmailHelper {
+public class EmailHelper implements IEmailer {
 
-    public EmailHelper()
-    {
-
-    }
-
-    private AmazonSimpleEmailServiceClient client;
-    private final String SENDER = "noreply@yetanotherwhatever.io>";
+    private static AmazonSimpleEmailServiceClient client = new AmazonSimpleEmailServiceClient();
+    private static final String SENDER = "noreply@yetanotherwhatever.io>";
 
     public void sendEmail(String email, String sub, String text)
     {
