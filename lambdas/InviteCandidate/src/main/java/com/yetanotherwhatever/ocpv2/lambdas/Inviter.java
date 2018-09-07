@@ -11,20 +11,27 @@ public class Inviter {
 
     private IOcpV2DB db;
     private IEmailer emailer;
+    private CodingProblem codingProblem;
 
     public Inviter(){}
 
-    public Inviter setDB(IOcpV2DB db)
+    protected Inviter setDB(IOcpV2DB db)
     {
         this.db = db;
 
         return this;
     }
 
-    public Inviter setEmailer(IEmailer emailer)
+    protected Inviter setEmailer(IEmailer emailer)
     {
         this.emailer = emailer;
 
+        return this;
+    }
+
+    protected Inviter setCodingProblem(CodingProblem codingProblem)
+    {
+        this.codingProblem = codingProblem;
         return this;
     }
 
@@ -50,12 +57,11 @@ public class Inviter {
             db.write(invite);
         }
 
-        CodingProblemPage problem = new CodingProblemPage();
-        problem.generate();
+        codingProblem.setup();
 
         if (null != emailer) {
-            emailCandidate(invite.getCandidateEmail(), problem.getUrl());
-            emailManager(invite, problem);
+            emailCandidate(invite.getCandidateEmail(), codingProblem.landingPageURL());
+            emailManager(invite, codingProblem);
         }
     }
 
@@ -69,14 +75,14 @@ public class Inviter {
         emailer.sendEmail(destEmailAddress, emailSubject, emailBody);
     }
 
-    private void emailManager(Invitation invite, CodingProblemPage problem)
+    private void emailManager(Invitation invite, CodingProblem problem)
     {
         //notify manager
         String emailSubject =  "New coding problem registration: " +
                 invite.getCandidateFirstName() + " " +
                 invite.getCandidateLastName()+ ", " +
                 invite.getCandidateEmail();
-        String emailBody = "Candidate link: " + problem.getUrl();
+        String emailBody = "Candidate link: " + problem.landingPageURL();
 
         emailer.sendEmail(invite.getManagerEmail(), emailSubject, emailBody);
     }

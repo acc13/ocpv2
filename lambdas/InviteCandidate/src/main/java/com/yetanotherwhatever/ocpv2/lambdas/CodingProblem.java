@@ -5,21 +5,21 @@ import java.io.IOException;
 /**
  * Created by achang on 9/3/2018.
  */
-public class CodingProblemPage {
+public class CodingProblem {
 
     String url;
 
-    public String getUrl() {
+    public String landingPageURL() {
         return url;
     }
 
 
-    public CodingProblemPage()
+    public CodingProblem()
     {
 
     }
 
-    public void generate() throws IOException
+    public void setup() throws IOException
     {
 
     }

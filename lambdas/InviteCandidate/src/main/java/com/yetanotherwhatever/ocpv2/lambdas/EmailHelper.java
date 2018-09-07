@@ -1,8 +1,6 @@
 package com.yetanotherwhatever.ocpv2.lambdas;
 
 
-import com.amazonaws.regions.Region;
-import com.amazonaws.regions.Regions;
 import com.amazonaws.services.simpleemail.AmazonSimpleEmailServiceClient;
 import com.amazonaws.services.simpleemail.model.*;
 
