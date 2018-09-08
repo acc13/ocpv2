@@ -37,7 +37,7 @@ public class Inviter {
 
     //null means valid
     //String return val describes error
-    public static String validate(Invitation invite) throws InvalidArgumentException
+    protected static String validate(Invitation invite) throws InvalidArgumentException
     {
         //TODO
 
@@ -60,7 +60,7 @@ public class Inviter {
         codingProblem.setup();
 
         if (null != emailer) {
-            emailCandidate(invite.getCandidateEmail(), codingProblem.landingPageURL());
+            emailCandidate(invite.getCandidateEmail(), codingProblem.getLandingPageURL());
             emailManager(invite, codingProblem);
         }
     }
@@ -82,7 +82,10 @@ public class Inviter {
                 invite.getCandidateFirstName() + " " +
                 invite.getCandidateLastName()+ ", " +
                 invite.getCandidateEmail();
-        String emailBody = "Candidate link: " + problem.landingPageURL();
+        String emailBody =
+                "Problem key: " + problem.getProblemKey() + "\n\n" +
+                "Problem GUID: " + problem.getProblemGuid() + "\n\n" +
+                "Candidate link: " + problem.getLandingPageURL();
 
         emailer.sendEmail(invite.getManagerEmail(), emailSubject, emailBody);
     }

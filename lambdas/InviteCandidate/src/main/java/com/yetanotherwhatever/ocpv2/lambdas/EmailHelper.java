@@ -8,7 +8,7 @@ import com.amazonaws.services.simpleemail.model.*;
 /**
  * Created by achang on 9/3/2018.
  */
-public class EmailHelper implements IEmailer {
+class EmailHelper implements IEmailer {
 
     private static AmazonSimpleEmailServiceClient client = new AmazonSimpleEmailServiceClient();
     private static final String SENDER = "noreply@yetanotherwhatever.io>";

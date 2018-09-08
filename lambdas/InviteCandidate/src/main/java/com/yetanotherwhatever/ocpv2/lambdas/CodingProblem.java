@@ -5,24 +5,33 @@ import java.io.IOException;
 /**
  * Created by achang on 9/3/2018.
  */
-public class CodingProblem {
+class CodingProblem {
 
-    String url;
+    private String problemKey;
+    private String problemGuid;
+    private String landingPageURL;
 
-    public String landingPageURL() {
-        return url;
+    protected String getLandingPageURL() {
+
+        return landingPageURL;
     }
 
+    protected String getProblemKey() {
+        return problemKey;
+    }
 
-    public CodingProblem()
+    protected String getProblemGuid() {
+        return problemGuid;
+    }
+
+    protected CodingProblem()
     {
 
     }
 
-    public void setup() throws IOException
+    protected void setup() throws IOException
     {
 
     }
-
 
 }
