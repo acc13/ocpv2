@@ -2,10 +2,11 @@
 
 PROJ_ROOT="${0%/*}"
 LAMBDAS=$PROJ_ROOT/../lambdas
+BUCKET=deployocp
 
 #copy web content first
 ZIP=$LAMBDAS/InviteCandidate/build/distributions/InviteCandidate-1.0.zip
-aws lambda update-function-code --function-name Ocpv2InviteCandidate --zip-file fileb://$ZIP
+aws s3 cp $ZIP s3://$BUCKET/lambas/InviteCandidate-1.0.zip
 
 echo
 echo Deployment ended

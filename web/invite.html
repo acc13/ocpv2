@@ -8,12 +8,10 @@
 <script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
 
 <!--for local debugging-->
+<script type="text/javascript" src="config.js" ></script>	
 <script type="text/javascript" src="utils.js" ></script>	
 
 <script type="text/javascript">
-	var inviteAPIURL = 'https://2splqmmatc.execute-api.us-east-1.amazonaws.com/prod/invitation';
-	if (isTest)
-		inviteAPIURL = 'https://2splqmmatc.execute-api.us-east-1.amazonaws.com/test/invitation';
 
 function prefill()
 {
@@ -57,10 +55,10 @@ $(document).ready(function(){
 	  $('#results').html("Submitting...")
 
 	  var data = {
-	    first: $('#first-name').val(),
-	    last: $('#last-name').val(),
-	    email: $('#email').val(),
-	    manager_email: $('#manager_email').val()
+	    candidateFirstName: $('#first-name').val(),
+	    candidateLastName: $('#last-name').val(),
+	    candidateEmail: $('#email').val(),
+	    managerEmail: $('#manager_email').val()
 	  }
 
 	  $.ajax({
@@ -69,10 +67,13 @@ $(document).ready(function(){
 	    dataType: 'json',
 	    contentType: 'application/json',
 	    data: JSON.stringify(data),
+	    headers: {
+	    	'Access-Control-Allow-Origin': '*'
+	    },
 	    success: function () {
 	      	$('#results').html('<span class="success">Invite succeeded.  You may wish to notify your candidate to expect an email.<br/><br/>They may need to check their junk folder, or notify <a href="mail://andrew_chang@symantec.com">andrew_chang@symantec.com</a>.</span>');
 	    },
-	    error: function () {
+	    error: function(){
 	      	$('#results').html('<span class="fail">Invite failed. Please refresh the page and try again; or notify <a href="mail://andrew_chang@symantec.com">andrew_chang@symantec.com</a></span>');
 	    }
 	  })
