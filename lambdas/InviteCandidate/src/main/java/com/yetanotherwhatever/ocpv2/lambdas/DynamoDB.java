@@ -6,8 +6,10 @@ import com.amazonaws.AmazonServiceException;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
-import com.amazonaws.services.dynamodbv2.model.PutItemResult;
 import com.amazonaws.services.dynamodbv2.model.ResourceNotFoundException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.util.HashMap;
 
 /**
@@ -15,16 +17,23 @@ import java.util.HashMap;
  */
 public class DynamoDB implements IOcpV2DB {
 
-    //table name
-    private static final String INVITE_TABLE_NAME = "Invitations";
-    //table columns
+    // Initialize the Log4j logger.
+    static final Logger logger = LogManager.getLogger(IOcpV2DB.class);
+
+
+    private static final String INVITE_TABLE_NAME = System.getenv("DYNAMODB_INVITE_TABLE");
+
     private static final String FIRST = "First";
     private static final String LAST = "Last";
     private static final String EMAIL = "Email";
-    private static final String MGR_EMAIL = "MgrEmail";
+    private static final String MGR_EMAIL = "ManagerEmail";
     private static final String DATE = "Date";
 
-    private final AmazonDynamoDB ddb = AmazonDynamoDBClientBuilder.defaultClient();
+    private static final String PROBLEM_KEY = "ProblemKey";
+    private static final String PROBLEM_LANDING_PAGE= "LandingPageURL";
+    private static final String PROBLEM_GUID= "ProblemPageGuid";
+
+    private static final AmazonDynamoDB ddb = AmazonDynamoDBClientBuilder.defaultClient();
 
     public DynamoDB ()
     {
@@ -41,18 +50,18 @@ public class DynamoDB implements IOcpV2DB {
         item_values.put(LAST, new AttributeValue(i.getCandidateLastName()));
         item_values.put(EMAIL, new AttributeValue(i.getCandidateEmail()));
         item_values.put(MGR_EMAIL, new AttributeValue(i.getManagerEmail()));
-        item_values.put(DATE, new AttributeValue(i.getDate().toString()));
+        item_values.put(DATE, new AttributeValue(i.getCreationDate().toString()));
 
+        item_values.put(PROBLEM_GUID, new AttributeValue(i.getProblemGuid()));
+        item_values.put(PROBLEM_KEY, new AttributeValue(i.getProblemKey()));
+        item_values.put(PROBLEM_LANDING_PAGE, new AttributeValue(i.getProblemLandingPageURL()));
 
         try {
             ddb.putItem(INVITE_TABLE_NAME, item_values);
         } catch (ResourceNotFoundException e) {
-            System.err.format("Error: The table \"%s\" can't be found.\n", INVITE_TABLE_NAME);
-            System.err.println("Be sure that it exists and that you've typed its name correctly!");
-            throw new IOException("Exception occurred while saving invitation to Dynamo DB", e);
+            throw new IOException(e);
         } catch (AmazonServiceException e) {
-            System.err.println(e.getMessage());
-            throw new IOException("Exception occurred while saving invitation to Dynamo DB", e);
+            throw new IOException(e);
         }
     }
 }
