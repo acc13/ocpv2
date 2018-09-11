@@ -67,15 +67,13 @@ $(document).ready(function(){
 	    dataType: 'json',
 	    contentType: 'application/json',
 	    data: JSON.stringify(data),
-	    headers: {
-	    	'Access-Control-Allow-Origin': '*'
-	    },
+	    crossDomain: true,
 	    success: function () {
 	      	$('#results').html('<span class="success">Invite succeeded.  You may wish to notify your candidate to expect an email.<br/><br/>They may need to check their junk folder, or notify <a href="mail://andrew_chang@symantec.com">andrew_chang@symantec.com</a>.</span>');
 	    },
-	    error: function(){
+		error: function(XMLHttpRequest, textStatus, errorThrown) {
 	      	$('#results').html('<span class="fail">Invite failed. Please refresh the page and try again; or notify <a href="mail://andrew_chang@symantec.com">andrew_chang@symantec.com</a></span>');
-	    }
+		}
 	  })
 
 	});

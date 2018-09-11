@@ -1,6 +1,5 @@
 package com.yetanotherwhatever.ocpv2.lambdas;
 
-import com.amazonaws.services.kinesis.model.InvalidArgumentException;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -57,7 +56,7 @@ public class InviterTest {
         return invite;
     }
 
-    @Test (expected = InvalidArgumentException.class)
+    @Test (expected = IllegalArgumentException.class)
     public void sendInvitation_invalidInput_invalidArgExceptionThrown() throws IOException
     {
         buildInviter();

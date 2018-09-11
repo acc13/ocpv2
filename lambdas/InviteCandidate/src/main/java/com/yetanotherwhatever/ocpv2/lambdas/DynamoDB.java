@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
+import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.amazonaws.services.dynamodbv2.model.ResourceNotFoundException;
@@ -33,7 +34,9 @@ public class DynamoDB implements IOcpV2DB {
     private static final String PROBLEM_LANDING_PAGE= "LandingPageURL";
     private static final String PROBLEM_GUID= "ProblemPageGuid";
 
-    private static final AmazonDynamoDB ddb = AmazonDynamoDBClientBuilder.defaultClient();
+    private static final AmazonDynamoDB ddb =
+            AmazonDynamoDBClientBuilder.defaultClient();  //aws lambda sdk > 1.9.6
+            //new AmazonDynamoDBClient(); //aws lambda sdk 1.9.6
 
     public DynamoDB ()
     {

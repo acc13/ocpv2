@@ -1,10 +1,12 @@
 package com.yetanotherwhatever.ocpv2.lambdas;
 
-import com.amazonaws.services.kinesis.model.InvalidArgumentException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.TimeZone;
 
 /**
  * Created by achang on 9/3/2018.
@@ -99,7 +101,17 @@ public class Invitation {
         return creationDate;
     }
 
-    public void validate() throws InvalidArgumentException
+    public String getCreationDateISO8601String()
+    {
+        TimeZone tz = TimeZone.getTimeZone("UTC");
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'"); // Quoted "Z" to indicate UTC, no timezone offset
+        df.setTimeZone(tz);
+        String nowAsISO = df.format(new Date());
+
+        return nowAsISO;
+    }
+
+    public void validate() throws IllegalArgumentException
     {
         isValidName(getCandidateFirstName());
         isValidName(getCandidateLastName());
@@ -109,12 +121,12 @@ public class Invitation {
     }
 
 
-    protected static void isValidName(String name) throws InvalidArgumentException
+    protected static void isValidName(String name) throws IllegalArgumentException
     {
         //just check length for now
         if (name == null || name.length() == 0 || name.length() > 100)
         {
-            throw new InvalidArgumentException("Name of invalid length: \"" + name + "\"");
+            throw new IllegalArgumentException("Name of invalid length: \"" + name + "\"");
         }
 
         isValidNameWarningOnly(name);
@@ -136,12 +148,12 @@ public class Invitation {
         return true;
     }
 
-    protected static void isValidEmail(String email) throws InvalidArgumentException
+    protected static void isValidEmail(String email) throws IllegalArgumentException
     {
         //just check length for now
         if (email == null || email.length() == 0 || email.length() > 100)
         {
-            throw new InvalidArgumentException("Email of invalid length: \"" + email + "\"");
+            throw new IllegalArgumentException("Email of invalid length: \"" + email + "\"");
         }
     }
 
@@ -152,7 +164,7 @@ public class Invitation {
 
         if (!email.endsWith("@symantec.com"))
         {
-            throw new InvalidArgumentException("Manager must have a symantec.com email address");
+            throw new IllegalArgumentException("Manager must have a symantec.com email address");
         }
 
         isValidManagerEmailWarningOnly(email);

@@ -2,15 +2,66 @@ AWSTemplateFormatVersion: 2010-09-09
 
 Resources:
 
+  #######################################
+  #       S3 
+  #######################################
   S3Web:
     Type: 'AWS::S3::Bucket'
     Properties: 
       AccessControl: PublicRead
-      BucketName: test.yetanotherwhatever.io
+      BucketName: 
+        !Join
+          - '.'
+          - - !Ref AWS::StackName
+            - yetanotherwhatever.io
       WebsiteConfiguration:
         ErrorDocument: error.html
         IndexDocument: index.html
 
+
+
+
+
+
+  #######################################
+  #       DynamoDB 
+  #######################################
+  DDBTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: "ManagerEmail"
+          AttributeType: "S"
+        - AttributeName: "ProblemPageGuid"
+          AttributeType: "S"
+      KeySchema:
+        - AttributeName: "ProblemPageGuid"
+          KeyType: "HASH"
+      TableName: 
+        !Join
+          - '.'
+          - - !Ref AWS::StackName
+            - Candidate_Invitations
+      GlobalSecondaryIndexes:
+        - IndexName: "Manager_Invites"
+          KeySchema:
+            - AttributeName: "ManagerEmail"
+              KeyType: "HASH"
+          Projection:
+            ProjectionType: "ALL"
+          ProvisionedThroughput:
+            ReadCapacityUnits: 5
+            WriteCapacityUnits: 5
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+
+
+
+
+  #######################################
+  #       Lambda 
+  #######################################
   LambdaInviteUser:
     Type: "AWS::Lambda::Function"
     Properties: 
@@ -24,16 +75,35 @@ Resources:
       #TODO create lambda role using CF
       Role: arn:aws:iam::229763884986:role/CodingProblemRegistration
       Runtime: java8
-      Timeout: 10
+      Timeout: 30
+      Environment:
+        Variables:
+          S3_WEB_BUCKET: 
+            !Join
+              - '.'
+              - - !Ref AWS::StackName
+                - yetanotherwhatever.io
+          DYNAMODB_INVITE_TABLE:             
+            !Join
+              - '.'
+              - - !Ref AWS::StackName
+                - Candidate_Invitations
 
-  #
-  # API Gateway settings
-  #
+
+
+
+
+
+  #########################################
+  #       API Gateway 
+  #########################################
+  
   OCPv2API:
     Type: "AWS::ApiGateway::RestApi"
     Properties:
       Name: "OCPv2"
       FailOnWarnings: "true"
+
   InvitationResource:
     Type: "AWS::ApiGateway::Resource"
     Properties:
@@ -45,6 +115,7 @@ Resources:
       RestApiId:
         Ref: OCPv2API
     DependsOn : OCPv2API
+
   InviteCandidateMethod:
     Type: "AWS::ApiGateway::Method"
     Properties:
@@ -71,6 +142,36 @@ Resources:
       MethodResponses:
       - StatusCode: 200 
     DependsOn : InvitationResource
+
+  #Enable CORS
+  InviteCandidateCORSOptionsMethod:
+    Type: "AWS::ApiGateway::Method"
+    Properties:
+      ResourceId: !Ref InvitationResource
+      RestApiId: !Ref OCPv2API
+      AuthorizationType: NONE
+      HttpMethod: OPTIONS
+      Integration:
+        Type: MOCK
+        IntegrationResponses:
+          - ResponseParameters:
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+              method.response.header.Access-Control-Allow-Methods: "'POST,OPTIONS'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+            ResponseTemplates:
+              application/json: ''
+            StatusCode: '200'
+        PassthroughBehavior: NEVER
+        RequestTemplates:
+          application/json: '{"statusCode": 200}'
+      MethodResponses:
+        - ResponseModels:
+            application/json: Empty
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Headers: true
+            method.response.header.Access-Control-Allow-Methods: true
+            method.response.header.Access-Control-Allow-Origin: true
+          StatusCode: '200'
 
   RedirectPermissions:
     Type: 'AWS::Lambda::Permission'
@@ -105,6 +206,14 @@ Resources:
     # This DependsOn relation ensures that we don't create the deployment before we finish configuring the resources;
     # otherwise the deployment might capture an incomplete configuration.
       - InviteCandidateMethod
+
+
+
+
+
+
+      
+
 
 Outputs:
   WebsiteURL:

@@ -2,7 +2,8 @@ package com.yetanotherwhatever.ocpv2.lambdas;
 
 
 import com.amazonaws.AmazonServiceException;
-import com.amazonaws.services.simpleemail.AmazonSimpleEmailServiceClient;
+import com.amazonaws.services.simpleemail.AmazonSimpleEmailService;
+import com.amazonaws.services.simpleemail.AmazonSimpleEmailServiceClientBuilder;
 import com.amazonaws.services.simpleemail.model.*;
 
 import java.io.IOException;
@@ -13,8 +14,12 @@ import java.io.IOException;
  */
 class SESEmailHelper implements IEmailer {
 
-    private static final AmazonSimpleEmailServiceClient client = new AmazonSimpleEmailServiceClient();
-    private static final String SENDER = "noreply@yetanotherwhatever.io>";
+    private static final AmazonSimpleEmailService client =
+            //AmazonSimpleEmailServiceClientBuilder.defaultClient();
+            AmazonSimpleEmailServiceClientBuilder.standard().build();
+            //new AmazonSimpleEmailServiceClient();   //1.9.6 version of aws libs
+
+    private static final String SENDER = "noreply@yetanotherwhatever.io";
 
     public void sendEmail(String email, String sub, String text) throws IOException
     {

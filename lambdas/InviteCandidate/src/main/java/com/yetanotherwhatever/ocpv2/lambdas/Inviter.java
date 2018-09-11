@@ -1,7 +1,5 @@
 package com.yetanotherwhatever.ocpv2.lambdas;
 
-import com.amazonaws.services.kinesis.model.InvalidArgumentException;
-
 import java.io.IOException;
 
 
@@ -41,7 +39,7 @@ public class Inviter {
         return this;
     }
 
-    public void sendInvitation(Invitation invite) throws InvalidArgumentException, IOException
+    public void sendInvitation(Invitation invite) throws IllegalArgumentException, IOException
     {
         if(null == db || null == codingProblem || null == emailer)
         {
@@ -49,24 +47,30 @@ public class Inviter {
         }
 
         invite.validate();
+        logger.info("Invitation validated.");
 
         codingProblem.setup();
+        logger.info("Coding problem page set up complete.");
 
         invite.setProblemGuid(codingProblem.getProblemGuid());
         invite.setProblemKey(codingProblem.getProblemKey());
         invite.setProblemLandingPageURL(codingProblem.getLandingPageURL());
         db.write(invite);
+        logger.info("Invite saved to DB.");
 
 
         emailCandidate(invite.getCandidateEmail(), codingProblem.getLandingPageURL());
+        logger.info("Candidate email sent.");
         emailManager(invite, codingProblem);
+        logger.info("Manager email sent.");
 
     }
 
+    static final String NL = System.getProperty("line.separator");
     private void emailCandidate(String destEmailAddress, String url) throws IOException
     {
         String emailSubject = "";
-        String  emailBody = "Thank you for your interest in Symantec.\n\n" +
+        String  emailBody = "Thank you for your interest in Symantec." + NL +
                 "Here is your unique link to the online coding problem: " +
                 url;
 
@@ -81,8 +85,8 @@ public class Inviter {
                 invite.getCandidateLastName()+ ", " +
                 invite.getCandidateEmail();
         String emailBody =
-                "Problem key: " + problem.getProblemKey() + "\n\n" +
-                "Problem GUID: " + problem.getProblemGuid() + "\n\n" +
+                "Problem key: " + problem.getProblemKey() + NL +
+                "Problem GUID: " + problem.getProblemGuid() +NL +
                 "Candidate link: " + problem.getLandingPageURL();
 
         emailer.sendEmail(invite.getManagerEmail(), emailSubject, emailBody);
