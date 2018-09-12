@@ -138,9 +138,17 @@ Resources:
               - "/invocations"
         IntegrationHttpMethod: "POST"
         IntegrationResponses: 
-        - StatusCode : 200
+          - ResponseParameters:
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+            ResponseTemplates:
+              application/json: ''
+            StatusCode : 200
       MethodResponses:
-      - StatusCode: 200 
+          - ResponseModels:
+              application/json: Empty
+            ResponseParameters:
+              method.response.header.Access-Control-Allow-Origin: true
+            StatusCode: 200 
     DependsOn : InvitationResource
 
   #Enable CORS
