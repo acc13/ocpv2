@@ -2,9 +2,9 @@ package com.yetanotherwhatever.ocpv2.lambdas;
 
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
-import com.amazonaws.services.s3.model.ObjectListing;
-import com.amazonaws.services.s3.model.S3ObjectSummary;
+import com.amazonaws.services.s3.model.*;
 
 import java.io.IOException;
 import java.util.UUID;
@@ -81,7 +81,10 @@ class S3CodingProblem implements ICodingProblem {
     {
         String destKey = TEMP_PAGE_PREFIX + problemGuid + ".html";
 
-        S3.copyObject(S3_WEB_BUCKET, problemKey, S3_WEB_BUCKET, destKey);
+        CopyObjectRequest cor = new CopyObjectRequest(S3_WEB_BUCKET, problemKey, S3_WEB_BUCKET, destKey);
+        cor.setCannedAccessControlList(CannedAccessControlList.PublicRead);
+
+        S3.copyObject(cor);
 
         return destKey;
     }
