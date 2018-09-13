@@ -35,8 +35,7 @@ public class DynamoDB implements IOcpV2DB {
     private static final String PROBLEM_GUID= "ProblemPageGuid";
 
     private static final AmazonDynamoDB ddb =
-            AmazonDynamoDBClientBuilder.defaultClient();  //aws lambda sdk > 1.9.6
-            //new AmazonDynamoDBClient(); //aws lambda sdk 1.9.6
+            AmazonDynamoDBClientBuilder.defaultClient();
 
     public DynamoDB ()
     {

@@ -15,9 +15,7 @@ import java.io.IOException;
 class SESEmailHelper implements IEmailer {
 
     private static final AmazonSimpleEmailService client =
-            //AmazonSimpleEmailServiceClientBuilder.defaultClient();
-            AmazonSimpleEmailServiceClientBuilder.standard().build();
-            //new AmazonSimpleEmailServiceClient();   //1.9.6 version of aws libs
+            AmazonSimpleEmailServiceClientBuilder.defaultClient();
 
     private static final String SENDER = "noreply@yetanotherwhatever.io";
 

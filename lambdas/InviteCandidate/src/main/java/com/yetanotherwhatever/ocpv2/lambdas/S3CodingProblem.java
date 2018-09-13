@@ -2,7 +2,6 @@ package com.yetanotherwhatever.ocpv2.lambdas;
 
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.ObjectListing;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
@@ -16,9 +15,7 @@ import java.util.concurrent.ThreadLocalRandom;
  */
 class S3CodingProblem implements ICodingProblem {
 
-    final AmazonS3 S3 =
-            AmazonS3ClientBuilder.defaultClient();
-            //new AmazonS3Client();   //aws sdks version 1.9.6
+    final AmazonS3 S3 = AmazonS3ClientBuilder.defaultClient();
 
     private static final String S3_WEB_BUCKET = System.getenv("S3_WEB_BUCKET");
     private static final String PROBLEMS_PREFIX = "problems/";
