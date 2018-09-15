@@ -5,6 +5,8 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.*;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.util.UUID;
@@ -14,6 +16,8 @@ import java.util.concurrent.ThreadLocalRandom;
  * Created by achang on 9/3/2018.
  */
 class S3CodingProblem implements ICodingProblem {
+
+    static final Logger logger = LogManager.getLogger(S3CodingProblem.class);
 
     final AmazonS3 S3 = AmazonS3ClientBuilder.defaultClient();
 
@@ -52,7 +56,9 @@ class S3CodingProblem implements ICodingProblem {
             String destKey = copyProblem();
 
             //build url
-            landingPageURL = "https://"+ S3_WEB_BUCKET + "/" + destKey;
+            landingPageURL = "http://"+ S3_WEB_BUCKET + "/" + destKey;
+
+            logger.info("Landing page URL: " + landingPageURL);
 
         } catch (AmazonServiceException e)
         {
@@ -67,6 +73,9 @@ class S3CodingProblem implements ICodingProblem {
         int objCount = object_listing.getObjectSummaries().size();
         int randIndex = pickOne(objCount);
         S3ObjectSummary summary = object_listing.getObjectSummaries().get(randIndex);
+
+        logger.info("Problem " + summary.getKey() + " selected.");
+
         return summary.getKey();
     }
 
@@ -85,6 +94,8 @@ class S3CodingProblem implements ICodingProblem {
         cor.setCannedAccessControlList(CannedAccessControlList.PublicRead);
 
         S3.copyObject(cor);
+
+        logger.info("Problem copied to key: " + destKey);
 
         return destKey;
     }

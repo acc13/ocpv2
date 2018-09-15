@@ -5,6 +5,8 @@ import com.amazonaws.AmazonServiceException;
 import com.amazonaws.services.simpleemail.AmazonSimpleEmailService;
 import com.amazonaws.services.simpleemail.AmazonSimpleEmailServiceClientBuilder;
 import com.amazonaws.services.simpleemail.model.*;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 
@@ -13,6 +15,8 @@ import java.io.IOException;
  * Created by achang on 9/3/2018.
  */
 class SESEmailHelper implements IEmailer {
+
+    static final Logger logger = LogManager.getLogger(SESEmailHelper.class);
 
     private static final AmazonSimpleEmailService client =
             AmazonSimpleEmailServiceClientBuilder.defaultClient();
@@ -35,6 +39,11 @@ class SESEmailHelper implements IEmailer {
                     .withMessage(message);
 
             client.sendEmail(request);
+
+            logger.info("Email sent to: " + email);
+            logger.info("Email subject: " + sub);
+            logger.info("Email body: " + text);
+
         } catch (AmazonServiceException e)
         {
             throw new IOException(e);

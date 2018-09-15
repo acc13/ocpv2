@@ -69,10 +69,9 @@ public class Inviter {
     static final String NL = System.getProperty("line.separator");
     private void emailCandidate(String destEmailAddress, String url) throws IOException
     {
-        String emailSubject = "";
-        String  emailBody = "Thank you for your interest in Symantec." + NL +
-                "Here is your unique link to the online coding problem: " +
-                url;
+        String emailSubject = "Welcome to the Symantec online coding problem";
+        String  emailBody = "Thank you for your interest in Symantec!" + NL +
+                "Here is your unique link to the online coding problem: " + url;
 
         emailer.sendEmail(destEmailAddress, emailSubject, emailBody);
     }

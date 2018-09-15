@@ -1,7 +1,7 @@
 #!/bin/bash
 
-PROJ_ROOT="${0%/*}"
-LAMBDAS=$PROJ_ROOT/../lambdas
+DEPLOY_FOLDER="${0%/*}"
+LAMBDAS=$DEPLOY_FOLDER/../lambdas
 BUCKET=deployocp
 INVITE_S3_KEY=lambas/InviteCandidate-1.0.zip
 

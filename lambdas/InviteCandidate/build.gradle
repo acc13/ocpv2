@@ -2,9 +2,14 @@ group 'com.yetanotherwhatever.ocpv2.lambdas'
 version '1.0'
 
         apply plugin: 'java'
+        apply plugin: 'jacoco'
 
         repositories {
             mavenCentral()
+        }
+
+        sourceSets {
+            tools
         }
 
         dependencies {
@@ -19,10 +24,17 @@ version '1.0'
 
             testCompile group: 'junit', name: 'junit', version: '4.12'
 
+            toolsCompile group: 'junit', name: 'junit', version: '4.12'
+
             testCompile (
                     'org.junit.jupiter:junit-jupiter-api:5.3.0',
                     'org.mockito:mockito-core:2.21.0'
             )
+        }
+
+        task testTools(type: Test, description: 'Runs the tools tests.', group: 'Verification') {
+            testClassesDir = sourceSets.tools.output.classesDir
+            classpath = sourceSets.tools.runtimeClasspath
         }
 
         task buildZip(type: Zip) {

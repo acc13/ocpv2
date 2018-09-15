@@ -1,4 +1,7 @@
 #!/bin/bash
+
+DEPLOY_FOLDER="${0%/*}"
+
 bucketname=test.yetanotherwhatever.io
 
 # idiomatic parameter and option handling in sh
@@ -19,7 +22,7 @@ then
 fi
 
 #copy web content first
-aws s3 sync ../web s3://$bucketname --content-type "text/html" --acl public-read 
+aws s3 sync $DEPLOY_FOLDER/../web s3://$bucketname --content-type "text/html" --acl public-read --exclude "*problems/outputs*"
 
 echo
 echo Deployment ended.
