@@ -1,8 +1,8 @@
-package com.yetanotherwhatever.ocpv2.lambdas;
+package com.yetanotherwhatever.ocpv2.aws;
 
 import org.junit.Test;
 
-import static com.yetanotherwhatever.ocpv2.lambdas.S3CodingProblem.pickOne;
+import static com.yetanotherwhatever.ocpv2.aws.S3CodingProblem.pickOne;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;

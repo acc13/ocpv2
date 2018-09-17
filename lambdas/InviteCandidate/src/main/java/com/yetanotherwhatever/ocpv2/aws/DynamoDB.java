@@ -1,13 +1,14 @@
-package com.yetanotherwhatever.ocpv2.lambdas;
+package com.yetanotherwhatever.ocpv2.aws;
 
 import java.io.IOException;
 
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.amazonaws.services.dynamodbv2.model.ResourceNotFoundException;
+import com.yetanotherwhatever.ocpv2.IOcpV2DB;
+import com.yetanotherwhatever.ocpv2.Invitation;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

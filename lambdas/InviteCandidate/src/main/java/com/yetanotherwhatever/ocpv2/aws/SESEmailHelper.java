@@ -1,10 +1,11 @@
-package com.yetanotherwhatever.ocpv2.lambdas;
+package com.yetanotherwhatever.ocpv2.aws;
 
 
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.services.simpleemail.AmazonSimpleEmailService;
 import com.amazonaws.services.simpleemail.AmazonSimpleEmailServiceClientBuilder;
 import com.amazonaws.services.simpleemail.model.*;
+import com.yetanotherwhatever.ocpv2.IEmailer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

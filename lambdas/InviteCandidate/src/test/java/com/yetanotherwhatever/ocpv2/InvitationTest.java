@@ -1,4 +1,4 @@
-package com.yetanotherwhatever.ocpv2.lambdas;
+package com.yetanotherwhatever.ocpv2;
 
 import org.junit.Test;
 

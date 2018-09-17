@@ -29,7 +29,7 @@ Resources:
     Type: 'AWS::S3::Bucket'
     DependsOn: 
       - LambdaOutputUploaded
-      - S3InvokeLambdaPermission
+      - S3InvokeLambdaOutputUploadedPermission
     Properties:
       BucketName: 
         !Join
@@ -46,15 +46,44 @@ Resources:
               S3Key:
                 Rules:
                   - Name: prefix
-                    Value: 'uploads/lambda/'
+                    Value: 'uploads/output/'
+          - Function: 
+              Fn::GetAtt: [LambdaCodeUploaded, Arn]
+            Event: s3:ObjectCreated:*
+            Filter:
+              S3Key:
+                Rules:
+                  - Name: prefix
+                    Value: 'uploads/code/'
 
-  S3InvokeLambdaPermission: 
+  S3InvokeLambdaOutputUploadedPermission: 
       Type: AWS::Lambda::Permission
       DependsOn:  LambdaOutputUploaded 
       Properties: 
         Action: lambda:InvokeFunction
         FunctionName: 
           Fn::GetAtt: [LambdaOutputUploaded, Arn]
+        Principal: s3.amazonaws.com
+        SourceAccount: 
+          Ref: AWS::AccountId
+        SourceArn: 
+          !Join
+            - ''
+            - - "arn:aws:s3:::"
+              -
+                !Join
+                  - '.'
+                  - - !Ref AWS::StackName
+                    - upload
+                    - yetanotherwhatever.io
+
+  S3InvokeLambdaCodeUploadedPermission: 
+      Type: AWS::Lambda::Permission
+      DependsOn:  LambdaCodeUploaded 
+      Properties: 
+        Action: lambda:InvokeFunction
+        FunctionName: 
+          Fn::GetAtt: [LambdaCodeUploaded, Arn]
         Principal: s3.amazonaws.com
         SourceAccount: 
           Ref: AWS::AccountId
@@ -166,6 +195,25 @@ Resources:
               - '.'
               - - !Ref AWS::StackName
                 - Output_Uploads
+
+  LambdaCodeUploaded:
+    Type: "AWS::Lambda::Function"
+    Properties: 
+      FunctionName: 
+        !Join
+          - '_'
+          - - !Ref AWS::StackName
+            - NotifyCodeUploaded
+      Description: notify hiring manager of solution upload, with link to .zip
+      Code: 
+        S3Bucket: deployocp
+        S3Key: lambas/InviteCandidate-1.0.zip
+      Handler: com.yetanotherwhatever.ocpv2.lambdas.CodeUploadedHandler::handleRequest
+      MemorySize: 256
+      #TODO create lambda role using CF
+      Role: arn:aws:iam::229763884986:role/notifyCodeUploadRole
+      Runtime: java8
+      Timeout: 30
 
   #########################################
   #       API Gateway 

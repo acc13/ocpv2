@@ -1,5 +1,6 @@
-package com.yetanotherwhatever.ocpv2.lambdas;
+package com.yetanotherwhatever.ocpv2;
 
+import com.yetanotherwhatever.ocpv2.aws.*;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;

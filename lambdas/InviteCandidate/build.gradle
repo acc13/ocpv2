@@ -1,4 +1,4 @@
-group 'com.yetanotherwhatever.ocpv2.lambdas'
+group 'com.yetanotherwhatever.ocpv2.aws'
 version '1.0'
 
         apply plugin: 'java'

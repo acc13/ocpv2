@@ -1,8 +1,8 @@
-package com.yetanotherwhatever.ocpv2.lambdas;
+package com.yetanotherwhatever.ocpv2;
 
 import java.io.IOException;
 
-interface IEmailer {
+public interface IEmailer {
 
     void sendEmail(String destEmailAddress, String subject, String bodyText) throws IOException;
 }

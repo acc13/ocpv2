@@ -1,4 +1,4 @@
-package com.yetanotherwhatever.ocpv2.lambdas;
+package com.yetanotherwhatever.ocpv2;
 
 import java.io.IOException;
 
@@ -21,19 +21,19 @@ public class Inviter {
 
     public Inviter(){}
 
-    protected Inviter setDB(IOcpV2DB db)
+    public Inviter setDB(IOcpV2DB db)
     {
         this.db = db;
         return this;
     }
 
-    protected Inviter setEmailer(IEmailer emailer)
+    public Inviter setEmailer(IEmailer emailer)
     {
         this.emailer = emailer;
         return this;
     }
 
-    protected Inviter setCodingProblem(ICodingProblem codingProblem)
+    public Inviter setCodingProblem(ICodingProblem codingProblem)
     {
         this.codingProblem = codingProblem;
         return this;

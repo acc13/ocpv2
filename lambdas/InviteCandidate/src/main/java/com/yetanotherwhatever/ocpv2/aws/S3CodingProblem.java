@@ -1,10 +1,10 @@
-package com.yetanotherwhatever.ocpv2.lambdas;
+package com.yetanotherwhatever.ocpv2.aws;
 
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.*;
+import com.yetanotherwhatever.ocpv2.ICodingProblem;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -15,7 +15,7 @@ import java.util.concurrent.ThreadLocalRandom;
 /**
  * Created by achang on 9/3/2018.
  */
-class S3CodingProblem implements ICodingProblem {
+public class S3CodingProblem implements ICodingProblem {
 
     static final Logger logger = LogManager.getLogger(S3CodingProblem.class);
 
