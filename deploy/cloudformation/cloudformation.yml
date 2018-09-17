@@ -56,6 +56,12 @@ Resources:
                   - Name: prefix
                     Value: 'uploads/code/'
 
+
+
+  #######################################
+  #       Permissions
+  #######################################
+
   S3InvokeLambdaOutputUploadedPermission: 
       Type: AWS::Lambda::Permission
       DependsOn:  LambdaOutputUploaded 
@@ -98,6 +104,14 @@ Resources:
                     - upload
                     - yetanotherwhatever.io
 
+  RedirectPermissions:
+    Type: 'AWS::Lambda::Permission'
+    Properties:
+      FunctionName: !Ref LambdaInviteUser
+      Action: 'lambda:InvokeFunction'
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${OCPv2API}/*
+
 
   #######################################
   #       DynamoDB 
@@ -132,6 +146,12 @@ Resources:
         ReadCapacityUnits: 5
         WriteCapacityUnits: 5
 
+  #TODO
+  #create output upload table
+            #!Join
+              #- '.'
+              #- - !Ref AWS::StackName
+                #- Output_Uploads
 
 
 
@@ -141,7 +161,6 @@ Resources:
   LambdaInviteUser:
     Type: "AWS::Lambda::Function"
     Properties: 
-      #TODO test stack name disambiguation
       FunctionName: 
         !Join
           - '_'
@@ -151,7 +170,7 @@ Resources:
       Code: 
         S3Bucket: deployocp
         S3Key: lambas/InviteCandidate-1.0.zip
-      Handler: com.yetanotherwhatever.ocpv2.lambdas.InviteCandidateHandler::handleRequest
+      Handler: com.yetanotherwhatever.ocpv2.aws.InviteCandidateHandler::handleRequest
       MemorySize: 256
       #TODO create lambda role using CF
       Role: arn:aws:iam::229763884986:role/CodingProblemRegistration
@@ -182,7 +201,7 @@ Resources:
       Code: 
         S3Bucket: deployocp
         S3Key: lambas/InviteCandidate-1.0.zip
-      Handler: com.yetanotherwhatever.ocpv2.lambdas.OutputUploadedHandler::handleRequest
+      Handler: com.yetanotherwhatever.ocpv2.aws.OutputUploadedHandler::handleRequest
       MemorySize: 256
       #TODO create lambda role using CF
       Role: arn:aws:iam::229763884986:role/testOutputUploadRole
@@ -208,7 +227,7 @@ Resources:
       Code: 
         S3Bucket: deployocp
         S3Key: lambas/InviteCandidate-1.0.zip
-      Handler: com.yetanotherwhatever.ocpv2.lambdas.CodeUploadedHandler::handleRequest
+      Handler: com.yetanotherwhatever.ocpv2.aws.CodeUploadedHandler::handleRequest
       MemorySize: 256
       #TODO create lambda role using CF
       Role: arn:aws:iam::229763884986:role/notifyCodeUploadRole
@@ -222,7 +241,11 @@ Resources:
   OCPv2API:
     Type: "AWS::ApiGateway::RestApi"
     Properties:
-      Name: "OCPv2"
+      Name: 
+        !Join
+          - '_'
+          - - !Ref AWS::StackName
+            - OCPv2
       FailOnWarnings: "true"
 
   InvitationResource:
@@ -302,14 +325,6 @@ Resources:
             method.response.header.Access-Control-Allow-Origin: true
           StatusCode: '200'
 
-  RedirectPermissions:
-    Type: 'AWS::Lambda::Permission'
-    Properties:
-      FunctionName: !Ref LambdaInviteUser
-      Action: 'lambda:InvokeFunction'
-      Principal: apigateway.amazonaws.com
-      SourceArn: !Sub arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${OCPv2API}/*
-
   # API gateway stage and deployment configuration. We use a new logical ID for the deployment each time we update the
   # CF template; this is because the deployment captures the current state of the resource and method tree at the time
   # it is created, so to reflect any changes it needs to be recreated and the new deployment bound to the stage.
@@ -318,7 +333,7 @@ Resources:
     Properties:
       RestApiId: !Ref OCPv2API
       DeploymentId: !Ref OCPv2APIDeploymentStage
-      StageName: test
+      StageName: !Ref AWS::StackName
       MethodSettings:
           - ResourcePath: /*
             HttpMethod: '*'
