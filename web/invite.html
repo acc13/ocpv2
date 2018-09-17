@@ -51,7 +51,7 @@ $(document).ready(function(){
 	  }
 
 	  $('#invite-form').hide();
-	  $('#results').html("Submitting...")
+	  $('#results').html("Generating problem and emailing candidate...")
 
 	  var data = {
 	    candidateFirstName: $('#first-name').val(),
@@ -72,6 +72,8 @@ $(document).ready(function(){
 	    },
 		error: function(XMLHttpRequest, textStatus, errorThrown) {
 	      	$('#results').html('<span class="fail">Invite failed. Please refresh the page and try again; or notify <a href="mail://andrew_chang@symantec.com">andrew_chang@symantec.com</a></span>');
+
+	  		$('#invite-form').show();
 		}
 	  })
 

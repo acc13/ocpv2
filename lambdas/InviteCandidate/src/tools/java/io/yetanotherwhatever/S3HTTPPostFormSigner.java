@@ -3,8 +3,10 @@ package io.yetanotherwhatever;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.Base64;
 import java.util.Calendar;
+import java.util.Date;
 
 
 
@@ -24,9 +26,8 @@ http://docs.aws.amazon.com/AmazonS3/latest/API/sigv4-UsingHTTPPOST.html
 
 public class S3HTTPPostFormSigner {
 
-
     String m_expiration;
-    String m_bucket;
+    String m_bucket, m_prodBucket, m_testBucket;
     String m_dateStamp;
     String m_region;
     String m_serviceName;
@@ -36,12 +37,21 @@ public class S3HTTPPostFormSigner {
 
 
 
-    S3HTTPPostFormSigner(String accessKeyID, String aws_secret_key, String bucket)
+
+    /*
+    Generates two signed forms, for the online coding problem
+    One to submit test output
+    One to submit the final coded solution in a .zip file
+     */
+    S3HTTPPostFormSigner(String accessKeyID, String aws_secret_key, String hostedZone)
     {
+        initBucketNames(hostedZone);
+
+        m_bucket= S3_UPLOAD_PROD;
+
         m_accessKeyID = accessKeyID;
         m_aws_secret_key = aws_secret_key;
-        m_expiration = oneYearFromToday();
-        m_bucket = bucket;
+        m_expiration = yearsFromToday(2);
 
         //WARNING: AWS oddity:
         //expiration will be calculate by S3 as max 7 days from x-amz-date
@@ -55,21 +65,36 @@ public class S3HTTPPostFormSigner {
         m_algorithm = "AWS4-HMAC-SHA256";
     }
 
-    private static String oneYearFromToday()
-    {
-        Calendar cal = Calendar.getInstance();
-        return oneYearFrom(cal);
+    String S3_WEB_PROD = null;
+    String S3_UPLOAD_PROD= null;
+    String S3_WEB_TEST= null;
+    String S3_UPLOAD_TEST= null;
+
+    private void initBucketNames(String hostedZone) {
+
+        final String PROD_ENV_PREFIX = "ocp.";
+        final String TEST_ENV_PREFIX = "test.";
+        final String S3_WEB = hostedZone;
+        final String S3_UPLOAD = "upload." + hostedZone;
+
+        S3_WEB_PROD= PROD_ENV_PREFIX + S3_WEB;
+        S3_UPLOAD_PROD= PROD_ENV_PREFIX + S3_UPLOAD;
+        S3_WEB_TEST= TEST_ENV_PREFIX + S3_WEB;
+        S3_UPLOAD_TEST= TEST_ENV_PREFIX + S3_UPLOAD;
     }
 
-    protected static String oneYearFrom(Calendar cal)
+    protected static String yearsFromToday(int i)
     {
-        cal.add(Calendar.YEAR, 1); // to get previous year add 1
+        Calendar cal = Calendar.getInstance();
+        return yearsFromToday(cal, i);
+    }
 
-        int year = cal.get(Calendar.YEAR);
-        int month = cal.get(Calendar.MONTH);
-        int day = cal.get(Calendar.DAY_OF_MONTH);
-
-        return String.join("-", Integer.toString(year), Integer.toString(month),Integer.toString(day));
+    protected static String yearsFromToday(Calendar cal, int i)
+    {
+        cal.add(Calendar.YEAR, i); // to get previous year add 1
+        Date d = cal.getTime();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        return sdf.format(d);
     }
 
     static byte[] HmacSHA256(String data, byte[] key) throws Exception  {
@@ -96,7 +121,7 @@ public class S3HTTPPostFormSigner {
         return kSigning;
     }
 
-    private static String b64Encode(String in)
+    static String b64Encode(String in)
     {
         String b64 = "";
 
@@ -162,24 +187,21 @@ public class S3HTTPPostFormSigner {
                 "  ]\n" +
                 "}";
 
-        return policyDoc;
+        return b64Encode(policyDoc);
     }
 
     private void buildForm(String folder, String additionalFields,
                            String redirectPage, String validation, String formId)
     {
         String policyDoc = buildPolicyDoc(m_expiration, m_bucket, folder, m_algorithm, m_accessKeyID, m_dateStamp, m_region, m_serviceName, redirectPage);
-        String b64PolicyDoc = b64Encode(policyDoc);
-        String signedPolicy = signPolicy(b64PolicyDoc, m_aws_secret_key, m_dateStamp, m_region, m_serviceName);
+        String signedPolicy = signPolicy(policyDoc, m_aws_secret_key, m_dateStamp, m_region, m_serviceName);
 
-
-
-        String form = "<form id=\"" + formId + "\" action=\"http://public.yetanotherwhatever.io.s3.amazonaws.com/\" method=\"post\"" +
+        String form = "<form id=\"" + formId + "\" action=\"http://" + m_bucket + ".s3.amazonaws.com/\" method=\"post\"" +
                 " enctype=\"multipart/form-data\" onsubmit=\"return(" + validation + ");\">\n" +
                 "\t      <input type=\"hidden\" name=\"key\" value=\"" + folder + "/${filename}\">\n" +
                 "\t      <input type=\"hidden\" name=\"acl\" value=\"private\"> \n" +
                 "\t      <input type=\"hidden\" name=\"success_action_redirect\" value=\"http://yetanotherwhatever.io/" + redirectPage + "\">\n" +
-                "\t      <input type=\"hidden\" name=\"policy\" value='" + b64PolicyDoc + "'>\n" +
+                "\t      <input type=\"hidden\" name=\"policy\" value='" + policyDoc + "'>\n" +
                 "\t       <input type=\"hidden\" name=\"x-amz-algorithm\" value=\"" + m_algorithm + "\">\n" +
                 "\t       <input type=\"hidden\" name=\"x-amz-credential\" value=\"" + m_accessKeyID + "/" + m_dateStamp + "/us-east-1/s3/aws4_request\">\n" +
                 "\t       <input type=\"hidden\" name=\"x-amz-date\" value=\"" + m_dateStamp + "T000000Z\">\n" +
@@ -191,57 +213,69 @@ public class S3HTTPPostFormSigner {
                 "    </form>";
 
         System.out.println();
-        System.out.println(formId + " upload form: ");
+        System.out.println("<!-- Replace form : " + formId  + "  -->");
         System.out.println(form);
         System.out.println();
         System.out.println();
     }
 
-    public static void main(String[] args) {
 
-        String awsAccessKeyID = null, awsSecretAccessKey = null, s3bucket = null;
-
-        try {
-            awsAccessKeyID = args[0];
-            awsSecretAccessKey = args[1];
-            s3bucket = args[2];
-        }
-        catch (ArrayIndexOutOfBoundsException e)
-        {
-            System.out.println("Usage: " + System.getProperty("sun.java.command") + " program access_key_id secret_access_key s3_bucket");
-            System.exit(1);
-        }
-
-
-
-        S3HTTPPostFormSigner signer = new S3HTTPPostFormSigner(awsAccessKeyID, awsSecretAccessKey, s3bucket);
-
-
+    void buildTestOutputForm()
+    {
         //policy for uploading user's test output
-        String outputFolder = "uploads/output";
-        String outputRedirectPage = "submitting.html";
-        String outputFormId = "outputForm";
-        String outputAdditionalFields = "\n" +
+        String htmlFormID = "outputForm";
+        String s3KeyPrefix = "uploads/output";
+        String successRedirectPage = "submitting.html";
+        String additionalFormFields = "\n" +
                 "      <div class=\"formlabel\">File to upload: <input id=\"outputFile\" name=\"file\" type=\"file\"> </div>\n" +
                 "      \n" +
                 "      <br>\n";
-        String outputFormValidation= "genSlnKey()";
-        signer.buildForm(outputFolder, outputAdditionalFields, outputRedirectPage, outputFormValidation, outputFormId);
+        String validationFunction = "genSlnKey()";
 
+        buildForm(s3KeyPrefix, additionalFormFields, successRedirectPage, validationFunction, htmlFormID);
+    }
 
+    void buildUploadSolutionForm()
+    {
 
         //policy for uploading user code (.zip)
-        String codeRedirectPage = "thanks.html";
-        String codeFolder = "uploads/code";
-        String codeAdditionalFields = "\n" +
+        String successRedirectPage = "thanks.html";
+        String s3KeyPrefix = "uploads/code";
+        String additionalFormFields = "\n" +
                 "\t      <div class=\"formlabel\">File to upload: <input id=\"codeFile\" name=\"file\" type=\"file\"> </div>\n" +
                 "\t      <br> \n" +
                 "\t      <div class=\"formlabel\">Your email address (preferably the same one as on your resume):</div>\n" +
                 "\t      <br>\n" +
                 "\t      <input id=\"email\" name=\"email\" type=\"text\">\n" +
                 "\t      <br><br>\n";
-        String codeFormValidation= "genCodeKey()";
-        String codeFormId = "codeForm";
-        signer.buildForm(codeFolder, codeAdditionalFields, codeRedirectPage, codeFormValidation, codeFormId);
+        String validationFunction= "genCodeKey()";
+        String htmlFormID = "codeForm";
+
+        buildForm(s3KeyPrefix, additionalFormFields, successRedirectPage, validationFunction, htmlFormID);
+    }
+
+    public static void main(String[] args) {
+
+        String awsAccessKeyID = null, awsSecretAccessKey = null, hostedZone = null;
+
+        try {
+            awsAccessKeyID = args[0];
+            awsSecretAccessKey = args[1];
+            hostedZone = args[2];
+        }
+        catch (ArrayIndexOutOfBoundsException e)
+        {
+            System.out.println("Usage: " + System.getProperty("sun.java.command") +
+                    " access_key_id secret_access_key hosted_zone");
+            System.exit(1);
+        }
+
+
+        S3HTTPPostFormSigner signer = new S3HTTPPostFormSigner(awsAccessKeyID, awsSecretAccessKey, hostedZone);
+
+        signer.buildTestOutputForm();
+
+        signer.buildUploadSolutionForm();
+
     }
 }

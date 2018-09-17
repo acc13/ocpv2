@@ -20,6 +20,8 @@ public class OutputUploadedHandler {
         try {
             OutputChecker.checkOutput();
 
+            logger.debug("Output check complete.");
+
             return "SUCCESS";
         }
         catch(IOException | IllegalArgumentException e)
