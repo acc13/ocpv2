@@ -22,7 +22,7 @@ then
 fi
 
 #copy web content first
-aws s3 sync $DEPLOY_FOLDER/../web s3://$bucketname --content-type "text/html" --acl public-read --exclude "*problems/outputs*"
+aws s3 sync $DEPLOY_FOLDER/../web s3://$bucketname --content-type "text/html" --acl public-read --exclude "*problems/outputs*" --exclude "*/combos.html"
 
 echo
 echo Deployment ended.
