@@ -58,13 +58,13 @@ Resources:
       SourceArn: 
         !Join
           - ''
-          - arn:aws:s3:::mybucketname
-          -
-            !Join
-              - '.'
-              - - !Ref AWS::StackName
-                - upload
-                - yetanotherwhatever.io
+          - - arn:aws:s3:::mybucketname
+            -
+              !Join
+                - '.'
+                - - !Ref AWS::StackName
+                  - upload
+                  - yetanotherwhatever.io
 
 
   #######################################
