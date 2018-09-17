@@ -125,22 +125,21 @@ $(document).ready(function(){
 
 
 //Submit test output form metadata
-function setCodeMeta(formName, email)
+function setCodeMeta(formName, problemName, email)
 {
   var myObj = {"email" : email,
-    "topic" : getTopic(),
-    "lls" : getLLS()
+    "inviteId" : getFilenameNoExtension(),
+    "problemName" : getProblemName()
   };
 
   setMeta(formName, myObj);
 }
 
-function setOutputMeta(formName, uuid)
+function setOutputMeta(formName, inviteId)
 {
-  var myObj = {"uuid" : uuid,
-    "lls" : getLLS(),
-    "problemname" : getProblemName(),
-    "home" : cleanLocation()
+  var myObj = {
+    "inviteId" : inviteId,
+    "problemName" : getProblemName()
   };
 
   setMeta(formName, myObj);
@@ -151,7 +150,7 @@ function setMeta(formName, myObj)
   debug(JSON.stringify(myObj));
 
   var form = document.getElementById(formName);
-  var meta = form.querySelectorAll("[name=x-amz-meta-id]");
+  var meta = form.querySelectorAll("[name=x-amz-meta-data]");
   var metaInput = meta[0];
   metaInput.value=JSON.stringify(myObj);
 }
@@ -177,26 +176,39 @@ function isDynamicPage()
 
 //Key Generation
 /* key for solution submission */
-function genSlnKey()
+function genOutputKey()
 {
+  //validate
   if(!document.getElementById("outputFile").value)
   {
         alert("No file selected.");
         return false;
-    }
+  }
 
-  var uuid = Math.uuid();
+  //build key
+  var keyVal = "uploads/output/" + getFilenameNoExtension() + "/" + Math.uuid() + ".txt";
+
+  debug("keyval" + keyVal);
 
   var formName = "outputForm";
   var form = document.getElementById(formName);
   var keys = form.querySelectorAll("[name=key]");
   var keyInput = keys[0];
-
-  keyInput.value = "uploads/output/" + getProblemName() + "/" + getLLS() + "/" + uuid + ".txt";
+  keyInput.value = keyVal;
 
   debug(keyInput.value);
 
-  setOutputMeta(formName, uuid);
+  setOutputMeta(formName, getFilenameNoExtension());
+}
+
+
+//given "http://foo.bar/index.html"
+//returns "index"
+function getFilenameNoExtension()
+{
+  var path = window.location.pathname;
+  var filename = path.split("/").pop();
+  return filename.split('.').slice(0, -1).join('.');
 }
 
 
@@ -204,6 +216,7 @@ function genSlnKey()
 function genCodeKey()
 {
 
+  //Validation
   var email = getAndValidateEmail();
   if (!email)
   {
@@ -228,30 +241,24 @@ function genCodeKey()
     return false;
   }
 
+  //build key
+  var keyVal = "uploads/code/" + getFilenameNoExtension() + "/" + Math.uuid() + ".zip";
 
-  var uuid = Math.uuid();
+  debug("keyval" + keyVal);
 
   var formName = "codeForm";
   var form = document.getElementById(formName);
   var keys = form.querySelectorAll("[name=key]");
   var keyInput = keys[0];
+  keyInput.value = keyVal;
 
-  var problemName = getProblemName();
+  debug("keyInput.value" + keyInput.value);
 
-  var topic = getTopic();
-
-  keyInput.value = "uploads/code/" + problemName + "/" + getLLS() + "/" + email + "/" + topic + "/" + uuid + ".zip";
-
-  debug(keyInput.value);
-
-  setCodeMeta(formName, email);
+  setCodeMeta(formName, getProblemName(), email);
 
   return true;
 
 }
-
-
-
 
 function getAndValidateEmail()
 {
@@ -278,82 +285,12 @@ function getAndValidateEmail()
   return email;
 }
 
-
-
-
-//Cookie management and page property methods
-function setCookie(name,value) {
-    var date = new Date();
-    date.setFullYear(date.getFullYear() + 1);
-    var expires = ";expires="+date.toGMTString();
-    document.cookie = name+"="+value+expires+";path=/";
-}
-
-function getCookie(name) {
-    var nameEQ = name + "=";
-    var ca = document.cookie.split(";");
-    var c;
-    for (i=0;i < ca.length;i+=1) {
-        c = ca[i];
-        while (c.charAt(0)==" ") 
-        {
-          c = c.substring(1,c.length);
-        }
-        if (c.indexOf(nameEQ) == 0)
-        {
-          return c.substring(nameEQ.length,c.length);
-        }
-    }
-    return null;
-}
-
-function setLLS()
-{
-  var LLS = getLLS();
-
-  if (!LLS)
-  {
-    var uuid = Math.uuid();
-    setCookie("LLS", uuid);
-  }
-
-}
-
-setLLS();
-
-
-function getLLS()
-{
-    return getCookie("LLS");
-}
-
-function cleanLocation()
+//given "http://foo.com/bar.html?baz=1"
+//returns "http://foo.com/bar.html"
+function getURLNoParams()
 {
   var location = document.location.protocol + "//" + window.location.hostname + window.location.pathname;
   return location;
-}
-
-function getHome()
-{
-  return getCookie("home");
-}
-
-function getParameterByName(name, url) {
-    if (!url) {
-      url = window.location.href;
-    }
-    name = name.replace(/[\[\]]/g, "\\$&");
-    var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)");
-    var results = regex.exec(url);
-    if (!results)
-      {
-        return null;
-      }
-    if (!results[2])
-    {
-      return "";
-    }
-    return decodeURIComponent(results[2].replace(/\+/g, " "));
 }
 
 function getProblemName()
@@ -361,31 +298,6 @@ function getProblemName()
   //this var is set by the base page
   return problemName;
 }
-
-function setTopic()
-{
-  var topic = getParameterByName("topic");
-
-  if (topic)
-  {
-    setCookie("topic", topic);
-  }
-}
-
-setTopic();
-
-
-function getTopic()
-{
-  var topic = getCookie("topic");
-  if(!topic)
-  {
-    topic = "none";
-  }
-
-  return topic;
-}
-
 
 
 
