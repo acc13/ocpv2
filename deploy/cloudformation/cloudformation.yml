@@ -25,10 +25,12 @@ Resources:
         ErrorDocument: error.html
         IndexDocument: index.html
 
-  S3Upload:
+  S3UploadBucket:
     Type: 'AWS::S3::Bucket'
-    Properties: 
-      AccessControl: Private
+    DependsOn: 
+      - LambdaOutputUploaded
+      - S3InvokeLambdaPermission
+    Properties:
       BucketName: 
         !Join
           - '.'
@@ -36,35 +38,36 @@ Resources:
             - upload
             - yetanotherwhatever.io
       NotificationConfiguration:
-        LambdaConfigurations:
-          - Function: !GetAtt LambdaOutputUploaded.Arn
-            Event: "s3:ObjectCreated:*"
+        LambdaConfigurations:             
+          - Function: 
+              Fn::GetAtt: [LambdaOutputUploaded, Arn]
+            Event: s3:ObjectCreated:*
             Filter:
               S3Key:
                 Rules:
-                  -
-                    Name: prefix
-                    Value: uploads/output
-      #TODO inline policy for s3 upload user
-    DependsOn : [LambdaOutputUploaded, S3InvokeLambdaPermission]
+                  - Name: prefix
+                    Value: 'uploads/lambda/'
 
-
-  S3InvokeLambdaPermission:
-    Type: 'AWS::Lambda::Permission'
-    Properties:
-      FunctionName: !Ref LambdaOutputUploaded
-      Action: 'lambda:InvokeFunction'
-      Principal: s3.amazonaws.com
-      SourceArn: 
-        !Join
-          - ''
-          - - arn:aws:s3:::mybucketname
-            -
-              !Join
-                - '.'
-                - - !Ref AWS::StackName
-                  - upload
-                  - yetanotherwhatever.io
+  S3InvokeLambdaPermission: 
+      Type: AWS::Lambda::Permission
+      DependsOn:  LambdaOutputUploaded 
+      Properties: 
+        Action: lambda:InvokeFunction
+        FunctionName: 
+          Fn::GetAtt: [LambdaOutputUploaded, Arn]
+        Principal: s3.amazonaws.com
+        SourceAccount: 
+          Ref: AWS::AccountId
+        SourceArn: 
+          !Join
+            - ''
+            - - "arn:aws:s3:::"
+              -
+                !Join
+                  - '.'
+                  - - !Ref AWS::StackName
+                    - upload
+                    - yetanotherwhatever.io
 
 
   #######################################
@@ -163,12 +166,6 @@ Resources:
               - '.'
               - - !Ref AWS::StackName
                 - Output_Uploads
-
-
-
-
-
-
 
   #########################################
   #       API Gateway 
