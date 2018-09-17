@@ -116,7 +116,8 @@ Resources:
   #######################################
   #       DynamoDB 
   #######################################
-  DDBTable:
+
+  InviteTable:
     Type: AWS::DynamoDB::Table
     Properties:
       AttributeDefinitions:
@@ -132,6 +133,9 @@ Resources:
           - '.'
           - - !Ref AWS::StackName
             - Candidate_Invitations
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
       GlobalSecondaryIndexes:
         - IndexName: "Manager_Invites"
           KeySchema:
@@ -142,17 +146,28 @@ Resources:
           ProvisionedThroughput:
             ReadCapacityUnits: 5
             WriteCapacityUnits: 5
+  
+  OutputUploadedTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: "ProblemPageGuid"
+          AttributeType: "S"
+        - AttributeName: "UploadDate"
+          AttributeType: "S"
+      KeySchema:
+        - AttributeName: "ProblemPageGuid"
+          KeyType: "HASH"
+        - AttributeName: "UploadDate"
+          KeyType: "RANGE"
+      TableName: 
+        !Join
+          - '.'
+          - - !Ref AWS::StackName
+            - Output_Uploads
       ProvisionedThroughput:
         ReadCapacityUnits: 5
         WriteCapacityUnits: 5
-
-  #TODO
-  #create output upload table
-            #!Join
-              #- '.'
-              #- - !Ref AWS::StackName
-                #- Output_Uploads
-
 
 
   #######################################
