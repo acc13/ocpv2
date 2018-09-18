@@ -22,7 +22,7 @@ public class InviteCandidateHandler {
 
         try {
             new Inviter()
-                    .setDB(new DynamoDB())
+                    .setDB(new DynamoOcpV2DB())
                     .setCodingProblem(new S3CodingProblem())
                     .setEmailer(new SESEmailHelper())
                     .sendInvitation(invitation);

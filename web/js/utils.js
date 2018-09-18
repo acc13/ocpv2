@@ -186,7 +186,7 @@ function genOutputKey()
   }
 
   //build key
-  var keyVal = "uploads/output/" + getFilenameNoExtension() + "/" + Math.uuid() + ".txt";
+  var keyVal = "uploads/output/" + getFilenameNoExtension() + "/" + getProblemName() + "/" + Math.uuid() + ".txt";
 
   debug("keyval" + keyVal);
 

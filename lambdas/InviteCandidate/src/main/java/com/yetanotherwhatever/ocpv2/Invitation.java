@@ -101,18 +101,6 @@ public class Invitation {
         return creationDate;
     }
 
-    //EST only
-    public String getCreationDateISO8601String()
-    {
-        final String defaultTZ = "EST";
-        TimeZone tz = TimeZone.getTimeZone(defaultTZ);
-        DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm'" + defaultTZ + "'");
-        df.setTimeZone(tz);
-        String nowAsISO = df.format(new Date());
-
-        return nowAsISO;
-    }
-
     public void validate() throws IllegalArgumentException
     {
         isValidName(getCandidateFirstName());

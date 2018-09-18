@@ -1,63 +1,107 @@
 package com.yetanotherwhatever.ocpv2;
 
+import com.yetanotherwhatever.ocpv2.aws.OutputResults;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Date;
 
 /**
  * Created by achang on 9/12/2018.
  */
 public class OutputChecker {
 
-    IOutputStore store;
+    static final Logger logger = LogManager.getLogger(OutputChecker.class);
+
+    IFileStore store;
     IOcpV2DB ocpv2DB;
 
     String lastErr = "";
 
-    OutputChecker()
+    public OutputChecker()
     {
 
     }
 
-    OutputChecker setOutputStore(IOutputStore store)
+    public OutputChecker setOutputStore(IFileStore store)
     {
         this.store = store;
         return this;
     }
 
-    OutputChecker setDB(IOcpV2DB db)
+    public OutputChecker setDB(IOcpV2DB db)
     {
         this.ocpv2DB = db;
         return this;
     }
 
-    public void checkOutput() throws IOException
+    public void checkOutput(String invitationId, String uploadId, String testFileName, String expectedFileName) throws IOException
     {
         //retrieve and compare test vs. expected output
-        InputStream test = store.getTestOutput();
-        InputStream expected = store.getExpectedOutput();
+        InputStream test = store.readFile(testFileName);
+        InputStream expected = store.readFile(expectedFileName);
 
         boolean success = doStreamsMatch(test, expected);
 
-        //build results page
 
-        //save success
+        //save results
+        OutputResults or = new OutputResults();
+        or.setInvitationId(invitationId);
+        or.setUploadDate(new Date());
+        or.setResults(success? "Success!" : lastErr);
+        or.setUploadID(uploadId);
+        ocpv2DB.write(or);
+
+        ocpv2DB.updateInvitation(invitationId, or.getUploadDate(), success);
 
     }
 
     //returns
-    static boolean doStreamsMatch(InputStream testOutput, InputStream expectedOutput) throws IOException
+    boolean doStreamsMatch(InputStream testOutput, InputStream expectedOutput) throws IOException
     {
         BufferedReader testBR = new BufferedReader(new InputStreamReader(testOutput));
         BufferedReader excpectedBR = new BufferedReader(new InputStreamReader(expectedOutput));
 
-        String line;
-        while((line = testBR.readLine()) != null) {
-            System.out.println(line);
+        String test;
+        String expected;
+        int line = 1;
+        while((expected = excpectedBR.readLine()) != null) {
+
+            test = testBR.readLine();
+
+            if(null == test)
+            {
+                //output too short
+                lastErr = "Output file too short.";
+                return false;
+            }
+
+            test = test.trim();
+            expected = expected.trim();
+
+            if (!test.equals(expected))
+            {
+                lastErr = "Failure on line: " + line + "\n" +
+                        "Expected line \"" + expected +"\" but encountered line \"" + test + "\"";
+                //output doesn't match
+                return false;
+            }
+
+            line++;
         }
 
-        return false;
+        if (testBR.readLine() != null)
+        {
+            //output too long
+            lastErr = "Output file too long.";
+            return false;
+        }
+
+        return true;
     }
 
 
