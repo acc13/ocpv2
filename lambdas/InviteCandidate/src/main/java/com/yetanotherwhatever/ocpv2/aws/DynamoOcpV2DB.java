@@ -70,7 +70,7 @@ public class DynamoOcpV2DB implements IOcpV2DB {
         item_values.put(I_LAST, new AttributeValue(i.getCandidateLastName()));
         item_values.put(I_EMAIL, new AttributeValue(i.getCandidateEmail()));
         item_values.put(I_MGR_EMAIL, new AttributeValue(i.getManagerEmail()));
-        item_values.put(I_DATE, new AttributeValue(formatDateISO8601(i.getCreationDate())));
+        item_values.put(I_DATE, new AttributeValue(i.getCreationDate()));
 
         item_values.put(I_PROBLEM_GUID, new AttributeValue(i.getProblemGuid()));
         item_values.put(I_PROBLEM_KEY, new AttributeValue(i.getProblemKey()));
@@ -99,26 +99,8 @@ public class DynamoOcpV2DB implements IOcpV2DB {
         }
     }
 
-    //EST only
-    static public String formatDateISO8601(Date d)
-    {
-        String nowAsISO = getISO8061DateFormat().format(d);
-
-        return nowAsISO;
-    }
-
-    static public DateFormat getISO8061DateFormat()
-    {
-        String DEFAULT_TZ = "EST";
-        String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm'" + DEFAULT_TZ + "'";
-        TimeZone tz = TimeZone.getTimeZone(DEFAULT_TZ);
-        DateFormat df = new SimpleDateFormat(DATE_FORMAT);
-        df.setTimeZone(tz);
-
-        return df;
-    }
-
-    public void updateInvitation(String invitationId, Date d, boolean success) throws IOException
+    @Override
+    public void updateInvitation(String invitationId, String outputUploadDate, boolean success) throws IOException
     {
 
         try {
@@ -137,7 +119,7 @@ public class DynamoOcpV2DB implements IOcpV2DB {
             if (success)
             {
                 expressionAttributeNames.put("#S", I_SUCCEEDED);
-                expressionAttributeValues.put(":val2", formatDateISO8601(d));
+                expressionAttributeValues.put(":val2", outputUploadDate);
                 updateExpression = "set #A = #A + :val1, #S = :val2 "; // set last update time, increment attempts
             }
             //else just update attempts
@@ -173,7 +155,7 @@ public class DynamoOcpV2DB implements IOcpV2DB {
         item_values.put(O_UPLOAD_ID, new AttributeValue(or.getUploadID()));
         item_values.put(O_INVITATION_ID, new AttributeValue(or.getInvitationId()));
         item_values.put(O_RESULT, new AttributeValue(or.getResults()));
-        item_values.put(O_OUTPUT_UPLOAD_DATE, new AttributeValue(formatDateISO8601(or.getUploadDate())));
+        item_values.put(O_OUTPUT_UPLOAD_DATE, new AttributeValue(or.getUploadDate()));
 
 
         try {
@@ -195,7 +177,7 @@ public class DynamoOcpV2DB implements IOcpV2DB {
     }
 
     @Override
-    public Invitation read(String invitationId)
+    public Invitation read(String invitationId) throws IOException
     {
         DynamoDB dynamoDB = new DynamoDB(addb);
 
@@ -213,21 +195,22 @@ public class DynamoOcpV2DB implements IOcpV2DB {
             i.setCandidateLastName(outcome.getString(I_LAST));
             i.setCandidateEmail(outcome.getString(I_EMAIL));
             i.setManagerEmail(outcome.getString(I_MGR_EMAIL));
-            i.set(outcome.getString(I_DATE));
-
+            i.setCreationDate(outcome.getString(I_DATE));
             i.setProblemGuid(outcome.getString(I_PROBLEM_GUID));
             i.setProblemKey(outcome.getString(I_PROBLEM_KEY));
             i.setProblemLandingPageURL(outcome.getString(I_PROBLEM_LANDING_PAGE));
+            i.setSucceeded(outcome.getString(I_SUCCEEDED));
+            i.setAttempts(outcome.getInt(I_ATTEMPTS));
 
-            i.set(outcome.getString(I_SUCCEEDED));
-
-            i.set(outcome.getInt(I_ATTEMPTS));
+            return i;
 
         }
         catch (Exception e) {
             logger.error("Unable to read item: " + I_PROBLEM_GUID +
                     " from table: " + INVITE_TABLE_NAME);
             logger.error(e.getMessage());
+
+            throw new IOException(e);
         }
     }
 }

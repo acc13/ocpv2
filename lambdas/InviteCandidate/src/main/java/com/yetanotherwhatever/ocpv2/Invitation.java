@@ -32,15 +32,31 @@ public class Invitation {
 
     private String problemGuid;
     private String problemLandingPageURL;
-    private Date creationDate;
+    private String creationDate;
+
+    public String getSucceeded() {
+        return succeeded;
+    }
+
+    public void setSucceeded(String succeeded) {
+        this.succeeded = succeeded;
+    }
+
+    public int getAttempts() {
+        return attempts;
+    }
+
+    public void setAttempts(int attempts) {
+        this.attempts = attempts;
+    }
+
     private String succeeded = "never";
     private int attempts = 0;
 
 
     public Invitation ()
     {
-
-        creationDate = new Date();
+        creationDate = Utils.formatDateISO8601(new Date());
     }
 
     public String getCandidateFirstName() {
@@ -99,12 +115,18 @@ public class Invitation {
         this.problemLandingPageURL = problemLandingPageURL;
     }
 
-    public Date getCreationDate()
+    public String getCreationDate()
     {
+
         return creationDate;
     }
 
     public void setCreationDate(Date creationDate)
+    {
+        this.creationDate = Utils.formatDateISO8601(creationDate);
+    }
+
+    public void setCreationDate(String creationDate)
     {
         this.creationDate = creationDate;
     }

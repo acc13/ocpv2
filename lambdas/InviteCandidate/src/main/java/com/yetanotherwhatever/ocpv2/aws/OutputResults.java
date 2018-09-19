@@ -1,5 +1,7 @@
 package com.yetanotherwhatever.ocpv2.aws;
 
+import com.yetanotherwhatever.ocpv2.Utils;
+
 import java.util.Date;
 
 /**
@@ -7,7 +9,7 @@ import java.util.Date;
  */
 public class OutputResults {
 
-    Date uploadDate;
+    String uploadDate;
     String results;
     String invitationId;
     String uploadID;
@@ -17,35 +19,44 @@ public class OutputResults {
 
     }
 
-    public Date getUploadDate() {
+    public String getUploadDate()
+    {
         return uploadDate;
     }
 
-    public void setUploadDate(Date uploadDate) {
-        this.uploadDate = uploadDate;
+    public void setUploadDate(Date uploadDate)
+    {
+
+        this.uploadDate = Utils.formatDateISO8601(uploadDate);
     }
 
-    public String getResults() {
+    public String getResults()
+    {
         return results;
     }
 
-    public void setResults(String results) {
+    public void setResults(String results)
+    {
         this.results = results;
     }
 
-    public String getInvitationId() {
+    public String getInvitationId()
+    {
         return invitationId;
     }
 
-    public void setInvitationId(String invitationId) {
+    public void setInvitationId(String invitationId)
+    {
         this.invitationId = invitationId;
     }
 
-    public String getUploadID() {
+    public String getUploadID()
+    {
         return uploadID;
     }
 
-    public void setUploadID(String uploadID) {
+    public void setUploadID(String uploadID)
+    {
         this.uploadID = uploadID;
     }
 
