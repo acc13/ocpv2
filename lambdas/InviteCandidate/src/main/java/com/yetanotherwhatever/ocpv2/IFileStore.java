@@ -9,4 +9,6 @@ import java.io.InputStream;
 public interface IFileStore {
 
     public InputStream readFile(String key) throws IOException;
+
+    public String buildDownloadUrl(String fileName) throws IOException;
 }

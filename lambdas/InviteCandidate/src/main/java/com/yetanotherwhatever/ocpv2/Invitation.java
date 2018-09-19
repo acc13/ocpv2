@@ -33,6 +33,8 @@ public class Invitation {
     private String problemGuid;
     private String problemLandingPageURL;
     private Date creationDate;
+    private String succeeded = "never";
+    private int attempts = 0;
 
 
     public Invitation ()
@@ -97,8 +99,14 @@ public class Invitation {
         this.problemLandingPageURL = problemLandingPageURL;
     }
 
-    public Date getCreationDate() {
+    public Date getCreationDate()
+    {
         return creationDate;
+    }
+
+    public void setCreationDate(Date creationDate)
+    {
+        this.creationDate = creationDate;
     }
 
     public void validate() throws IllegalArgumentException

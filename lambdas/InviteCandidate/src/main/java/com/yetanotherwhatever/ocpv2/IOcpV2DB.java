@@ -14,5 +14,7 @@ public interface IOcpV2DB {
 
         public void updateInvitation(String invitationId, Date d, boolean success) throws IOException;
 
+        public Invitation read(String invitationId);
+
         public void write(OutputResults or) throws IOException;
 }

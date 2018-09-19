@@ -42,11 +42,15 @@ public class OutputUploadedHandler implements RequestHandler<S3Event,S3Event> {
             }
         }
 
-
         return s3Event;
     }
 
-    private void parseRecord(S3EventNotification.S3EventNotificationRecord record)
+    String getS3WebBucketName()
+    {
+        return System.getenv("S3_WEB_BUCKET");
+    }
+
+    boolean parseRecord(S3EventNotification.S3EventNotificationRecord record)
     {
         ///////////////////////////////
         //  EXTRACT TEST FILENAME
@@ -79,7 +83,7 @@ public class OutputUploadedHandler implements RequestHandler<S3Event,S3Event> {
 
         //correct output is stored in the S3Web bucket, under the problems/output folder
         //under key <problem-name>-out.txt
-        String s3webBucket = System.getenv("S3_WEB_BUCKET");
+        String s3webBucket = getS3WebBucketName();
         this.expectedFileName = s3webBucket + ":" + "expectedOutputs/" + problemName + "-out.txt";
 
         logger.debug("Correct output file: " + expectedFileName);
@@ -95,6 +99,8 @@ public class OutputUploadedHandler implements RequestHandler<S3Event,S3Event> {
         {
             uploadId = parts[4].substring(0, dot);    //strip extension
         }
+
+        return true;
 
     }
 }

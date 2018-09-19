@@ -17,13 +17,17 @@ public class S3FileStoreImpl implements IFileStore {
 
     static final Logger logger = LogManager.getLogger(S3FileStoreImpl.class);
 
-    static final AmazonS3 S3 = AmazonS3ClientBuilder.defaultClient();
+    static AmazonS3 S3;
 
     S3FileStoreImpl()
     {
     }
 
     public InputStream readFile(String fileName) throws IOException {
+
+        if (null == S3) {
+            S3 = AmazonS3ClientBuilder.defaultClient();
+        }
 
         String[] parts = fileName.split(":");
 
@@ -40,5 +44,29 @@ public class S3FileStoreImpl implements IFileStore {
         logger.debug("Object retrieved from S3: " + fileName);
 
         return s3object.getObjectContent();
+    }
+
+    @Override
+    public String buildDownloadUrl(String fileName) throws IOException
+    {
+        if (null == fileName)
+        {
+            throw new IllegalArgumentException("fileName cannot be null.");
+        }
+
+        String[] parts = fileName.split(":");
+        if (parts.length != 2)
+        {
+            throw new IllegalArgumentException("Invalid fileName encountered: " + fileName);
+        }
+
+        String bucket = parts[0];
+        String key = parts[1];
+
+        //Example:
+        //https://s3.amazonaws.com/test.upload.yetanotherwhatever.io/uploads/code/63ba691e-3a9d-4c26-a22f-735cd4b83328/135A04E5-F2A4-49C4-B298-D9E29BB7BBCC.zip
+
+        String url =  "https://s3.amazonaws.com/" + bucket + "/" + key;
+        return url;
     }
 }

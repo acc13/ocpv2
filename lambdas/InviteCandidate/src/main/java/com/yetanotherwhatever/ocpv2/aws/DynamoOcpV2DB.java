@@ -6,8 +6,10 @@ import com.amazonaws.AmazonServiceException;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
 import com.amazonaws.services.dynamodbv2.document.DynamoDB;
+import com.amazonaws.services.dynamodbv2.document.Item;
 import com.amazonaws.services.dynamodbv2.document.Table;
 import com.amazonaws.services.dynamodbv2.document.UpdateItemOutcome;
+import com.amazonaws.services.dynamodbv2.document.spec.GetItemSpec;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.amazonaws.services.dynamodbv2.model.ResourceNotFoundException;
 import com.yetanotherwhatever.ocpv2.IOcpV2DB;
@@ -100,13 +102,20 @@ public class DynamoOcpV2DB implements IOcpV2DB {
     //EST only
     static public String formatDateISO8601(Date d)
     {
-        final String defaultTZ = "EST";
-        TimeZone tz = TimeZone.getTimeZone(defaultTZ);
-        DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm'" + defaultTZ + "'");
-        df.setTimeZone(tz);
-        String nowAsISO = df.format(d);
+        String nowAsISO = getISO8061DateFormat().format(d);
 
         return nowAsISO;
+    }
+
+    static public DateFormat getISO8061DateFormat()
+    {
+        String DEFAULT_TZ = "EST";
+        String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm'" + DEFAULT_TZ + "'";
+        TimeZone tz = TimeZone.getTimeZone(DEFAULT_TZ);
+        DateFormat df = new SimpleDateFormat(DATE_FORMAT);
+        df.setTimeZone(tz);
+
+        return df;
     }
 
     public void updateInvitation(String invitationId, Date d, boolean success) throws IOException
@@ -182,6 +191,43 @@ public class DynamoOcpV2DB implements IOcpV2DB {
             throw new IOException(e);
         } catch (AmazonServiceException e) {
             throw new IOException(e);
+        }
+    }
+
+    @Override
+    public Invitation read(String invitationId)
+    {
+        DynamoDB dynamoDB = new DynamoDB(addb);
+
+        Table table = dynamoDB.getTable(INVITE_TABLE_NAME);
+
+        GetItemSpec spec = new GetItemSpec().withPrimaryKey(I_PROBLEM_GUID, invitationId);
+
+        try {
+            logger.info("Attempting to read the item...");
+            Item outcome = table.getItem(spec);
+            logger.info("GetItem succeeded: " + outcome);
+
+            Invitation i = new Invitation();
+            i.setCandidateFirstName(outcome.getString(I_FIRST));
+            i.setCandidateLastName(outcome.getString(I_LAST));
+            i.setCandidateEmail(outcome.getString(I_EMAIL));
+            i.setManagerEmail(outcome.getString(I_MGR_EMAIL));
+            i.set(outcome.getString(I_DATE));
+
+            i.setProblemGuid(outcome.getString(I_PROBLEM_GUID));
+            i.setProblemKey(outcome.getString(I_PROBLEM_KEY));
+            i.setProblemLandingPageURL(outcome.getString(I_PROBLEM_LANDING_PAGE));
+
+            i.set(outcome.getString(I_SUCCEEDED));
+
+            i.set(outcome.getInt(I_ATTEMPTS));
+
+        }
+        catch (Exception e) {
+            logger.error("Unable to read item: " + I_PROBLEM_GUID +
+                    " from table: " + INVITE_TABLE_NAME);
+            logger.error(e.getMessage());
         }
     }
 }
