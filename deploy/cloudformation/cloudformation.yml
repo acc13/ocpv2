@@ -325,10 +325,46 @@ Resources:
               - - !Ref AWS::StackName
                 - Candidate_Invitations
 
+  LambdaGetTestOutputResult:
+    Type: "AWS::Lambda::Function"
+    DependsOn : LambdaRole
+    Properties: 
+      FunctionName: 
+        !Join
+          - '_'
+          - - !Ref AWS::StackName
+            - GetTestOutputResult
+      Description: invite candidate, create dynamic, temporary coding exercise page.
+      Code: 
+        S3Bucket: deployocp
+        S3Key: lambas/InviteCandidate-1.0.zip
+      Handler: com.yetanotherwhatever.ocpv2.aws.InviteCandidateHandler::handleRequest
+      MemorySize: 256
+      Role: 
+        !Join
+          - '/'
+          - - !Sub arn:aws:iam::${AWS::AccountId}:role
+            - 
+              !Join
+                - '.'
+                - - ocpv2
+                  - !Ref AWS::StackName
+                  - lambda
+      Runtime: java8
+      Timeout: 30
+      Environment:
+        Variables:
+          DYNAMODB_OUTPUT_UPLOADS_TABLE:
+            !Join
+              - '.'
+              - - !Ref AWS::StackName
+                - Output_Uploads
+
+
   #########################################
   #       API Gateway 
   #########################################
-  
+
   OCPv2API:
     Type: "AWS::ApiGateway::RestApi"
     Properties:
@@ -339,6 +375,8 @@ Resources:
             - OCPv2
       FailOnWarnings: "true"
 
+
+  #################  INVITATION RESOURCE AND METHODS #################
   InvitationResource:
     Type: "AWS::ApiGateway::Resource"
     Properties:
@@ -353,6 +391,9 @@ Resources:
 
   InviteCandidateMethod:
     Type: "AWS::ApiGateway::Method"
+    DependsOn : 
+      - InvitationResource
+      - LambdaInviteUser
     Properties:
       HttpMethod: "POST"
       AuthorizationType: "NONE"
@@ -372,6 +413,8 @@ Resources:
               - !GetAtt [LambdaInviteUser, Arn]
               - "/invocations"
         IntegrationHttpMethod: "POST"
+        RequestParameters:
+                  "integration.request.header.X-Amz-Invocation-Type": "'Event'"
         IntegrationResponses: 
           - ResponseParameters:
               method.response.header.Access-Control-Allow-Origin: "'*'"
@@ -384,11 +427,11 @@ Resources:
             ResponseParameters:
               method.response.header.Access-Control-Allow-Origin: true
             StatusCode: 200 
-    DependsOn : InvitationResource
 
   #Enable CORS
   InviteCandidateCORSOptionsMethod:
     Type: "AWS::ApiGateway::Method"
+    DependsOn : InvitationResource
     Properties:
       ResourceId: !Ref InvitationResource
       RestApiId: !Ref OCPv2API
@@ -416,14 +459,100 @@ Resources:
             method.response.header.Access-Control-Allow-Origin: true
           StatusCode: '200'
 
-  # API gateway stage and deployment configuration. We use a new logical ID for the deployment each time we update the
-  # CF template; this is because the deployment captures the current state of the resource and method tree at the time
-  # it is created, so to reflect any changes it needs to be recreated and the new deployment bound to the stage.
+
+  #################  RESULTS RESOURCE AND METHODS #################
+  TestOutputResultResource:
+    Type: "AWS::ApiGateway::Resource"
+    DependsOn : OCPv2API
+    Properties:
+      ParentId:
+        Fn::GetAtt:
+          - "OCPv2API"
+          - "RootResourceId"
+      PathPart: "outputtestresult"
+      RestApiId:
+        Ref: OCPv2API
+
+  TestOutputResultMethod:
+    Type: "AWS::ApiGateway::Method"
+    DependsOn: 
+      - TestOutputResultResource
+      - LambdaGetTestOutputResult
+    Properties:
+      HttpMethod: "POST"
+      AuthorizationType: "NONE"
+      ResourceId:
+        Ref: TestOutputResultResource
+      RestApiId:
+        Ref: OCPv2API
+      Integration:
+        Type: "AWS"
+        Uri:
+          Fn::Join:
+            - ""
+            - - "arn:aws:apigateway:"
+              - !Ref "AWS::Region"
+              - ":lambda:path/"
+              - "/2015-03-31/functions/"
+              - !GetAtt [LambdaGetTestOutputResult, Arn]
+              - "/invocations"
+        IntegrationHttpMethod: "POST"
+        RequestParameters:
+                  "integration.request.header.X-Amz-Invocation-Type": "'Event'"
+        IntegrationResponses: 
+          - ResponseParameters:
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+            ResponseTemplates:
+              application/json: ''
+            StatusCode : 200
+      MethodResponses:
+          - ResponseModels:
+              application/json: Empty
+            ResponseParameters:
+              method.response.header.Access-Control-Allow-Origin: true
+            StatusCode: 200 
+
+  #Enable CORS
+  TestOutputResultCORSOptionsMethod:
+    Type: "AWS::ApiGateway::Method"
+    DependsOn : TestOutputResultResource
+    Properties:
+      ResourceId: !Ref TestOutputResultResource
+      RestApiId: !Ref OCPv2API
+      AuthorizationType: NONE
+      HttpMethod: OPTIONS
+      Integration:
+        Type: MOCK
+        IntegrationResponses:
+          - ResponseParameters:
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+              method.response.header.Access-Control-Allow-Methods: "'POST,OPTIONS'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+            ResponseTemplates:
+              application/json: ''
+            StatusCode: '200'
+        PassthroughBehavior: NEVER
+        RequestTemplates:
+          application/json: '{"statusCode": 200}'
+      MethodResponses:
+        - ResponseModels:
+            application/json: Empty
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Headers: true
+            method.response.header.Access-Control-Allow-Methods: true
+            method.response.header.Access-Control-Allow-Origin: true
+          StatusCode: '200'
+
+
+  # API gateway stage and deployment configuration. 
+  # We use a new logical ID for the deployment each time we update the CF template
+  # this is because the deployment captures the current state of the resource and method tree at the time it is created, 
+  # so to reflect any changes it needs to be recreated and the new deployment bound to the stage.
   OCPv2APIStage:
     Type: 'AWS::ApiGateway::Stage'
     Properties:
       RestApiId: !Ref OCPv2API
-      DeploymentId: !Ref OCPv2APIDeploymentStage
+      DeploymentId: !Ref OCPv2APIDeploymentStage1
       StageName: !Ref AWS::StackName
       MethodSettings:
           - ResourcePath: /*
@@ -431,9 +560,10 @@ Resources:
             DataTraceEnabled: true
             LoggingLevel: INFO
             MetricsEnabled: true          
-    DependsOn : OCPv2APIDeploymentStage
+    DependsOn : OCPv2APIDeploymentStage1
 
-  OCPv2APIDeploymentStage:
+  #update logical name to triger new deployment  
+  OCPv2APIDeploymentStage1:
     Type: 'AWS::ApiGateway::Deployment'
     Properties:
       RestApiId: !Ref OCPv2API
