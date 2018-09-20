@@ -30,7 +30,7 @@ then
 	#aws s3 cp $ZIP s3://$BUCKET/$INVITE_S3_KEY
 fi
 
-aws cloudformation create-stack --stack-name $TEST_STACK_NAME --template-url https://s3.amazonaws.com/$BUCKET/$KEY
+aws cloudformation create-stack --stack-name $TEST_STACK_NAME --template-url https://s3.amazonaws.com/$BUCKET/$KEY --capabilities CAPABILITY_NAMED_IAM
 aws cloudformation wait stack-create-complete --stack-name $TEST_STACK_NAME
 aws cloudformation describe-stacks --stack-name $TEST_STACK_NAME
 

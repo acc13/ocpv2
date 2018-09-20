@@ -59,7 +59,7 @@ Resources:
 
 
   #######################################
-  #       Permissions
+  #       Permissions & Roles
   #######################################
 
   S3InvokeLambdaOutputUploadedPermission: 
@@ -111,6 +111,37 @@ Resources:
       Action: 'lambda:InvokeFunction'
       Principal: apigateway.amazonaws.com
       SourceArn: !Sub arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${OCPv2API}/*
+
+
+  LambdaRole: 
+      Type: "AWS::IAM::Role"
+      Properties: 
+        RoleName: 
+          !Join
+            - '.'
+            - - ocpv2
+              - !Ref AWS::StackName
+              - lambda
+        AssumeRolePolicyDocument: 
+          Version: "2012-10-17"
+          Statement: 
+            - 
+              Effect: "Allow"
+              Principal: 
+                Service: 
+                  - "lambda.amazonaws.com"
+              Action: 
+                - "sts:AssumeRole"
+        Path: "/"
+        Policies: 
+          - 
+            PolicyName: "root"
+            PolicyDocument: 
+              Version: "2012-10-17"
+              Statement: 
+                - Effect: "Allow"
+                  Action: "*"
+                  Resource: "*"
 
 
   #######################################
@@ -175,6 +206,7 @@ Resources:
   #######################################
   LambdaInviteUser:
     Type: "AWS::Lambda::Function"
+    DependsOn : LambdaRole
     Properties: 
       FunctionName: 
         !Join
@@ -187,8 +219,16 @@ Resources:
         S3Key: lambas/InviteCandidate-1.0.zip
       Handler: com.yetanotherwhatever.ocpv2.aws.InviteCandidateHandler::handleRequest
       MemorySize: 256
-      #TODO create lambda role using CF
-      Role: arn:aws:iam::229763884986:role/CodingProblemRegistration
+      Role: 
+        !Join
+          - '/'
+          - - !Sub arn:aws:iam::${AWS::AccountId}:role
+            - 
+              !Join
+                - '.'
+                - - ocpv2
+                  - !Ref AWS::StackName
+                  - lambda
       Runtime: java8
       Timeout: 30
       Environment:
@@ -206,6 +246,7 @@ Resources:
 
   LambdaOutputUploaded:
     Type: "AWS::Lambda::Function"
+    DependsOn : LambdaRole
     Properties: 
       FunctionName: 
         !Join
@@ -218,8 +259,16 @@ Resources:
         S3Key: lambas/InviteCandidate-1.0.zip
       Handler: com.yetanotherwhatever.ocpv2.aws.OutputUploadedHandler::handleRequest
       MemorySize: 256
-      #TODO create lambda role using CF
-      Role: arn:aws:iam::229763884986:role/testOutputUploadRole
+      Role: 
+        !Join
+          - '/'
+          - - !Sub arn:aws:iam::${AWS::AccountId}:role
+            - 
+              !Join
+                - '.'
+                - - ocpv2
+                  - !Ref AWS::StackName
+                  - lambda
       Runtime: java8
       Timeout: 30
       Environment:
@@ -243,6 +292,7 @@ Resources:
 
   LambdaCodeUploaded:
     Type: "AWS::Lambda::Function"
+    DependsOn : LambdaRole
     Properties: 
       FunctionName: 
         !Join
@@ -255,8 +305,16 @@ Resources:
         S3Key: lambas/InviteCandidate-1.0.zip
       Handler: com.yetanotherwhatever.ocpv2.aws.CodeUploadedHandler::handleRequest
       MemorySize: 256
-      #TODO create lambda role using CF
-      Role: arn:aws:iam::229763884986:role/notifyCodeUploadRole
+      Role: 
+        !Join
+          - '/'
+          - - !Sub arn:aws:iam::${AWS::AccountId}:role
+            - 
+              !Join
+                - '.'
+                - - ocpv2
+                  - !Ref AWS::StackName
+                  - lambda
       Runtime: java8
       Timeout: 30
       Environment:

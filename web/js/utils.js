@@ -105,9 +105,22 @@ Dual licensed under the MIT and GPL licenses.
 "use strict";
 
 /* Functions */
+
+function getUrlVars() {
+    var vars = {};
+    var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
+        vars[key] = value;
+    });
+    return vars;
+}
+
+
+var debug = typeof(getUrlVars()[debug]) != "undefined";
+
 function debug(msg)
  {
-  if (isTest)
+
+  if (isTest && debug)
   {
     alert(msg);
   }
