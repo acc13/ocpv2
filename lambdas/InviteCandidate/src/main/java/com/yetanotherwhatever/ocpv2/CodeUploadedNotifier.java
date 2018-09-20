@@ -46,7 +46,7 @@ public class CodeUploadedNotifier {
         }
 
         //look up invitation
-        Invitation i = db.read(invitationId);
+        Invitation i = db.getInvitation(invitationId);
 
         //build upload url
         String zipfileUrl = fileStore.buildDownloadUrl(zipFileName);

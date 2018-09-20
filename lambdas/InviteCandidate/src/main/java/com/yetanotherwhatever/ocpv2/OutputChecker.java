@@ -52,7 +52,8 @@ public class OutputChecker {
         OutputResults or = new OutputResults();
         or.setInvitationId(invitationId);
         or.setUploadDate(new Date());
-        or.setResults(success? "Success!" : lastErr);
+        //TODO - add unit tests to confirm that success/fail string expected by web page js is contained in or.results
+        or.setResults(success? "Success!" : "Failed: " + lastErr);
         or.setUploadID(uploadId);
         ocpv2DB.write(or);
 

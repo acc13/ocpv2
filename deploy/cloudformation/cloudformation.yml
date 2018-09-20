@@ -184,13 +184,9 @@ Resources:
       AttributeDefinitions:
         - AttributeName: "UploadId"
           AttributeType: "S"
-        - AttributeName: "UploadDate"
-          AttributeType: "S"
       KeySchema:
         - AttributeName: "UploadId"
           KeyType: "HASH"
-        - AttributeName: "UploadDate"
-          KeyType: "RANGE"
       TableName: 
         !Join
           - '.'
@@ -338,7 +334,7 @@ Resources:
       Code: 
         S3Bucket: deployocp
         S3Key: lambas/InviteCandidate-1.0.zip
-      Handler: com.yetanotherwhatever.ocpv2.aws.InviteCandidateHandler::handleRequest
+      Handler: com.yetanotherwhatever.ocpv2.aws.GetOutputTestResultsHandler::handleRequest
       MemorySize: 256
       Role: 
         !Join
@@ -479,7 +475,7 @@ Resources:
       - TestOutputResultResource
       - LambdaGetTestOutputResult
     Properties:
-      HttpMethod: "POST"
+      HttpMethod: "GET"
       AuthorizationType: "NONE"
       ResourceId:
         Ref: TestOutputResultResource

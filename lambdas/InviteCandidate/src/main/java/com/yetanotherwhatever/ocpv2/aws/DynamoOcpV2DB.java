@@ -177,7 +177,7 @@ public class DynamoOcpV2DB implements IOcpV2DB {
     }
 
     @Override
-    public Invitation read(String invitationId) throws IOException
+    public Invitation getInvitation(String invitationId) throws IOException
     {
         DynamoDB dynamoDB = new DynamoDB(addb);
 
@@ -207,6 +207,39 @@ public class DynamoOcpV2DB implements IOcpV2DB {
         }
         catch (Exception e) {
             logger.error("Unable to read item: " + invitationId +
+                    " from table: " + INVITE_TABLE_NAME);
+            logger.error(e.getMessage());
+
+            throw new IOException(e);
+        }
+    }
+
+    @Override
+    public OutputResults getOutputResults(String uploadId) throws IOException
+    {
+        DynamoDB dynamoDB = new DynamoDB(addb);
+
+        Table table = dynamoDB.getTable(OUTPUT_UPLOAD_TABLE);
+
+        GetItemSpec spec = new GetItemSpec().withPrimaryKey(O_UPLOAD_ID, uploadId);
+
+        try {
+            logger.info("Attempting to read the item: \"" + uploadId + "\" from table: \"" + OUTPUT_UPLOAD_TABLE + "\"");
+            Item outcome = table.getItem(spec);
+            logger.info("GetItem succeeded: " + outcome);
+
+            OutputResults or = new OutputResults();
+
+            or.setInvitationId(outcome.getString(O_INVITATION_ID));
+            or.setResults(outcome.getString(O_RESULT));
+            or.setUploadDate(outcome.getString(O_OUTPUT_UPLOAD_DATE));
+            or.setUploadID(outcome.getString(O_UPLOAD_ID));
+
+            return or;
+
+        }
+        catch (Exception e) {
+            logger.error("Unable to read item: " + uploadId +
                     " from table: " + INVITE_TABLE_NAME);
             logger.error(e.getMessage());
 

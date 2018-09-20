@@ -26,8 +26,12 @@ public class OutputResults {
 
     public void setUploadDate(Date uploadDate)
     {
-
         this.uploadDate = Utils.formatDateISO8601(uploadDate);
+    }
+
+    public void setUploadDate(String uploadDate)
+    {
+        this.uploadDate = uploadDate;
     }
 
     public String getResults()
