@@ -186,7 +186,7 @@ public class DynamoOcpV2DB implements IOcpV2DB {
         GetItemSpec spec = new GetItemSpec().withPrimaryKey(I_PROBLEM_GUID, invitationId);
 
         try {
-            logger.info("Attempting to read the item...");
+            logger.info("Attempting to read the item: \"" + invitationId + "\" from table: \"" + INVITE_TABLE_NAME + "\"");
             Item outcome = table.getItem(spec);
             logger.info("GetItem succeeded: " + outcome);
 
@@ -206,7 +206,7 @@ public class DynamoOcpV2DB implements IOcpV2DB {
 
         }
         catch (Exception e) {
-            logger.error("Unable to read item: " + I_PROBLEM_GUID +
+            logger.error("Unable to read item: " + invitationId +
                     " from table: " + INVITE_TABLE_NAME);
             logger.error(e.getMessage());
 

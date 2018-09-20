@@ -32,17 +32,17 @@ public class CodeUploadedHandler  implements RequestHandler<S3Event,S3Event> {
                 un.setEmailer(new SESEmailHelper());
                 un.setFileStore(new S3FileStoreImpl());
 
+                parseRecord(record);
+
                 un.notifyManager(invitationId, zipFileName);
 
                 logger.info("Manager notified.");
+                logger.debug("Code upload notification complete.");
 
             } catch (IOException | IllegalArgumentException e) {
                 logger.error(e);
             }
         }
-
-        //notify code upload
-        logger.debug("Code upload notification complete.");
 
         return s3Event;
     }

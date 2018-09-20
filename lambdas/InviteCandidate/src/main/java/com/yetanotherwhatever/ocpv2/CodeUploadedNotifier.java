@@ -40,6 +40,10 @@ public class CodeUploadedNotifier {
         {
             throw new IllegalStateException("CodeUploadedNotifier not initialized.");
         }
+        if (null == invitationId || null == zipFileName)
+        {
+            throw new IllegalArgumentException("invitationId and zipFileName cannot be null.");
+        }
 
         //look up invitation
         Invitation i = db.read(invitationId);
