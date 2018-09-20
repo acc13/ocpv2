@@ -259,6 +259,13 @@ Resources:
       Role: arn:aws:iam::229763884986:role/notifyCodeUploadRole
       Runtime: java8
       Timeout: 30
+      Environment:
+        Variables:
+          DYNAMODB_INVITE_TABLE:             
+            !Join
+              - '.'
+              - - !Ref AWS::StackName
+                - Candidate_Invitations
 
   #########################################
   #       API Gateway 
