@@ -1,34 +1,93 @@
 package com.yetanotherwhatever.ocpv2.aws;
 
+import com.amazonaws.services.lambda.runtime.RequestStreamHandler;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.yetanotherwhatever.ocpv2.IOcpV2DB;
-import com.yetanotherwhatever.ocpv2.Invitation;
-import com.yetanotherwhatever.ocpv2.Inviter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.IOException;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
-public class GetOutputTestResultsHandler {
+import java.io.*;
 
+
+//using AWS_PROXY Api Gateway->Lambda integration
+//see: https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-create-api-as-simple-proxy-for-lambda.html#api-gateway-proxy-integration-lambda-function-java
+
+public class GetOutputTestResultsHandler implements RequestStreamHandler {
     // Initialize the Log4j logger.
     static final Logger logger = LogManager.getLogger(InviteCandidateHandler.class);
 
-    public String handleRequest(String uploadId, Context context) {
+    JSONParser parser = new JSONParser();
+
+
+    public void handleRequest(InputStream inputStream, OutputStream outputStream, Context context) throws IOException
+    {
+
+        logger.debug("Loading Java Lambda handler of ProxyWithStream");
+
+
+        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+        JSONObject responseJson = new JSONObject();
+        String uploadId = null;
+        String responseCode = "200";
+
 
         try {
 
-            IOcpV2DB db = new DynamoOcpV2DB();
-            OutputResults or = db.getOutputResults(uploadId);
+            JSONObject event = (JSONObject)parser.parse(reader);
 
-            return or.getResults();
+            if (event.get("pathParameters") != null) {
+                JSONObject pps = (JSONObject)event.get("pathParameters");
+                if ( pps.get("outputtestresult") != null) {
+                    uploadId = (String)pps.get("outputtestresult");
+                }
+            }
+
+            JSONObject responseBody = new JSONObject();
+            //responseBody.put("input", event.toJSONString());
+
+            try {
+                IOcpV2DB db = new DynamoOcpV2DB();
+                OutputResults or = db.getOutputResults(uploadId);
+                responseBody.put("result", or.getResults());
+            }
+            catch (IllegalArgumentException e)
+            {
+                logger.error(e);
+                responseCode = "400";
+                responseJson.put("exception", e);
+
+            }
+            catch (IOException e)
+            {
+                logger.error(e);
+                responseCode = "500";
+                responseJson.put("exception", e);
+
+            }
+
+            JSONObject headerJson = new JSONObject();
+            //headerJson.put("x-custom-header", "my custom header value");
+
+            responseJson.put("isBase64Encoded", false);
+            responseJson.put("statusCode", responseCode);
+            responseJson.put("headers", headerJson);
+            responseJson.put("body", responseBody.toString());
+
         }
-        catch(IOException | IllegalArgumentException e)
+        catch (ParseException e)
         {
             logger.error(e);
-            return "ERROR: " + e.getMessage();
+            responseJson.put("statusCode", "400");
+            responseJson.put("exception", e);
         }
 
-
+        logger.debug(responseJson.toJSONString());
+        OutputStreamWriter writer = new OutputStreamWriter(outputStream, "UTF-8");
+        writer.write(responseJson.toJSONString());
+        writer.close();
     }
 }

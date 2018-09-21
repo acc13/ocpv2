@@ -104,7 +104,7 @@ Resources:
                     - upload
                     - yetanotherwhatever.io
 
-  RedirectPermissions:
+  RedirectPermissionsInvitations:
     Type: 'AWS::Lambda::Permission'
     Properties:
       FunctionName: !Ref LambdaInviteUser
@@ -112,13 +112,13 @@ Resources:
       Principal: apigateway.amazonaws.com
       SourceArn: !Sub arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${OCPv2API}/*
 
-  RedirectPermissions:
+  RedirectPermissionsResults:
     Type: 'AWS::Lambda::Permission'
     Properties:
-      FunctionName: !Ref LambdaInviteUser
-      Action: 'lambda:*'
+      FunctionName: !Ref LambdaGetTestOutputResult
+      Action: 'lambda:InvokeFunction'
       Principal: apigateway.amazonaws.com
-      SourceArn: !Sub arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${OCPv2API}/*
+      SourceArn: !Sub "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${OCPv2API}/*/*"
 
 
   LambdaRole: 
@@ -192,6 +192,8 @@ Resources:
       AttributeDefinitions:
         - AttributeName: "UploadId"
           AttributeType: "S"
+        - AttributeName: "ProblemPageGuid"
+          AttributeType: "S"
       KeySchema:
         - AttributeName: "UploadId"
           KeyType: "HASH"
@@ -203,6 +205,16 @@ Resources:
       ProvisionedThroughput:
         ReadCapacityUnits: 5
         WriteCapacityUnits: 5
+      GlobalSecondaryIndexes:
+        - IndexName: "Manager_Invites"
+          KeySchema:
+            - AttributeName: "ProblemPageGuid"
+              KeyType: "HASH"
+          Projection:
+            ProjectionType: "ALL"
+          ProvisionedThroughput:
+            ReadCapacityUnits: 5
+            WriteCapacityUnits: 5
 
 
   #######################################
@@ -418,16 +430,16 @@ Resources:
               - "/invocations"
         IntegrationHttpMethod: "POST"
         RequestParameters:
-                  "integration.request.header.X-Amz-Invocation-Type": "'Event'"
+          "integration.request.header.X-Amz-Invocation-Type": "'Event'"
         IntegrationResponses: 
           - ResponseParameters:
               method.response.header.Access-Control-Allow-Origin: "'*'"
             ResponseTemplates:
-              application/json: ''
+              text/html: ''
             StatusCode : 200
       MethodResponses:
           - ResponseModels:
-              application/json: Empty
+              text/html: Empty
             ResponseParameters:
               method.response.header.Access-Control-Allow-Origin: true
             StatusCode: 200 
@@ -477,20 +489,29 @@ Resources:
       RestApiId:
         Ref: OCPv2API
 
+  TestOutputResultOutputIdResource:
+    Type: "AWS::ApiGateway::Resource"
+    DependsOn : TestOutputResultResource
+    Properties:
+      ParentId: !Ref TestOutputResultResource
+      PathPart: "{outputid}"
+      RestApiId:
+        Ref: OCPv2API
+
   TestOutputResultMethod:
     Type: "AWS::ApiGateway::Method"
     DependsOn: 
-      - TestOutputResultResource
+      - TestOutputResultOutputIdResource
       - LambdaGetTestOutputResult
     Properties:
       HttpMethod: "GET"
       AuthorizationType: "NONE"
       ResourceId:
-        Ref: TestOutputResultResource
+        Ref: TestOutputResultOutputIdResource
       RestApiId:
         Ref: OCPv2API
       Integration:
-        Type: "AWS"
+        Type: "AWS_PROXY"
         Uri:
           Fn::Join:
             - ""
@@ -517,9 +538,9 @@ Resources:
   #Enable CORS
   TestOutputResultCORSOptionsMethod:
     Type: "AWS::ApiGateway::Method"
-    DependsOn : TestOutputResultResource
+    DependsOn : TestOutputResultOutputIdResource
     Properties:
-      ResourceId: !Ref TestOutputResultResource
+      ResourceId: !Ref TestOutputResultOutputIdResource
       RestApiId: !Ref OCPv2API
       AuthorizationType: NONE
       HttpMethod: OPTIONS
@@ -552,6 +573,7 @@ Resources:
   # so to reflect any changes it needs to be recreated and the new deployment bound to the stage.
   OCPv2APIStage:
     Type: 'AWS::ApiGateway::Stage'
+    DependsOn : OCPv2APIDeploymentStage1
     Properties:
       RestApiId: !Ref OCPv2API
       DeploymentId: !Ref OCPv2APIDeploymentStage1
@@ -562,9 +584,8 @@ Resources:
             DataTraceEnabled: true
             LoggingLevel: INFO
             MetricsEnabled: true          
-    DependsOn : OCPv2APIDeploymentStage1
 
-  #update logical name to triger new deployment  
+  #update/modify logical name to triger new deployment  
   OCPv2APIDeploymentStage1:
     Type: 'AWS::ApiGateway::Deployment'
     Properties:

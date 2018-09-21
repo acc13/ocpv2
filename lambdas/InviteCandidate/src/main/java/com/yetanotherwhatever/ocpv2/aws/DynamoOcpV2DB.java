@@ -48,7 +48,7 @@ public class DynamoOcpV2DB implements IOcpV2DB {
 
     //Output upload table attributes
     private static final String O_UPLOAD_ID = "UploadId";
-    private static final String O_INVITATION_ID = "ProblemPageGuid";
+    private static final String O_INVITATION_ID = I_PROBLEM_GUID;
     private static final String O_RESULT = "Result";
     private static final String O_OUTPUT_UPLOAD_DATE = "UploadDate";
 
@@ -137,7 +137,7 @@ public class DynamoOcpV2DB implements IOcpV2DB {
                     expressionAttributeNames,
                     expressionAttributeValues);
 
-            logger.debug("Invitation succeeded updated for record: " + invitationId);
+            logger.debug("Invitation update succeeded for record: " + invitationId);
 
         } catch (ResourceNotFoundException e) {
             throw new IOException(e);

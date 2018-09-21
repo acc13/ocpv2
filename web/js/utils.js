@@ -106,6 +106,7 @@ Dual licensed under the MIT and GPL licenses.
 
 /* Functions */
 
+
 function getUrlVars() {
     var vars = {};
     var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
@@ -114,13 +115,13 @@ function getUrlVars() {
     return vars;
 }
 
+var debufUrlVar = typeof(getUrlVars()[debug]) != "undefined";
 
-var debug = typeof(getUrlVars()[debug]) != "undefined";
 
 function debug(msg)
  {
 
-  if (isTest && debug)
+  if (isTest && debufUrlVar)
   {
     alert(msg);
   }
