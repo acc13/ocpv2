@@ -112,6 +112,14 @@ Resources:
       Principal: apigateway.amazonaws.com
       SourceArn: !Sub arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${OCPv2API}/*
 
+  RedirectPermissions:
+    Type: 'AWS::Lambda::Permission'
+    Properties:
+      FunctionName: !Ref LambdaInviteUser
+      Action: 'lambda:*'
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${OCPv2API}/*
+
 
   LambdaRole: 
       Type: "AWS::IAM::Role"
@@ -493,8 +501,6 @@ Resources:
               - !GetAtt [LambdaGetTestOutputResult, Arn]
               - "/invocations"
         IntegrationHttpMethod: "POST"
-        RequestParameters:
-                  "integration.request.header.X-Amz-Invocation-Type": "'Event'"
         IntegrationResponses: 
           - ResponseParameters:
               method.response.header.Access-Control-Allow-Origin: "'*'"
