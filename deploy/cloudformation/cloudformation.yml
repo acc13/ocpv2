@@ -118,7 +118,9 @@ Resources:
       FunctionName: !Ref LambdaGetTestOutputResult
       Action: 'lambda:InvokeFunction'
       Principal: apigateway.amazonaws.com
-      SourceArn: !Sub "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${OCPv2API}/*/*"
+      #those last 4 * are for .../stage/method/resource/resource
+      #ie. test/GET/outputtestresult/{outputid}
+      SourceArn: !Sub "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${OCPv2API}/*/*/*/*"
 
 
   LambdaRole: 
@@ -573,10 +575,10 @@ Resources:
   # so to reflect any changes it needs to be recreated and the new deployment bound to the stage.
   OCPv2APIStage:
     Type: 'AWS::ApiGateway::Stage'
-    DependsOn : OCPv2APIDeploymentStage1
+    DependsOn : OCPv2APIDeploymentStage
     Properties:
       RestApiId: !Ref OCPv2API
-      DeploymentId: !Ref OCPv2APIDeploymentStage1
+      DeploymentId: !Ref OCPv2APIDeploymentStage
       StageName: !Ref AWS::StackName
       MethodSettings:
           - ResourcePath: /*
@@ -586,7 +588,7 @@ Resources:
             MetricsEnabled: true          
 
   #update/modify logical name to triger new deployment  
-  OCPv2APIDeploymentStage1:
+  OCPv2APIDeploymentStage:
     Type: 'AWS::ApiGateway::Deployment'
     Properties:
       RestApiId: !Ref OCPv2API

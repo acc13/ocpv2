@@ -13,6 +13,7 @@ aws s3 cp $ZIP s3://$BUCKET/$INVITE_S3_KEY
 aws lambda update-function-code --function-name ${ENV_PREFIX}InviteCandidate --s3-bucket $BUCKET --s3-key $INVITE_S3_KEY
 aws lambda update-function-code --function-name ${ENV_PREFIX}TestOutput --s3-bucket $BUCKET --s3-key $INVITE_S3_KEY
 aws lambda update-function-code --function-name ${ENV_PREFIX}NotifyCodeUploaded --s3-bucket $BUCKET --s3-key $INVITE_S3_KEY
+aws lambda update-function-code --function-name ${ENV_PREFIX}GetTestOutputResult --s3-bucket $BUCKET --s3-key $INVITE_S3_KEY
 
 echo
 echo Deployment ended

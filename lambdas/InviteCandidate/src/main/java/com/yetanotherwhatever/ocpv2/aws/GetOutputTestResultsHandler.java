@@ -18,7 +18,7 @@ import java.io.*;
 
 public class GetOutputTestResultsHandler implements RequestStreamHandler {
     // Initialize the Log4j logger.
-    static final Logger logger = LogManager.getLogger(InviteCandidateHandler.class);
+    static final Logger logger = LogManager.getLogger(GetOutputTestResultsHandler.class);
 
     JSONParser parser = new JSONParser();
 
@@ -34,56 +34,56 @@ public class GetOutputTestResultsHandler implements RequestStreamHandler {
         String uploadId = null;
         String responseCode = "200";
 
+        JSONObject responseBody = new JSONObject();
 
         try {
 
             JSONObject event = (JSONObject)parser.parse(reader);
-
-            if (event.get("pathParameters") != null) {
-                JSONObject pps = (JSONObject)event.get("pathParameters");
-                if ( pps.get("outputtestresult") != null) {
-                    uploadId = (String)pps.get("outputtestresult");
-                }
-            }
-
-            JSONObject responseBody = new JSONObject();
             //responseBody.put("input", event.toJSONString());
 
-            try {
-                IOcpV2DB db = new DynamoOcpV2DB();
-                OutputResults or = db.getOutputResults(uploadId);
+            if (event.get("pathParameters") == null) {
+                throw new IllegalArgumentException("pathParameters not found");
+            }
+            JSONObject pps = (JSONObject)event.get("pathParameters");
+
+            if (null == pps.get("outputid")) {
+                throw new IllegalArgumentException("outputid not found");
+            }
+
+            uploadId = (String)pps.get("outputid");
+
+            IOcpV2DB db = new DynamoOcpV2DB();
+            OutputResults or = db.getOutputResults(uploadId);
+            if (null == or)
+            {
+                responseCode = "404";
+            }
+            else {
+                responseCode = "200";
                 responseBody.put("result", or.getResults());
             }
-            catch (IllegalArgumentException e)
-            {
-                logger.error(e);
-                responseCode = "400";
-                responseJson.put("exception", e);
-
-            }
-            catch (IOException e)
-            {
-                logger.error(e);
-                responseCode = "500";
-                responseJson.put("exception", e);
-
-            }
-
-            JSONObject headerJson = new JSONObject();
-            //headerJson.put("x-custom-header", "my custom header value");
-
-            responseJson.put("isBase64Encoded", false);
-            responseJson.put("statusCode", responseCode);
-            responseJson.put("headers", headerJson);
-            responseJson.put("body", responseBody.toString());
 
         }
-        catch (ParseException e)
+        catch (IllegalArgumentException | ParseException e)
         {
             logger.error(e);
-            responseJson.put("statusCode", "400");
+            responseCode = "400";
             responseJson.put("exception", e);
         }
+        catch (IOException e)
+        {
+            logger.error(e);
+            responseCode = "500";
+            responseJson.put("exception", e);
+        }
+
+
+        JSONObject headerJson = new JSONObject();
+        //headerJson.put("x-custom-header", "my custom header value");
+        responseJson.put("isBase64Encoded", false);
+        responseJson.put("statusCode", responseCode);
+        responseJson.put("headers", headerJson);
+        responseJson.put("body", responseBody.toString());
 
         logger.debug(responseJson.toJSONString());
         OutputStreamWriter writer = new OutputStreamWriter(outputStream, "UTF-8");

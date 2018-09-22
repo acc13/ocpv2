@@ -228,6 +228,11 @@ public class DynamoOcpV2DB implements IOcpV2DB {
             Item outcome = table.getItem(spec);
             logger.info("GetItem succeeded: " + outcome);
 
+            if (null == outcome)
+            {
+                return null;
+            }
+
             OutputResults or = new OutputResults();
 
             or.setInvitationId(outcome.getString(O_INVITATION_ID));
@@ -240,7 +245,7 @@ public class DynamoOcpV2DB implements IOcpV2DB {
         }
         catch (Exception e) {
             logger.error("Unable to read item: " + uploadId +
-                    " from table: " + INVITE_TABLE_NAME);
+                    " from table: " + OUTPUT_UPLOAD_TABLE);
             logger.error(e.getMessage());
 
             throw new IOException(e);
