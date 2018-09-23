@@ -10,3 +10,4 @@ var restAPIBaseURL = "https://" + ocpv2RestAPIId + ".execute-api.us-east-1.amazo
 
 var inviteAPIURL = restAPIBaseURL + '/invitation';
 
+var getRessultsAPIURL = restAPIBaseURL + '/outputtestresult';

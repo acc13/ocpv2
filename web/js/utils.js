@@ -115,13 +115,12 @@ function getUrlVars() {
     return vars;
 }
 
-var debufUrlVar = typeof(getUrlVars()[debug]) != "undefined";
-
+var debugSet = (getUrlVars()["debug"] != "undefined");
 
 function debug(msg)
  {
 
-  if (isTest && debufUrlVar)
+  if (isTest && debugSet)
   {
     alert(msg);
   }
