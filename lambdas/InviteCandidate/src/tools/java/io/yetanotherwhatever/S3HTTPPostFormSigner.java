@@ -27,14 +27,14 @@ http://docs.aws.amazon.com/AmazonS3/latest/API/sigv4-UsingHTTPPOST.html
 public class S3HTTPPostFormSigner {
 
     String m_expiration;
-    String m_bucket, m_prodBucket, m_testBucket;
     String m_dateStamp;
     String m_region;
     String m_serviceName;
     String m_algorithm;
     String m_accessKeyID;
     String m_aws_secret_key;
-
+    String m_s3UploadBucketName;
+    String m_s3WebBucketName;
 
 
 
@@ -43,11 +43,9 @@ public class S3HTTPPostFormSigner {
     One to submit test output
     One to submit the final coded solution in a .zip file
      */
-    S3HTTPPostFormSigner(String accessKeyID, String aws_secret_key, String hostedZone)
+    S3HTTPPostFormSigner(String accessKeyID, String aws_secret_key, String hostedZone, String stackName)
     {
-        initBucketNames(hostedZone);
-
-        m_bucket= S3_UPLOAD_TEST;
+        initBucketNames(hostedZone, stackName);
 
         m_accessKeyID = accessKeyID;
         m_aws_secret_key = aws_secret_key;
@@ -65,22 +63,10 @@ public class S3HTTPPostFormSigner {
         m_algorithm = "AWS4-HMAC-SHA256";
     }
 
-    String S3_WEB_PROD = null;
-    String S3_UPLOAD_PROD= null;
-    String S3_WEB_TEST= null;
-    String S3_UPLOAD_TEST= null;
+    private void initBucketNames(String hostedZone, String stackName) {
 
-    private void initBucketNames(String hostedZone) {
-
-        final String PROD_ENV_PREFIX = "ocp.";
-        final String TEST_ENV_PREFIX = "test.";
-        final String S3_WEB = hostedZone;
-        final String S3_UPLOAD = "upload." + hostedZone;
-
-        S3_WEB_PROD= PROD_ENV_PREFIX + S3_WEB;
-        S3_UPLOAD_PROD= PROD_ENV_PREFIX + S3_UPLOAD;
-        S3_WEB_TEST= TEST_ENV_PREFIX + S3_WEB;
-        S3_UPLOAD_TEST= TEST_ENV_PREFIX + S3_UPLOAD;
+        m_s3WebBucketName = stackName + "." + hostedZone;
+        m_s3UploadBucketName = stackName + ".upload." + hostedZone;
     }
 
     protected static String yearsFromToday(int i)
@@ -168,17 +154,22 @@ public class S3HTTPPostFormSigner {
         return "";
     }
 
-    private static String buildPolicyDoc(String expiration, String bucket, String folder, String algorithm,
-                                         String accessKeyID, String dateStamp, String region, String serviceName,
+    private String buildPolicyDoc(String expiration,
+                                         String folder,
+                                         String algorithm,
+                                         String accessKeyID,
+                                         String dateStamp,
+                                         String region,
+                                         String serviceName,
                                          String redirectPage)
     {
         String policyDoc = "{\n" +
                 "  \"expiration\":\"" + expiration + " T00:00:00Z\",\n" +
                 "  \"conditions\": [\n" +
-                "    {\"bucket\":\"" + bucket + "\"},\n" +
+                "    {\"bucket\":\"" + m_s3UploadBucketName + "\"},\n" +
                 "    [\"starts-with\",\"$key\",\"" + folder + "/\"],\n" +
                 "    {\"acl\":\"private\"},\n" +
-                "    {\"success_action_redirect\":\"http://yetanotherwhatever.io/" + redirectPage + "\"},\n" +
+                "    {\"success_action_redirect\":\"http://" + m_s3WebBucketName + "/" + redirectPage + "\"},\n" +
                 "    {\"x-amz-algorithm\":\"" + algorithm + "\"},\n" +
                 "    {\"x-amz-credential\":\"" + accessKeyID + "/" + dateStamp + "/" + region + "/" + serviceName + "/aws4_request\"},\n" +
                 "    {\"x-amz-date\":\"" + dateStamp + "T000000Z\"},\n" +
@@ -194,14 +185,14 @@ public class S3HTTPPostFormSigner {
     private void buildForm(String folder, String additionalFields,
                            String redirectPage, String validation, String formId)
     {
-        String policyDoc = buildPolicyDoc(m_expiration, m_bucket, folder, m_algorithm, m_accessKeyID, m_dateStamp, m_region, m_serviceName, redirectPage);
+        String policyDoc = buildPolicyDoc(m_expiration, folder, m_algorithm, m_accessKeyID, m_dateStamp, m_region, m_serviceName, redirectPage);
         String signedPolicy = signPolicy(policyDoc, m_aws_secret_key, m_dateStamp, m_region, m_serviceName);
 
-        String form = "<form id=\"" + formId + "\" action=\"http://" + m_bucket + ".s3.amazonaws.com/\" method=\"post\"" +
+        String form = "<form id=\"" + formId + "\" action=\"http://" + m_s3UploadBucketName + ".s3.amazonaws.com/\" method=\"post\"" +
                 " enctype=\"multipart/form-data\" onsubmit=\"return(" + validation + ");\">\n" +
                 "\t      <input type=\"hidden\" name=\"key\" value=\"" + folder + "/${filename}\">\n" +
                 "\t      <input type=\"hidden\" name=\"acl\" value=\"private\"> \n" +
-                "\t      <input type=\"hidden\" name=\"success_action_redirect\" value=\"http://yetanotherwhatever.io/" + redirectPage + "\">\n" +
+                "\t      <input type=\"hidden\" name=\"success_action_redirect\" value=\"http://" + m_s3WebBucketName + "/" + redirectPage + "\">\n" +
                 "\t      <input type=\"hidden\" name=\"policy\" value='" + policyDoc + "'>\n" +
                 "\t       <input type=\"hidden\" name=\"x-amz-algorithm\" value=\"" + m_algorithm + "\">\n" +
                 "\t       <input type=\"hidden\" name=\"x-amz-credential\" value=\"" + m_accessKeyID + "/" + m_dateStamp + "/us-east-1/s3/aws4_request\">\n" +
@@ -258,22 +249,23 @@ public class S3HTTPPostFormSigner {
 
     public static void main(String[] args) {
 
-        String awsAccessKeyID = null, awsSecretAccessKey = null, hostedZone = null;
+        String awsAccessKeyID = null, awsSecretAccessKey = null, hostedZone = null, stackName = null;
 
         try {
             awsAccessKeyID = args[0];
             awsSecretAccessKey = args[1];
             hostedZone = args[2];
+            stackName = args[3];
         }
         catch (ArrayIndexOutOfBoundsException e)
         {
             System.out.println("Usage: " + System.getProperty("sun.java.command") +
-                    " access_key_id secret_access_key hosted_zone");
+                    " access_key_id secret_access_key hosted_zone stack_name");
             System.exit(1);
         }
 
 
-        S3HTTPPostFormSigner signer = new S3HTTPPostFormSigner(awsAccessKeyID, awsSecretAccessKey, hostedZone);
+        S3HTTPPostFormSigner signer = new S3HTTPPostFormSigner(awsAccessKeyID, awsSecretAccessKey, hostedZone, stackName);
 
         signer.buildTestOutputForm();
 

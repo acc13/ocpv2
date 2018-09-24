@@ -8,7 +8,7 @@ import java.util.Calendar;
 import static io.yetanotherwhatever.S3HTTPPostFormSigner.*;
 import static java.util.Calendar.*;
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertThat;
 
 public class S3HTTPPostFormSignerTest {
 

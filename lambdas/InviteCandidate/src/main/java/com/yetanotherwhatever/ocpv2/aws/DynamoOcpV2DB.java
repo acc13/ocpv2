@@ -52,12 +52,22 @@ public class DynamoOcpV2DB implements IOcpV2DB {
     private static final String O_RESULT = "Result";
     private static final String O_OUTPUT_UPLOAD_DATE = "UploadDate";
 
-    private static final AmazonDynamoDB addb =
-            AmazonDynamoDBClientBuilder.defaultClient();
+    private static AmazonDynamoDB addb;
 
     public DynamoOcpV2DB ()
     {
 
+    }
+
+    private AmazonDynamoDB getAmazonDynamoDB()
+    {
+        //lazy load
+        if (null == addb)
+        {
+            addb = AmazonDynamoDBClientBuilder.defaultClient();
+        }
+
+        return addb;
     }
 
     @Override
@@ -82,7 +92,7 @@ public class DynamoOcpV2DB implements IOcpV2DB {
 
 
         try {
-            addb.putItem(INVITE_TABLE_NAME, item_values);
+            getAmazonDynamoDB().putItem(INVITE_TABLE_NAME, item_values);
 
             logger.info("Invitation successfully saved to DynamoDB table " + INVITE_TABLE_NAME);
 
@@ -104,7 +114,7 @@ public class DynamoOcpV2DB implements IOcpV2DB {
     {
 
         try {
-            DynamoDB ddb = new DynamoDB(addb);
+            DynamoDB ddb = new DynamoDB(getAmazonDynamoDB());
 
             Table table = ddb.getTable(INVITE_TABLE_NAME);
 
@@ -159,7 +169,7 @@ public class DynamoOcpV2DB implements IOcpV2DB {
 
 
         try {
-            addb.putItem(OUTPUT_UPLOAD_TABLE, item_values);
+            getAmazonDynamoDB().putItem(OUTPUT_UPLOAD_TABLE, item_values);
 
             logger.info("Output upload result successfully saved to DynamoDB table " + OUTPUT_UPLOAD_TABLE);
 
@@ -179,7 +189,7 @@ public class DynamoOcpV2DB implements IOcpV2DB {
     @Override
     public Invitation getInvitation(String invitationId) throws IOException
     {
-        DynamoDB dynamoDB = new DynamoDB(addb);
+        DynamoDB dynamoDB = new DynamoDB(getAmazonDynamoDB());
 
         Table table = dynamoDB.getTable(INVITE_TABLE_NAME);
 
@@ -217,7 +227,7 @@ public class DynamoOcpV2DB implements IOcpV2DB {
     @Override
     public OutputResults getOutputResults(String uploadId) throws IOException
     {
-        DynamoDB dynamoDB = new DynamoDB(addb);
+        DynamoDB dynamoDB = new DynamoDB(getAmazonDynamoDB());
 
         Table table = dynamoDB.getTable(OUTPUT_UPLOAD_TABLE);
 
