@@ -16,6 +16,7 @@ import java.io.*;
 //using AWS_PROXY Api Gateway->Lambda integration
 //see: https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-create-api-as-simple-proxy-for-lambda.html#api-gateway-proxy-integration-lambda-function-java
 
+
 public class GetOutputTestResultsHandler implements RequestStreamHandler {
     // Initialize the Log4j logger.
     static final Logger logger = LogManager.getLogger(GetOutputTestResultsHandler.class);
@@ -77,9 +78,11 @@ public class GetOutputTestResultsHandler implements RequestStreamHandler {
             responseJson.put("exception", e);
         }
 
-
+        //for response format, see:
+        ////https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html
         JSONObject headerJson = new JSONObject();
-        //headerJson.put("x-custom-header", "my custom header value");
+        headerJson.put("Access-Control-Allow-Origin:domain-name", "*");
+
         responseJson.put("isBase64Encoded", false);
         responseJson.put("statusCode", responseCode);
         responseJson.put("headers", headerJson);
