@@ -53,7 +53,7 @@ public class OutputChecker {
         or.setInvitationId(invitationId);
         or.setUploadDate(new Date());
         //TODO - add unit tests to confirm that success/fail string expected by web page js is contained in or.results
-        or.setResults(success? "Success!" : "Failed: " + lastErr);
+        or.setResults(success? "Your output is correct!  Please return to your problem page and follow the instructions in the section, \"Submitting Your Solution.\"" : lastErr);
         or.setUploadID(uploadId);
         ocpv2DB.write(or);
 
@@ -62,8 +62,11 @@ public class OutputChecker {
     }
 
     //returns
+
+
     boolean doStreamsMatch(InputStream testOutput, InputStream expectedOutput) throws IOException
     {
+
         BufferedReader testBR = new BufferedReader(new InputStreamReader(testOutput));
         BufferedReader excpectedBR = new BufferedReader(new InputStreamReader(expectedOutput));
 
@@ -86,8 +89,19 @@ public class OutputChecker {
 
             if (!test.equals(expected))
             {
-                lastErr = "Failure on line: " + line + "\n" +
-                        "Expected line \"" + expected +"\" but encountered line \"" + test + "\"";
+                lastErr = "Output incorrect. " + line + "\n" +
+                        "First error countered on line " + line + ".\n" +
+                        "Expected value \"" + expected +"\" " +
+                        (expected.length()==0? "(empty string) " : "") +
+                        "but encountered value \"" + test + "\" "+
+                        (test.length()==0? "(empty string) " : "");
+
+                String friendlyHint = "\n\n\nSuggestions: \n" +
+                        "-Did you remember to remove trailing and preceding whitespace?\n" +
+                        "-Does your solution work for the sample input and output provided?";
+
+                lastErr += friendlyHint;
+
                 //output doesn't match
                 return false;
             }

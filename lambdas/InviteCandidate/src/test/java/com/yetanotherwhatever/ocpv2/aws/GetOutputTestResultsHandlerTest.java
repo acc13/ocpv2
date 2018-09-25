@@ -56,7 +56,8 @@ public class GetOutputTestResultsHandlerTest {
         JSONObject responseJson = getter.getResults(event);
 
         assertThat(responseJson.get("statusCode"), is(equalTo("200")));
-        JSONObject bodyJson = (JSONObject) responseJson.get("body");
+        JSONParser parser = new JSONParser();
+        JSONObject bodyJson = (JSONObject) parser.parse((String) responseJson.get("body"));
         assertThat(bodyJson.get("result"), is(equalTo(or.getResults())));
     }
 

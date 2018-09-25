@@ -3,48 +3,50 @@
 <head>
 	<title>Processing...</title> 
     <meta http-equiv="Content-Type" content='text/html; charset=UTF-8' />
+   
+ <link rel="stylesheet" type="text/css" href="styles.css">
+
 <style>
 <!--
- /* Font Definitions */
- @font-face
-	{font-family:"Cambria Math";
-	panose-1:2 4 5 3 5 4 6 3 2 4;}
-@font-face
-	{font-family:Calibri;
-	panose-1:2 15 5 2 2 2 4 3 2 4;}
- /* Style Definitions */
- p.MsoNormal, li.MsoNormal, div.MsoNormal
-	{margin-top:0in;
-	margin-right:0in;
-	margin-bottom:8.0pt;
-	margin-left:0in;
-	line-height:107%;
-	font-size:11.0pt;
-	font-family:"Calibri",sans-serif;}
-.MsoChpDefault
-	{font-family:"Calibri",sans-serif;}
-.MsoPapDefault
-	{margin-bottom:8.0pt;
-	line-height:107%;}
-@page WordSection1
-	{size:8.5in 11.0in;
-	margin:1.0in 1.0in 1.0in 1.0in;}
-div.WordSection1
-	{page:WordSection1;}
+
+	div 
+	{
+		height: 100px;
+		margin: 80px;
+		padding: 0px;
+		white-space: pre-wrap;
+	}
+
+	p.success
+	{
+		color: green;
+	}
+
+	p.error
+	{
+		color: red;
+	}
+
+	.backDiv
+	{
+		margin-top: 200px;
+	}
+
 -->
 </style>
 
 
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+
 <script type="text/javascript" src="/js/config.js" ></script>
 <script type="text/javascript" src="/js/utils.js" ></script>
+
 
 <script type="text/javascript">
 
 
-
-	var retries = 5;
+	var retries = (isTest? 1 : 15);
 
 	$(document).ready(function(){
 
@@ -54,35 +56,74 @@ div.WordSection1
 		var outputId = getOutputId();
 		debug("Output id:" + outputId);
 
-		var timer = setInterval(myMethod, 5000);
+		var timer = setInterval(myMethod, (isTest? 3000 : 1000));
 
 		function myMethod( )
 		{
 
 			$.ajax({
-			type: 'GET',
-			url: getRessultsAPIURL + "/" + outputId,
-			dataType: 'text',
-			contentType: 'test/html',
-			data: "",
-			crossDomain: true,
-			success: function (data) {
-				  	$('#resultsdiv').html('<span class="success">' + data + '</span>');
+				type: 'GET',
+				url: getRessultsAPIURL + "/" + outputId,
+				
+				crossDomain: true,
+				success: function (data) {
 
-				  	clearInterval(timer);
+						debug("success: \n" + JSON.stringify(data));
+
+						displayResult(data.result);
+					  	
+					},
+				error: function (data) {
+
+					debug("error: \n" + JSON.stringify(data));
+
+					if(data.status != 404)
+					{
+						//display error and bail
+						var error = "An error occurred.  You can retry by refreshing this page, or email andrew_chang@symantec.com. \n" + JSON.stringify(data);
+
+						showMessageAndStop(error, "error");
+					}
+					
+					//else results may not be available yet - keep retrying
+
 				}
 			})
 
-			retries--;
-
-			if (retries == 0)
+			if (retries-- <= 0)
 			{
-				clearInterval(timer);
+				showMessageAndStop("Unable to locate your results.  You can refresh to try again, or email andrew_chang1@symantec.com", "error");
 			}
 		}
 
 
+
+		function showMessageAndStop(msg, cssClass)
+		{
+			$('#pleaseWait').html('<p class="' + cssClass + '">' + msg + '</p>');
+			$('#loader').hide();
+			clearInterval(timer);
+		}
+
+		function displayResult(result)
+		{
+			var cssClass = "";
+			if (result.toLowerCase().indexOf( "submit") != -1)
+			{
+				 cssClass = "success";
+			}
+			else
+			{
+				 cssClass = "error";			
+			}
+			showMessageAndStop(result, cssClass);
+		}
+
+
+
 	});
+
+
 
 	function getOutputId()
 	{
@@ -106,17 +147,31 @@ div.WordSection1
 
 </head>
 
+
 <body lang=EN-US>
 
 <div>
+	<img id=loader src="/res/infiniteloginloader.gif">
 
-<p><img src="/res/infiniteloginloader.gif">Please wait.  We are processing your request...</p>
-
+	<span id=pleaseWait>
+		<p>Please wait.  We are processing your request...</p>
+	</span>
 </div>
 
-<div id=resultsdiv>
 
+
+<div class=backDiv>
+	 <button id=backButton onclick="goBack()">Go Back</button>
 </div>
+
+
+
+
+<script>
+function goBack() {
+    window.history.back();
+}
+</script> 
 
 </body>
 

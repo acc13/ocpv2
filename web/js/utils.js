@@ -102,7 +102,6 @@ Dual licensed under the MIT and GPL licenses.
 
 
 
-"use strict";
 
 /* Functions */
 
@@ -115,7 +114,10 @@ function getUrlVars() {
     return vars;
 }
 
-var debugSet = (getUrlVars()["debug"] != "undefined");
+var debugSet = (getUrlVars()["debug"] != undefined);
+
+debug("isTest: " + isTest);
+debug("debugSet: " + getUrlVars()["debug"]);
 
 function debug(msg)
  {

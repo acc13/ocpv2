@@ -104,7 +104,7 @@ public class OutputTestResultGetter {
         JSONObject responseJson = new JSONObject();
 
         JSONObject headerJson = new JSONObject();
-        headerJson.put("Access-Control-Allow-Origin:domain-name", "*");
+        headerJson.put("Access-Control-Allow-Origin", "*");
         responseJson.put("isBase64Encoded", false);
         responseJson.put("headers", headerJson);
 
@@ -112,7 +112,10 @@ public class OutputTestResultGetter {
             responseJson.put("statusCode", statusCode);
         }
 
-        responseJson.put("body", result);
+        JSONObject bodyJson = new JSONObject();
+        bodyJson.put("result", result);
+
+        responseJson.put("body", bodyJson.toString());
 
         if (null != exception) {
             responseJson.put("exception", exception);
