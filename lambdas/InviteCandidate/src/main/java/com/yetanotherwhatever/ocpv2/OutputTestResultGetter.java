@@ -112,11 +112,7 @@ public class OutputTestResultGetter {
             responseJson.put("statusCode", statusCode);
         }
 
-        if (null != result) {
-            JSONObject body = new JSONObject();
-            body.put("result", result);
-            responseJson.put("body", body);
-        }
+        responseJson.put("body", result);
 
         if (null != exception) {
             responseJson.put("exception", exception);

@@ -575,10 +575,10 @@ Resources:
   # so to reflect any changes it needs to be recreated and the new deployment bound to the stage.
   OCPv2APIStage:
     Type: 'AWS::ApiGateway::Stage'
-    DependsOn : OCPv2APIDeploymentStage
+    DependsOn : OCPv2APIDeploymentStage1
     Properties:
       RestApiId: !Ref OCPv2API
-      DeploymentId: !Ref OCPv2APIDeploymentStage
+      DeploymentId: !Ref OCPv2APIDeploymentStage1
       StageName: !Ref AWS::StackName
       MethodSettings:
           - ResourcePath: /*
@@ -588,7 +588,7 @@ Resources:
             MetricsEnabled: true          
 
   #update/modify logical name to triger new deployment  
-  OCPv2APIDeploymentStage:
+  OCPv2APIDeploymentStage1:
     Type: 'AWS::ApiGateway::Deployment'
     Properties:
       RestApiId: !Ref OCPv2API

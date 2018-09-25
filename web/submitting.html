@@ -44,7 +44,7 @@ div.WordSection1
 
 
 
-	var retries = 20;
+	var retries = 5;
 
 	$(document).ready(function(){
 
@@ -54,7 +54,7 @@ div.WordSection1
 		var outputId = getOutputId();
 		debug("Output id:" + outputId);
 
-		var timer = setInterval(myMethod, 1000);
+		var timer = setInterval(myMethod, 5000);
 
 		function myMethod( )
 		{
@@ -63,8 +63,8 @@ div.WordSection1
 			type: 'GET',
 			url: getRessultsAPIURL + "/" + outputId,
 			dataType: 'text',
-			contentType: 'application/json',
-			data: JSON.stringify({}),
+			contentType: 'test/html',
+			data: "",
 			crossDomain: true,
 			success: function (data) {
 				  	$('#resultsdiv').html('<span class="success">' + data + '</span>');
