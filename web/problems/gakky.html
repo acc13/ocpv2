@@ -366,16 +366,16 @@ for which a gakky must be calculated.</p>
 
 
 <div id=uploadSlnDiv class=uploadDiv>
-	<form id="outputForm" action="http://test.upload.yetanotherwhatever.io.s3.amazonaws.com/" method="post" enctype="multipart/form-data" onsubmit="return(genOutputKey());">
+	<form id="outputForm" action="tbd" method="post" enctype="multipart/form-data" onsubmit="return(genOutputKey());">
 	      <input type="hidden" name="key" value="uploads/output/${filename}">
 	      <input type="hidden" name="acl" value="private"> 
-	      <input type="hidden" name="success_action_redirect" value="http://test.yetanotherwhatever.io/submitting.html">
-	      <input type="hidden" name="policy" value='eyJleHBpcmF0aW9uIjoiMjAyMC0wOS0yNFQwMDowMDowMFoiLCJjb25kaXRpb25zIjpbeyJidWNrZXQiOiJ0ZXN0LnVwbG9hZC55ZXRhbm90aGVyd2hhdGV2ZXIuaW8ifSxbInN0YXJ0cy13aXRoIiwiJGtleSIsInVwbG9hZHMvb3V0cHV0LyJdLHsiYWNsIjoicHJpdmF0ZSJ9LHsic3VjY2Vzc19hY3Rpb25fcmVkaXJlY3QiOiJodHRwOi8vdGVzdC55ZXRhbm90aGVyd2hhdGV2ZXIuaW8vc3VibWl0dGluZy5odG1sIn0seyJ4LWFtei1hbGdvcml0aG0iOiJBV1M0LUhNQUMtU0hBMjU2In0seyJ4LWFtei1jcmVkZW50aWFsIjoiQUtJQUlIVFFWVUpVUjJJV09DT0EvMjAyMDA5MjQvdXMtZWFzdC0xL3MzL2F3czRfcmVxdWVzdCJ9LHsieC1hbXotZGF0ZSI6IjIwMjAwOTI0VDAwMDAwMFoifSx7IngtYW16LXN0b3JhZ2UtY2xhc3MiOiJSRURVQ0VEX1JFRFVOREFOQ1kifSxbInN0YXJ0cy13aXRoIiwiJHgtYW16LW1ldGEtZGF0YSIsIiJdLFsiY29udGVudC1sZW5ndGgtcmFuZ2UiLDAsMTA0ODU3Nl1dfQ=='>
+	      <input type="hidden" name="success_action_redirect" value="tbd">
+	      <input type="hidden" name="policy" value='tbd='>
 	       <input type="hidden" name="x-amz-algorithm" value="AWS4-HMAC-SHA256">
-	       <input type="hidden" name="x-amz-credential" value="AKIAIHTQVUJUR2IWOCOA/20200924/us-east-1/s3/aws4_request">
-	       <input type="hidden" name="x-amz-date" value="20200924T000000Z">
+	       <input type="hidden" name="x-amz-credential" value="AKIAIHTQVUJUR2IWOCOA/20200926/us-east-1/s3/aws4_request">
+	       <input type="hidden" name="x-amz-date" value="20200926T000000Z">
 	       <input type="hidden" name="x-amz-storage-class" value="REDUCED_REDUNDANCY">
-	       <input type="hidden" name="x-amz-signature" value="cd727015c7d455b7071844b4af395d0d750228c7f41c6e10a91b311edcb8e597">
+	       <input type="hidden" name="x-amz-signature" value="tbd">
 	       <input type="hidden" name="x-amz-meta-data" value="">
 	      <!-- Include any additional input fields here -->
 
@@ -442,16 +442,16 @@ for which a gakky must be calculated.</p>
 
 
 <div id=uploadCodeDiv class=uploadDiv>
-	<form id="codeForm" action="http://test.upload.yetanotherwhatever.io.s3.amazonaws.com/" method="post" enctype="multipart/form-data" onsubmit="return(genCodeKey());">
+	<form id="codeForm" action="tbd" method="post" enctype="multipart/form-data" onsubmit="return(genCodeKey());">
 	      <input type="hidden" name="key" value="uploads/code/${filename}">
 	      <input type="hidden" name="acl" value="private"> 
-	      <input type="hidden" name="success_action_redirect" value="http://test.yetanotherwhatever.io/thanks.html">
-	      <input type="hidden" name="policy" value='eyJleHBpcmF0aW9uIjoiMjAyMC0wOS0yNFQwMDowMDowMFoiLCJjb25kaXRpb25zIjpbeyJidWNrZXQiOiJ0ZXN0LnVwbG9hZC55ZXRhbm90aGVyd2hhdGV2ZXIuaW8ifSxbInN0YXJ0cy13aXRoIiwiJGtleSIsInVwbG9hZHMvY29kZS8iXSx7ImFjbCI6InByaXZhdGUifSx7InN1Y2Nlc3NfYWN0aW9uX3JlZGlyZWN0IjoiaHR0cDovL3Rlc3QueWV0YW5vdGhlcndoYXRldmVyLmlvL3RoYW5rcy5odG1sIn0seyJ4LWFtei1hbGdvcml0aG0iOiJBV1M0LUhNQUMtU0hBMjU2In0seyJ4LWFtei1jcmVkZW50aWFsIjoiQUtJQUlIVFFWVUpVUjJJV09DT0EvMjAyMDA5MjQvdXMtZWFzdC0xL3MzL2F3czRfcmVxdWVzdCJ9LHsieC1hbXotZGF0ZSI6IjIwMjAwOTI0VDAwMDAwMFoifSx7IngtYW16LXN0b3JhZ2UtY2xhc3MiOiJSRURVQ0VEX1JFRFVOREFOQ1kifSxbInN0YXJ0cy13aXRoIiwiJHgtYW16LW1ldGEtZGF0YSIsIiJdLFsiY29udGVudC1sZW5ndGgtcmFuZ2UiLDAsMTA0ODU3Nl1dfQ=='>
+	      <input type="hidden" name="success_action_redirect" value="tbd">
+	      <input type="hidden" name="policy" value='tbd'>
 	       <input type="hidden" name="x-amz-algorithm" value="AWS4-HMAC-SHA256">
-	       <input type="hidden" name="x-amz-credential" value="AKIAIHTQVUJUR2IWOCOA/20200924/us-east-1/s3/aws4_request">
-	       <input type="hidden" name="x-amz-date" value="20200924T000000Z">
+	       <input type="hidden" name="x-amz-credential" value="AKIAIHTQVUJUR2IWOCOA/20200926/us-east-1/s3/aws4_request">
+	       <input type="hidden" name="x-amz-date" value="20200926T000000Z">
 	       <input type="hidden" name="x-amz-storage-class" value="REDUCED_REDUNDANCY">
-	       <input type="hidden" name="x-amz-signature" value="787c62971bf70ed37ad626f75da8e82702cb1b17187428c6e14da6a31c73be78">
+	       <input type="hidden" name="x-amz-signature" value="tbd">
 	       <input type="hidden" name="x-amz-meta-data" value="">
 	      <!-- Include any additional input fields here -->
 
@@ -463,6 +463,7 @@ for which a gakky must be calculated.</p>
 	      <br><br></div>
 	      <input type="submit" value="Upload File">
     </form>
+
 
 </div>
 

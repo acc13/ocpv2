@@ -178,6 +178,7 @@ public class S3HTTPPostFormSigner {
                 "    [\"content-length-range\",0,1048576]\n" +
                 "  ]\n" +
                 "}";
+        System.out.println(policyDoc);
 
         return b64Encode(policyDoc);
     }

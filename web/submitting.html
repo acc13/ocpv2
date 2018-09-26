@@ -46,7 +46,7 @@
 <script type="text/javascript">
 
 
-	var retries = (isTest? 1 : 15);
+	var retries = 15;
 
 	$(document).ready(function(){
 
@@ -56,7 +56,7 @@
 		var outputId = getOutputId();
 		debug("Output id:" + outputId);
 
-		var timer = setInterval(myMethod, (isTest? 3000 : 1000));
+		var timer = setInterval(myMethod, 1000);
 
 		function myMethod( )
 		{

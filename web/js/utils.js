@@ -116,13 +116,12 @@ function getUrlVars() {
 
 var debugSet = (getUrlVars()["debug"] != undefined);
 
-debug("isTest: " + isTest);
 debug("debugSet: " + getUrlVars()["debug"]);
 
 function debug(msg)
  {
 
-  if (isTest && debugSet)
+  if (debugSet)
   {
     alert(msg);
   }
@@ -187,12 +186,41 @@ function isDynamicPage()
   return (isDyn);
 }
 
+//environment specific bucket/policy/sigs are set in config.js
+function updateOutputFormPolicySignatures()
+{
+  $("#outputForm").attr("action", form_action);
+
+  $("#outputForm input[name=success_action_redirect]").val(outputForm_success_action_redirect);
+  $("#outputForm input[name=policy]").val(outputForm_policy);
+  $("#outputForm input[name=x-amz-signature]").val(outputForm_signature);
+
+  debug(form_action);
+  debug(outputForm_success_action_redirect);
+  debug(outputForm_policy);
+  debug(outputForm_signature);
+}
+function updateCodeFormPolicySignatures()
+{
+  $("#codeForm").attr("action", form_action);
+
+  $("#codeForm input[name=success_action_redirect]").val(codeForm_success_action_redirect);
+  $("#codeForm input[name=policy]").val(codeForm_policy);
+  $("#codeForm input[name=x-amz-signature]").val(codeForm_signature);
+
+  debug(form_action);
+  debug(codeForm_success_action_redirect);
+  debug(codeForm_policy);
+  debug(codeForm_signature);
+}
 
 
 //Key Generation
 /* key for solution submission */
 function genOutputKey()
 {
+  updateOutputFormPolicySignatures();
+
   //validate
   if(!document.getElementById("outputFile").value)
   {
@@ -230,6 +258,8 @@ function getFilenameNoExtension()
 /* key for output submission */
 function genCodeKey()
 {
+
+  updateCodeFormPolicySignatures();
 
   //Validation
   var email = getAndValidateEmail();

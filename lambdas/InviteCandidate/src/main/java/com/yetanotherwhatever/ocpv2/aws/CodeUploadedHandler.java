@@ -70,7 +70,7 @@ public class CodeUploadedHandler  implements RequestHandler<S3Event,S3Event> {
             throw new IllegalArgumentException("Malformed output upload key: " + testKey);
         }
 
-        this.invitationId = parts[2];
+        this.invitationId = parts[3];
 
     }
 }
