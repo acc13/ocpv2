@@ -1,16 +1,14 @@
 #!/bin/bash
 
 display_usage() { 
-	echo -e "\nUsage:\n__g5_token5ba897ea44608 --env <environment/stack name> [--clean] \n" 
+	echo -e "\nUsage:\n__g5_token5ba897ea44608 --env <environment/stack name>\n" 
+    exit 1
 	} 
 
 # idiomatic parameter and option handling in sh
 while test $# -gt 0
 do
     case "$1" in
-        --clean) 
-        	CLEAN="true"
-            ;;
         --env)
         	shift
         	ENV=$1

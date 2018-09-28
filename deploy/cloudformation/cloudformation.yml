@@ -24,6 +24,11 @@ Resources:
       WebsiteConfiguration:
         ErrorDocument: error.html
         IndexDocument: index.html
+      LifecycleConfiguration:
+        Rules:
+          - ExpirationInDays: 1
+            Prefix: tp/
+            Status: Enabled
 
   S3UploadBucket:
     Type: 'AWS::S3::Bucket'
