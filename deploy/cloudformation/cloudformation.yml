@@ -26,7 +26,8 @@ Resources:
         IndexDocument: index.html
       LifecycleConfiguration:
         Rules:
-          - ExpirationInDays: 1
+          #this must match the lambda env var "PROBLEM_EXPIRY_IN_DAYS" below
+          - ExpirationInDays: 7
             Prefix: tp/
             Status: Enabled
 
@@ -266,6 +267,7 @@ Resources:
               - '.'
               - - !Ref AWS::StackName
                 - Candidate_Invitations
+          PROBLEM_EXPIRY_IN_DAYS: 7
 
   LambdaOutputUploaded:
     Type: "AWS::Lambda::Function"
