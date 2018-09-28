@@ -30,7 +30,8 @@ class SESEmailHelper implements IEmailer {
             Destination destination = new Destination().withToAddresses(new String[]{email});
             Content subject = new Content().withData(sub);
             Content textContent = new Content().withData(text);
-            Body body = new Body().withText(textContent);
+
+            Body body = new Body().withHtml(textContent);
             Message message = new Message()
                     .withSubject(subject)
                     .withBody(body);
@@ -51,3 +52,4 @@ class SESEmailHelper implements IEmailer {
         }
     }
 }
+

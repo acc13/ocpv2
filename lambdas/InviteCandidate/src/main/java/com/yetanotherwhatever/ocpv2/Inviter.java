@@ -1,6 +1,10 @@
 package com.yetanotherwhatever.ocpv2;
 
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 
 
 import org.apache.logging.log4j.LogManager;
@@ -66,12 +70,13 @@ public class Inviter {
 
     }
 
-    static final String NL = System.getProperty("line.separator");
+    static final String NL = "<br>" + System.getProperty("line.separator");
     private void emailCandidate(String destEmailAddress, String url) throws IOException
     {
         String emailSubject = "Welcome to the Symantec online coding problem";
-        String  emailBody = "Thank you for your interest in Symantec!" + NL +
-                "Here is your unique link to the online coding problem: " + url;
+        String  emailBody = "Thank you for your interest in Symantec!<br>" + NL +
+                "Here is your unique link to the online coding problem: <a href='" + url + "'>" + url + "</a>" + NL + NL +
+                "<b>WARNING: You will have 7 days to complete the coding problem, before your personalized link expires.</b>";
 
         emailer.sendEmail(destEmailAddress, emailSubject, emailBody);
     }
@@ -83,12 +88,35 @@ public class Inviter {
                 invite.getCandidateFirstName() + " " +
                 invite.getCandidateLastName()+ ", " +
                 invite.getCandidateEmail();
+
         String emailBody =
+                "Candidate first name: " + invite.getCandidateFirstName()  + NL +
+                "Candidate last name: " + invite.getCandidateLastName() + NL +
+                "Candidate email: " + invite.getCandidateEmail() + NL +
                 "Problem key: " + problem.getProblemKey() + NL +
-                "Problem GUID: " + problem.getProblemGuid() +NL +
-                "Candidate link: " + problem.getLandingPageURL();
+                "Problem GUID: " + problem.getProblemGuid() + NL +
+                "Candidate link: <a href='" + problem.getLandingPageURL() + "'>" + problem.getLandingPageURL() + "</a>" +  NL +
+                "Link expires: " + calcExpiry();
 
         emailer.sendEmail(invite.getManagerEmail(), emailSubject, emailBody);
+    }
+
+    private String calcExpiry()
+    {
+        Calendar expiry = Calendar.getInstance();
+
+        try {
+            int days = Integer.parseInt(System.getenv("PROBLEM_EXPIRY_IN_DAYS"));
+        }
+        catch(NumberFormatException e)
+        {
+            return "Error: configuration not found.";
+        }
+
+        expiry.add(Calendar.DAY_OF_YEAR, 7);
+        Date date = expiry.getTime();
+        SimpleDateFormat format = new SimpleDateFormat("MM-dd-yyyy");
+        return format.format(date);
     }
 
 
