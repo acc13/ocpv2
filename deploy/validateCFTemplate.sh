@@ -1,7 +1,7 @@
 #!/bin/bash
 
 display_usage() { 
-	echo -e "\nUsage:\n__g5_token5ba897ea44608 --env <environment/stack name>\n" 
+	echo -e "\nUsage:\n$0 --env <environment/stack name> [--clean] \n" 
     exit 1
 	} 
 
