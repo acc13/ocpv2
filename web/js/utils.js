@@ -190,8 +190,11 @@ function isDynamicPage()
 function updateOutputFormPolicySignatures()
 {
   $("#outputForm").attr("action", form_action);
-
   $("#outputForm input[name=success_action_redirect]").val(outputForm_success_action_redirect);
+
+  $("#outputForm input[name=x-amz-credential]").val(formCredential);
+  $("#outputForm input[name=x-amz-date]").val(formTimestamp);
+
   $("#outputForm input[name=policy]").val(outputForm_policy);
   $("#outputForm input[name=x-amz-signature]").val(outputForm_signature);
 
@@ -203,8 +206,11 @@ function updateOutputFormPolicySignatures()
 function updateCodeFormPolicySignatures()
 {
   $("#codeForm").attr("action", form_action);
-
   $("#codeForm input[name=success_action_redirect]").val(codeForm_success_action_redirect);
+
+  $("#outputForm input[name=x-amz-credential]").val(formCredential);
+  $("#outputForm input[name=x-amz-date]").val(formTimestamp);
+
   $("#codeForm input[name=policy]").val(codeForm_policy);
   $("#codeForm input[name=x-amz-signature]").val(codeForm_signature);
 
