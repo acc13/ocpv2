@@ -26,17 +26,47 @@ http://docs.aws.amazon.com/AmazonS3/latest/API/sigv4-UsingHTTPPOST.html
 
 public class S3HTTPPostFormSigner {
 
-    String m_expiration;
-    String m_dateStamp;
-    String m_region;
-    String m_serviceName;
-    String m_algorithm;
-    String m_accessKeyID;
-    String m_aws_secret_key;
-    String m_s3UploadBucketName;
-    String m_s3WebBucketName;
+    private String m_expiration;
+    private String m_dateStamp;
+    private String m_region;
+    private String m_serviceName;
+    private String m_algorithm;
+    private String m_accessKeyID;
+    private String m_aws_secret_key;
+    private String m_s3UploadBucketName;
+    private String m_s3WebBucketName;
 
+    //OUTPUTS
+    private String m_credential;
+    private String m_timeStamp;
+    private String m_outputFormPolicyDoc;
+    private String m_outputFormSignedPolicy;
+    private String m_codeFormPolicyDoc;
+    private String m_codeFormSignedPolicy;
 
+    public String getCredential() {
+        return m_credential;
+    }
+
+    public String getTimeStamp() {
+        return m_timeStamp;
+    }
+
+    public String getOutputFormPolicyDoc() {
+        return m_outputFormPolicyDoc;
+    }
+
+    public String getOutputFormSignedPolicy() {
+        return m_outputFormSignedPolicy;
+    }
+
+    public String getCodeFormPolicyDoc() {
+        return m_codeFormPolicyDoc;
+    }
+
+    public String getCodeFormSignedPolicy() {
+        return m_codeFormSignedPolicy;
+    }
 
     /*
     Generates two signed forms, for the online coding problem
@@ -49,7 +79,7 @@ public class S3HTTPPostFormSigner {
 
         m_accessKeyID = accessKeyID;
         m_aws_secret_key = aws_secret_key;
-        m_expiration = yearsFromToday(2);
+        m_expiration = yearsFromToday(1);
 
         //WARNING: AWS oddity:
         //expiration will be calculate by S3 as max 7 days from x-amz-date
@@ -126,11 +156,11 @@ public class S3HTTPPostFormSigner {
         return b64;
     }
 
-    public static String signPolicy(String b64_policy_doc, String aws_secret_key, String dateStamp, String region, String serviceName)
+    public String signPolicy(String b64_policy_doc)
     {
         try {
 
-            byte[] signatureKey = getSignatureKey(aws_secret_key, dateStamp, region, serviceName);
+            byte[] signatureKey = getSignatureKey(m_aws_secret_key, m_dateStamp, m_region, m_serviceName);
 
             byte[] signingKey = signatureKey;
 
@@ -154,50 +184,43 @@ public class S3HTTPPostFormSigner {
         return "";
     }
 
-    private String buildPolicyDoc(String expiration,
-                                         String folder,
-                                         String algorithm,
-                                         String accessKeyID,
-                                         String dateStamp,
-                                         String region,
-                                         String serviceName,
-                                         String redirectPage)
+    private String buildPolicyDoc(String s3KeyPrefix,
+                                  String successRedirectPage)
     {
         String policyDoc = "{\n" +
-                "  \"expiration\":\"" + expiration + " T00:00:00Z\",\n" +
+                "  \"expiration\":\"" + m_expiration + " T00:00:00Z\",\n" +
                 "  \"conditions\": [\n" +
                 "    {\"bucket\":\"" + m_s3UploadBucketName + "\"},\n" +
-                "    [\"starts-with\",\"$key\",\"" + folder + "/\"],\n" +
+                "    [\"starts-with\",\"$key\",\"" + s3KeyPrefix + "/\"],\n" +
                 "    {\"acl\":\"private\"},\n" +
-                "    {\"success_action_redirect\":\"http://" + m_s3WebBucketName + "/" + redirectPage + "\"},\n" +
-                "    {\"x-amz-algorithm\":\"" + algorithm + "\"},\n" +
-                "    {\"x-amz-credential\":\"" + accessKeyID + "/" + dateStamp + "/" + region + "/" + serviceName + "/aws4_request\"},\n" +
-                "    {\"x-amz-date\":\"" + dateStamp + "T000000Z\"},\n" +
+                "    {\"success_action_redirect\":\"http://" + m_s3WebBucketName + "/" + successRedirectPage + "\"},\n" +
+                "    {\"x-amz-algorithm\":\"" + m_algorithm + "\"},\n" +
+                "    {\"x-amz-credential\":\"" + m_accessKeyID + "/" + m_dateStamp + "/" + m_region + "/" + m_serviceName + "/aws4_request\"},\n" +
+                "    {\"x-amz-date\":\"" + m_dateStamp + "T000000Z\"},\n" +
                 "    {\"x-amz-storage-class\":\"REDUCED_REDUNDANCY\"},\n" +
                 "    [\"starts-with\",\"$x-amz-meta-data\",\"\"],\n" +
                 "    [\"content-length-range\",0,1048576]\n" +
                 "  ]\n" +
                 "}";
-        System.out.println(policyDoc);
 
         return b64Encode(policyDoc);
     }
 
-    private void buildForm(String folder, String additionalFields,
-                           String redirectPage, String validation, String formId)
+    private String buildForm(String s3KeyPrefix, String additionalFields,
+                           String successRedirectPage, String validation, String formId, String policyDoc, String signedPolicy)
     {
-        String policyDoc = buildPolicyDoc(m_expiration, folder, m_algorithm, m_accessKeyID, m_dateStamp, m_region, m_serviceName, redirectPage);
-        String signedPolicy = signPolicy(policyDoc, m_aws_secret_key, m_dateStamp, m_region, m_serviceName);
+        m_credential = m_accessKeyID + "/" + m_dateStamp + "/us-east-1/s3/aws4_request";
+        m_timeStamp = m_dateStamp + "T000000Z";
 
         String form = "<form id=\"" + formId + "\" action=\"http://" + m_s3UploadBucketName + ".s3.amazonaws.com/\" method=\"post\"" +
                 " enctype=\"multipart/form-data\" onsubmit=\"return(" + validation + ");\">\n" +
-                "\t      <input type=\"hidden\" name=\"key\" value=\"" + folder + "/${filename}\">\n" +
+                "\t      <input type=\"hidden\" name=\"key\" value=\"" + s3KeyPrefix + "/${filename}\">\n" +
                 "\t      <input type=\"hidden\" name=\"acl\" value=\"private\"> \n" +
-                "\t      <input type=\"hidden\" name=\"success_action_redirect\" value=\"http://" + m_s3WebBucketName + "/" + redirectPage + "\">\n" +
+                "\t      <input type=\"hidden\" name=\"success_action_redirect\" value=\"http://" + m_s3WebBucketName + "/" + successRedirectPage + "\">\n" +
                 "\t      <input type=\"hidden\" name=\"policy\" value='" + policyDoc + "'>\n" +
                 "\t       <input type=\"hidden\" name=\"x-amz-algorithm\" value=\"" + m_algorithm + "\">\n" +
-                "\t       <input type=\"hidden\" name=\"x-amz-credential\" value=\"" + m_accessKeyID + "/" + m_dateStamp + "/us-east-1/s3/aws4_request\">\n" +
-                "\t       <input type=\"hidden\" name=\"x-amz-date\" value=\"" + m_dateStamp + "T000000Z\">\n" +
+                "\t       <input type=\"hidden\" name=\"x-amz-credential\" value=\"" + m_credential + "\">\n" +
+                "\t       <input type=\"hidden\" name=\"x-amz-date\" value=\"" + m_timeStamp + "\">\n" +
                 "\t       <input type=\"hidden\" name=\"x-amz-storage-class\" value=\"REDUCED_REDUNDANCY\">\n" +
                 "\t       <input type=\"hidden\" name=\"x-amz-signature\" value=\"" + signedPolicy + "\">\n" +
                 "\t       <input type=\"hidden\" name=\"x-amz-meta-data\" value=\"\">\n" +
@@ -206,15 +229,11 @@ public class S3HTTPPostFormSigner {
                 "\t      <input type=\"submit\" value=\"Upload File\">\n" +
                 "    </form>";
 
-        System.out.println();
-        System.out.println("<!-- Replace form : " + formId  + "  -->");
-        System.out.println(form);
-        System.out.println();
-        System.out.println();
+        return form;
     }
 
 
-    void buildTestOutputForm()
+    String buildTestOutputForm()
     {
         //policy for uploading user's test output
         String htmlFormID = "outputForm";
@@ -226,10 +245,13 @@ public class S3HTTPPostFormSigner {
                 "      <br>\n";
         String validationFunction = "genOutputKey()";
 
-        buildForm(s3KeyPrefix, additionalFormFields, successRedirectPage, validationFunction, htmlFormID);
+        m_outputFormPolicyDoc = buildPolicyDoc(s3KeyPrefix, successRedirectPage);
+        m_outputFormSignedPolicy = signPolicy(m_outputFormPolicyDoc);
+        return buildForm(s3KeyPrefix, additionalFormFields, successRedirectPage, validationFunction, htmlFormID,
+                m_outputFormPolicyDoc, m_outputFormSignedPolicy);
     }
 
-    void buildUploadSolutionForm()
+    String buildUploadSolutionForm()
     {
 
         //policy for uploading user code (.zip)
@@ -245,7 +267,10 @@ public class S3HTTPPostFormSigner {
         String validationFunction= "genCodeKey()";
         String htmlFormID = "codeForm";
 
-        buildForm(s3KeyPrefix, additionalFormFields, successRedirectPage, validationFunction, htmlFormID);
+        m_codeFormPolicyDoc = buildPolicyDoc(s3KeyPrefix, successRedirectPage);
+        m_codeFormSignedPolicy = signPolicy(m_codeFormPolicyDoc);
+        return buildForm(s3KeyPrefix, additionalFormFields, successRedirectPage, validationFunction, htmlFormID,
+                m_codeFormPolicyDoc, m_codeFormSignedPolicy);
     }
 
     public static void main(String[] args) {
@@ -268,9 +293,34 @@ public class S3HTTPPostFormSigner {
 
         S3HTTPPostFormSigner signer = new S3HTTPPostFormSigner(awsAccessKeyID, awsSecretAccessKey, hostedZone, stackName);
 
-        signer.buildTestOutputForm();
 
-        signer.buildUploadSolutionForm();
+
+        System.out.println();
+        System.out.println("<!-- Replace output upload form-->");
+        System.out.println(signer.buildTestOutputForm());
+        System.out.println();
+        System.out.println();
+
+
+        System.out.println();
+        System.out.println("<!-- Replace code upload form -->");
+        System.out.println(signer.buildUploadSolutionForm());
+        System.out.println();
+        System.out.println();
+
+
+        System.out.println("<!-- environment: " + stackName + " -->\n");
+        System.out.println();
+        System.out.println(
+                "        var formCredential = \"" + signer.getCredential() + "\";\n" +
+                "        var formTimestamp = \"" + signer.getTimeStamp() + "\";\n" +
+                "\n" +
+                "        var outputForm_policy = \"" + signer.getOutputFormPolicyDoc() + "\";\n" +
+                "        var outputForm_signature = \"" + signer.getOutputFormSignedPolicy() + "\";\n" +
+                "\n" +
+                "        var codeForm_policy = \"" + signer.getCodeFormPolicyDoc() + "\";\n" +
+                "        var codeForm_signature = \"" + signer.getCodeFormSignedPolicy() + "\";"
+        );
 
     }
 }
