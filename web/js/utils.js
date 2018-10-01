@@ -189,47 +189,13 @@ function isDynamicPage()
   return (isDyn);
 }
 
-//environment specific bucket/policy/sigs are set in config.js
-function updateOutputFormPolicySignatures()
-{
-  $("#outputForm").attr("action", form_action);
-  $("#outputForm input[name=success_action_redirect]").val(outputForm_success_action_redirect);
-
-  $("#outputForm input[name=x-amz-credential]").val(formCredential);
-  $("#outputForm input[name=x-amz-date]").val(formTimestamp);
-
-  $("#outputForm input[name=policy]").val(outputForm_policy);
-  $("#outputForm input[name=x-amz-signature]").val(outputForm_signature);
-
-  debug(form_action);
-  debug(outputForm_success_action_redirect);
-  debug(outputForm_policy);
-  debug(outputForm_signature);
-}
-function updateCodeFormPolicySignatures()
-{
-  $("#codeForm").attr("action", form_action);
-  $("#codeForm input[name=success_action_redirect]").val(codeForm_success_action_redirect);
-
-  $("#outputForm input[name=x-amz-credential]").val(formCredential);
-  $("#outputForm input[name=x-amz-date]").val(formTimestamp);
-
-  $("#codeForm input[name=policy]").val(codeForm_policy);
-  $("#codeForm input[name=x-amz-signature]").val(codeForm_signature);
-
-  debug(form_action);
-  debug(codeForm_success_action_redirect);
-  debug(codeForm_policy);
-  debug(codeForm_signature);
-}
-
 
 //Key Generation
 /* key for solution submission */
 //TODO break this up into validation, and prepare key/metadata
-function genOutputKey()
+function prepareoutputForm()
 {
-  updateOutputFormPolicySignatures();
+  prepareS3UploadForms();
 
   //validate
   if(!document.getElementById("outputFile").value)
@@ -267,11 +233,11 @@ function getFilenameNoExtension()
 
 // TODO break this function up
 // int validation and prepare key/metadata
-function genCodeKey()
+function preparecodeForm()
 {
 
-  updateCodeFormPolicySignatures();
-
+  prepareS3UploadForms();
+  
   /*
    * VALIDATION 
    */

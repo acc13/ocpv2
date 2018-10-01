@@ -141,7 +141,7 @@ public class Invitation {
         //just check length for now
         if (name == null || name.length() == 0 || name.length() > 100)
         {
-            throw new IllegalArgumentException("Name of invalid length: \"" + name + "\"");
+            throw new IllegalArgumentException("Name of invalid length: '" + name + "'");
         }
 
         isValidNameWarningOnly(name);
@@ -168,7 +168,7 @@ public class Invitation {
         //just check length for now
         if (email == null || email.length() == 0 || email.length() > 100)
         {
-            throw new IllegalArgumentException("Email of invalid length: \"" + email + "\"");
+            throw new IllegalArgumentException("Email of invalid length: '" + email + "'");
         }
     }
 

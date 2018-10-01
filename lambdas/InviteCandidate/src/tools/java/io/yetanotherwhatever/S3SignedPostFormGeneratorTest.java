@@ -5,12 +5,13 @@ import org.junit.Test;
 
 import java.util.Calendar;
 
-import static io.yetanotherwhatever.S3HTTPPostFormSigner.*;
-import static java.util.Calendar.*;
+import static io.yetanotherwhatever.SignedS3Form.b64Encode;
+import static io.yetanotherwhatever.SignedS3Form.yearsFromToday;
+import static java.util.Calendar.OCTOBER;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 
-public class S3HTTPPostFormSignerTest {
+public class S3SignedPostFormGeneratorTest {
 
     @Test
     public void oneYearFrom_plusOne_1stbday()
