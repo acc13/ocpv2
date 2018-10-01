@@ -1,3 +1,6 @@
+'use strict';
+
+
 /*!
 Math.uuid.js (v1.4)
 http://www.broofa.com
@@ -223,6 +226,7 @@ function updateCodeFormPolicySignatures()
 
 //Key Generation
 /* key for solution submission */
+//TODO break this up into validation, and prepare key/metadata
 function genOutputKey()
 {
   updateOutputFormPolicySignatures();
@@ -261,13 +265,16 @@ function getFilenameNoExtension()
 }
 
 
-/* key for output submission */
+// TODO break this function up
+// int validation and prepare key/metadata
 function genCodeKey()
 {
 
   updateCodeFormPolicySignatures();
 
-  //Validation
+  /*
+   * VALIDATION 
+   */
   var email = getAndValidateEmail();
   if (!email)
   {
@@ -336,13 +343,6 @@ function getAndValidateEmail()
   return email;
 }
 
-//given "http://foo.com/bar.html?baz=1"
-//returns "http://foo.com/bar.html"
-function getURLNoParams()
-{
-  var location = document.location.protocol + "//" + window.location.hostname + window.location.pathname;
-  return location;
-}
 
 function getProblemName()
 {

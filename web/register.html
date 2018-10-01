@@ -47,14 +47,8 @@ $(document).ready(function(){
 		
 	  save();
 
-	  if (!($('#manager_email').val().includes("symantec.com")))
-	  {
-	  	alert("Manager must have a symantec.com email.");
-	  	return false;
-	  }
-
 	  if(!confirm("Confirm?")) {
-	  	return true;
+	  	return;
 	  }
 
 	  $('#invite-form').hide();
@@ -189,7 +183,7 @@ p.formheading {
 		<p class=formheading>Hiring manager</p>
 		<p>	 
 		  <label for="manager_email">Your email:</label>
-		  <input class=email type="email" id="manager_email" placeholder="email@symantec.com" required/>
+		  <input class=email type="email" id="manager_email" placeholder="hiring manager email..." required/>
 		</p>
 		<p>	 
 		  <input type="checkbox" id="remember_me"/>
