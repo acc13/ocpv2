@@ -4,3 +4,6 @@
 */build
 */out
 *.iml
+lambdas/InviteCandidate/out*
+lambdas/InviteCandidate/.gradle
+lambdas/InviteCandidate/build*
