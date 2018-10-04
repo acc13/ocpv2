@@ -32,12 +32,21 @@ const env = extractStackName(window.location.href);
 //TODO fix this
 let ocpv2RestAPIId = "rz34guof5h";
 
+switch(env) {
+        case 'test':
+              ocpv2RestAPIId = "rz34guof5h";
+              break;
+        case 'ocp':
+              ocpv2RestAPIId = "0e5jqclkvb";
+              break;
+}
+
+
 /*************************** AUTO-GENERATED FORM SETUP CODE ***************************/
 function prepareS3UploadForms() {
     switch(env) {
         case 'test':
 
-              ocpv2RestAPIId = "rz34guof5h";
 
               $('#outputForm').attr('action', 'http://test.upload.yetanotherwhatever.io.s3.amazonaws.com/');
               $('#outputForm input[name=success_action_redirect]').val('http://test.yetanotherwhatever.io/submitting.html');
@@ -58,8 +67,6 @@ function prepareS3UploadForms() {
               $('#codeForm input[name=x-amz-signature]').val('99d4f6970a7c86dde15000a252bcad554721a51fcd6016ccc90f9aa7a5220bac');
             break;
         case 'ocp':
-
-              ocpv2RestAPIId = "0e5jqclkvb";
 
               $('#outputForm').attr('action', 'http://ocp.upload.yetanotherwhatever.io.s3.amazonaws.com/');
               $('#outputForm input[name=success_action_redirect]').val('http://ocp.yetanotherwhatever.io/submitting.html');
