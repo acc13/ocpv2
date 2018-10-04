@@ -1,9 +1,6 @@
-*/.gradle
-*credentials.csv
-*.idea
-*/build
-*/out
-*.iml
-lambdas/InviteCandidate/out*
-lambdas/InviteCandidate/.gradle
-lambdas/InviteCandidate/build*
+**/.gradle
+**credentials.csv
+**/.idea
+**/build
+**/out
+**.iml
