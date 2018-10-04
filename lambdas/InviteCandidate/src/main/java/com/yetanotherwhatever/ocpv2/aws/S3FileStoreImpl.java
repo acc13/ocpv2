@@ -46,23 +46,8 @@ public class S3FileStoreImpl implements IFileStore {
         return s3object.getObjectContent();
     }
 
-    @Override
-    public String buildDownloadUrl(String fileName) throws IOException
+    static public String buildDownloadUrl(String bucket, String key)
     {
-        if (null == fileName)
-        {
-            throw new IllegalArgumentException("fileName cannot be null.");
-        }
-
-        String[] parts = fileName.split(":");
-        if (parts.length != 2)
-        {
-            throw new IllegalArgumentException("Invalid fileName encountered: " + fileName);
-        }
-
-        String bucket = parts[0];
-        String key = parts[1];
-
         //Example:
         //https://s3.amazonaws.com/test.upload.yetanotherwhatever.io/uploads/code/63ba691e-3a9d-4c26-a22f-735cd4b83328/135A04E5-F2A4-49C4-B298-D9E29BB7BBCC.zip
 

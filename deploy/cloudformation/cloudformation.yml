@@ -37,6 +37,7 @@ Resources:
       - LambdaOutputUploaded
       - S3InvokeLambdaOutputUploadedPermission
     Properties:
+      AccessControl: PublicRead
       BucketName: 
         !Join
           - '.'
@@ -62,6 +63,26 @@ Resources:
                   - Name: prefix
                     Value: 'uploads/code/'
 
+  AllowPublicDownloadFromUploadBucketPolicy: 
+    Type: AWS::S3::BucketPolicy
+    Properties: 
+      Bucket: 
+        Ref: S3UploadBucket
+      PolicyDocument: 
+        Statement: 
+          - 
+            Action: 
+              - "s3:GetObject"
+            Effect: "Allow"
+            Resource: 
+              Fn::Join: 
+                - ""
+                - 
+                  - "arn:aws:s3:::"
+                  - 
+                    Ref: S3UploadBucket
+                  - "/*"
+            Principal: "*"
 
 
   #######################################

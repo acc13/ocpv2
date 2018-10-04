@@ -17,8 +17,8 @@ public class S3FileStoreImplTest {
     public void buildDownloadUrl_validFileName_succeeds() throws IOException
     {
         S3FileStoreImpl s3FS = new S3FileStoreImpl();
-        String url = s3FS.buildDownloadUrl("bucketname:key");
+        String url = s3FS.buildDownloadUrl("bucket", "key");
         assertThat(url,
-                is(equalTo("https://s3.amazonaws.com/bucketname/key")));
+                is(equalTo("https://s3.amazonaws.com/bucket/key")));
     }
 }

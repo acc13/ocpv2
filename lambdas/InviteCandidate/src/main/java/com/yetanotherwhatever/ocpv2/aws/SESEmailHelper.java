@@ -19,8 +19,7 @@ class SESEmailHelper implements IEmailer {
 
     static final Logger logger = LogManager.getLogger(SESEmailHelper.class);
 
-    private static final AmazonSimpleEmailService client =
-            AmazonSimpleEmailServiceClientBuilder.defaultClient();
+    private static AmazonSimpleEmailService sesClient = null;
 
     private static final String SENDER = "noreply@yetanotherwhatever.io";
 
@@ -40,7 +39,7 @@ class SESEmailHelper implements IEmailer {
                     .withDestination(destination)
                     .withMessage(message);
 
-            client.sendEmail(request);
+            getSESClient().sendEmail(request);
 
             logger.info("Email sent to: " + email);
             logger.info("Email subject: " + sub);
@@ -50,6 +49,17 @@ class SESEmailHelper implements IEmailer {
         {
             throw new IOException(e);
         }
+    }
+
+    //lazy load
+    private AmazonSimpleEmailService getSESClient()
+    {
+        if (null == sesClient)
+        {
+            this.sesClient = AmazonSimpleEmailServiceClientBuilder.defaultClient();
+        }
+
+        return this.sesClient;
     }
 }
 

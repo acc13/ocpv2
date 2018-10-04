@@ -5,12 +5,10 @@ import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.amazonaws.services.lambda.runtime.events.S3Event;
 import com.amazonaws.services.s3.event.S3EventNotification;
 import com.yetanotherwhatever.ocpv2.CodeUploadedNotifier;
-import com.yetanotherwhatever.ocpv2.OutputChecker;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
-import java.util.function.Function;
 
 /**
  * Created by achang on 9/12/2018.
@@ -19,7 +17,7 @@ public class CodeUploadedHandler  implements RequestHandler<S3Event,S3Event> {
 
     static final Logger logger = LogManager.getLogger(CodeUploadedHandler.class);
 
-    String zipFileName, invitationId;
+    CodeUploadedNotifier cun = null;
 
     public S3Event handleRequest(S3Event s3Event, Context context) {
 
@@ -27,14 +25,15 @@ public class CodeUploadedHandler  implements RequestHandler<S3Event,S3Event> {
         for (S3EventNotification.S3EventNotificationRecord record : s3Event.getRecords()) {
             try {
 
-                CodeUploadedNotifier un = new CodeUploadedNotifier();
+                CodeUploadedNotifier un = getCodeUploadedNotifier();
                 un.setDb(new DynamoOcpV2DB());
                 un.setEmailer(new SESEmailHelper());
                 un.setFileStore(new S3FileStoreImpl());
 
-                parseRecord(record);
+                String invitationId = extractInvitationId(record);
+                String downloadUrl = extractS3DownloadUrl(record);
 
-                un.notifyManager(invitationId, zipFileName);
+                un.notifyManager(invitationId, downloadUrl);
 
                 logger.info("Manager notified.");
                 logger.debug("Code upload notification complete.");
@@ -47,30 +46,48 @@ public class CodeUploadedHandler  implements RequestHandler<S3Event,S3Event> {
         return s3Event;
     }
 
-    public void parseRecord(S3EventNotification.S3EventNotificationRecord record)
+    protected void setCodeUploadedNotifier(CodeUploadedNotifier cun)
     {
-        ///////////////////////////////
-        //  EXTRACT TEST FILENAME
-        ///////////////////////////////
-        String bucketName = record.getS3().getBucket().getName();
+        this.cun = cun;
+    }
+
+    protected CodeUploadedNotifier getCodeUploadedNotifier()
+    {
+        if (null == this.cun)
+        {
+            this.cun = new CodeUploadedNotifier();
+        }
+
+        return this.cun;
+    }
+
+    private String extractS3DownloadUrl(S3EventNotification.S3EventNotificationRecord record)
+    {
+        String bucket = record.getS3().getBucket().getName();
+        String key = record.getS3().getObject().getKey();
+
+        logger.debug("Code upload at s3 bucket: '" + bucket + "' key: '" + key + "'");
+
+        String downloadUrl = S3FileStoreImpl.buildDownloadUrl(bucket, key);
+
+        logger.debug("Download URL: " + downloadUrl);
+
+        return downloadUrl;
+    }
+
+    private String extractInvitationId(S3EventNotification.S3EventNotificationRecord record)
+    {
         String testKey = record.getS3().getObject().getKey();
-
-        this.zipFileName = bucketName + ":" + testKey;
-
-        logger.debug("Test output file created in S3: " + zipFileName );
-
-
-        ///////////////////////////////
-        //  EXTRACT INVITATION ID
-        ///////////////////////////////
-        String[] parts =testKey.split("/");
+        String[] pathParts =testKey.split("/");
         //test key should look like: "uploads/code/<invitation Id>/<random uuid>.zip"
-        if (parts.length != 4)
+        if (pathParts.length != 4)
         {
             throw new IllegalArgumentException("Malformed output upload key: " + testKey);
         }
 
-        this.invitationId = parts[3];
+        String invitationId = pathParts[2];
+
+        return invitationId;
 
     }
 }

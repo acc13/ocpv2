@@ -29,9 +29,10 @@ const env = extractStackName(window.location.href);
  ****************** ENV SPECIFIC VARS  ****************** 
  */
 
-let ocpv2RestAPIId = "rz34guof5h";  //TODO fix this
+//TODO fix this
+let ocpv2RestAPIId = "rz34guof5h";
 
-<!------------ AUTO-GENERATED FORM SETUP CODE --------------------->
+/*************************** AUTO-GENERATED FORM SETUP CODE ***************************/
 function prepareS3UploadForms() {
     switch(env) {
         case 'test':
@@ -80,7 +81,7 @@ function prepareS3UploadForms() {
             break;
     }
 }
-<!------------ END AUTO-GENERATED FORM SETUP CODE --------------------->
+/*************************** END AUTO-GENERATED FORM SETUP CODE ***************************/
 
 //API gateway stage name matches env name
 const stage = env;

@@ -64,7 +64,7 @@ public class S3SignedPostFormGenerator {
     private static void generateJS(String awsAccessKeyID, String awsSecretAccessKey, String hostedZone, ArrayList<String> stackNames)
     {
 
-        System.out.println("<!--------------------- AUTO-GENERATED FORM SETUP JS --------------------->");
+        System.out.println("/************************** AUTO-GENERATED FORM SETUP JS **************************/");
         System.out.println("function prepareS3UploadForms() {");
         System.out.println("\tswitch(env) {");
 
@@ -106,7 +106,7 @@ public class S3SignedPostFormGenerator {
         System.out.println("\t}");  //close switch
         System.out.println("}");    //close function
 
-        System.out.println("<!--------------------- END AUTO-GENERATED FORM SETUP CODE --------------------->");
+        System.out.println("/************************** END AUTO-GENERATED FORM SETUP CODE **************************/");
     }
 
 

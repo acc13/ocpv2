@@ -91,9 +91,9 @@ public class OutputChecker {
             {
                 lastErr = "Output incorrect. " + line + "\n" +
                         "First error countered on line " + line + ".\n" +
-                        "Expected value '" + expected +"' " +
+                        "Expected value \"" + expected +"\" " +
                         (expected.length()==0? "(empty string) " : "") +
-                        "but encountered value '" + test + "' "+
+                        "but encountered value \"" + test + "\" "+
                         (test.length()==0? "(empty string) " : "");
 
                 String friendlyHint = "\n\n\nSuggestions: \n" +

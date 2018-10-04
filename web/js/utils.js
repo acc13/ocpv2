@@ -36,13 +36,13 @@ Dual licensed under the MIT and GPL licenses.
  */
 (function() {
   // Private array of chars to use
-  var LEGAL = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-  var CHARS = LEGAL.split("");
+  const LEGAL = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+  const CHARS = LEGAL.split("");
 
   Math.uuid = function (len, radix) {
-    var chars = CHARS;
-    var uuid = [];
-    var i;
+    const chars = CHARS;
+    let uuid = [];
+      let i;
     radix = radix || chars.length;
 
     if (len) {
@@ -52,18 +52,18 @@ Dual licensed under the MIT and GPL licenses.
       }
     } else {
       // rfc4122, version 4 form
-      var r;
+      let r;
 
       // rfc4122 requires these characters
       uuid[8] = uuid[13] = uuid[18] = uuid[23] = "-";
       uuid[14] = "4";
 
-      // Fill in random data.  At i==19 set the high bits of clock sequence as
+      // Fill in random data.  At i===19 set the high bits of clock sequence as
       // per rfc4122, sec. 4.1.5
       for (i = 0;i < 36;i+=1) {
         if (!uuid[i]) {
           r = 0 | Math.random()*16;
-          uuid[i] = chars[(i == 19) ? (r & 0x3) | 0x8 : r];
+          uuid[i] = chars[(i === 19) ? (r & 0x3) | 0x8 : r];
         }
       }
     }
@@ -74,20 +74,20 @@ Dual licensed under the MIT and GPL licenses.
   // A more performant, but slightly bulkier, RFC4122v4 solution.  We boost performance
   // by minimizing calls to random()
   Math.uuidFast = function() {
-    var chars = CHARS;
-    var uuid = new Array(36);
-    var rnd=0;
-    var r;
+    const chars = CHARS;
+    let uuid = new Array(36);
+    let rnd=0;
+      let r;
     for (var i = 0;i < 36;i+=1) {
-      if (i==8 || i==13 ||  i==18 || i==23) {
+      if (i===8 || i===13 ||  i===18 || i===23) {
         uuid[i] = "-";
-      } else if (i==14) {
+      } else if (i===14) {
         uuid[i] = "4";
       } else {
         if (rnd <= 0x02) rnd = 0x2000000 + (Math.random()*0x1000000)|0;
         r = rnd & 0xf;
         rnd = rnd >> 4;
-        uuid[i] = chars[(i == 19) ? (r & 0x3) | 0x8 : r];
+        uuid[i] = chars[(i === 19) ? (r & 0x3) | 0x8 : r];
       }
     }
     return uuid.join("");
@@ -96,7 +96,7 @@ Dual licensed under the MIT and GPL licenses.
   // A more compact, but less performant, RFC4122v4 solution:
   Math.uuidCompact = function() {
     return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function(c) {
-      var r = Math.random()*16|0, v = c == "x" ? r : (r&0x3|0x8);
+      const r = Math.random()*16|0, v = c === "x" ? r : (r&0x3|0x8);
       return v.toString(16);
     });
   };
@@ -110,20 +110,18 @@ Dual licensed under the MIT and GPL licenses.
 
 
 function getUrlVars() {
-    var vars = {};
-    var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
+    let vars = {};
+    let parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
         vars[key] = value;
     });
     return vars;
 }
 
-var debugSet = (getUrlVars()["debug"] != undefined);
-
+let debugSet = (getUrlVars()["debug"] !== undefined);
 debug("debugSet: " + getUrlVars()["debug"]);
 
 function debug(msg)
  {
-
   if (debugSet)
   {
     alert(msg);
@@ -144,7 +142,7 @@ $(document).ready(function(){
 //Submit test output form metadata
 function setCodeMeta(formName, problemName, email)
 {
-  var myObj = {"email" : email,
+  const myObj = {"email" : email,
     "inviteId" : getFilenameNoExtension(),
     "problemName" : getProblemName()
   };
@@ -154,7 +152,7 @@ function setCodeMeta(formName, problemName, email)
 
 function setOutputMeta(formName, inviteId)
 {
-  var myObj = {
+  const myObj = {
     "inviteId" : inviteId,
     "problemName" : getProblemName()
   };
@@ -166,25 +164,25 @@ function setMeta(formName, myObj)
 {
   debug(JSON.stringify(myObj));
 
-  var form = document.getElementById(formName);
-  var meta = form.querySelectorAll("[name=x-amz-meta-data]");
-  var metaInput = meta[0];
+  const form = document.getElementById(formName);
+  const meta = form.querySelectorAll("[name=x-amz-meta-data]");
+  let metaInput = meta[0];
   metaInput.value=JSON.stringify(myObj);
 }
 
 
 //Page type
-/* Checks if the page is dynamically created */
+/* Checks if the page was dynamically created */
 function isDynamicPage()
 {
   //page will have "/tp/" folder in the path
   //and will be named "<UUID>.html"
 
-  var path = window.location.pathname;
-  var pageName = path.split("/").pop();
+  const path = window.location.pathname;
+  const pageName = path.split("/").pop();
 
-  var example = "0C109B3C-1FC3-4EEB-AF02-D604D476FF74.html";
-  var isDyn = path.indexOf("tp/") != -1 && pageName.length == example.length;
+  const example = "0C109B3C-1FC3-4EEB-AF02-D604D476FF74.html";
+  const isDyn = path.indexOf("tp/") !== -1 && pageName.length === example.length;
 
   return (isDyn);
 }
@@ -205,14 +203,14 @@ function prepareoutputForm()
   }
 
   //build key
-  var keyVal = "uploads/output/" + getFilenameNoExtension() + "/" + getProblemName() + "/" + Math.uuid() + ".txt";
+  const keyVal = "uploads/output/" + getFilenameNoExtension() + "/" + getProblemName() + "/" + Math.uuid() + ".txt";
 
   debug("keyval" + keyVal);
 
-  var formName = "outputForm";
-  var form = document.getElementById(formName);
-  var keys = form.querySelectorAll("[name=key]");
-  var keyInput = keys[0];
+  const formName = "outputForm";
+  const form = document.getElementById(formName);
+  let keys = form.querySelectorAll("[name=key]");
+  let keyInput = keys[0];
   keyInput.value = keyVal;
 
   debug(keyInput.value);
@@ -225,8 +223,8 @@ function prepareoutputForm()
 //returns "index"
 function getFilenameNoExtension()
 {
-  var path = window.location.pathname;
-  var filename = path.split("/").pop();
+  const path = window.location.pathname;
+  const filename = path.split("/").pop();
   return filename.split('.').slice(0, -1).join('.');
 }
 
@@ -241,20 +239,20 @@ function preparecodeForm()
   /*
    * VALIDATION 
    */
-  var email = getAndValidateEmail();
+  const email = getAndValidateEmail();
   if (!email)
   {
     return false;
   }
 
-  var fileName = document.getElementById("codeFile").value;
+  const fileName = document.getElementById("codeFile").value;
   if(!fileName)
   {
     alert("No file selected.");
     return false;
   }
   
-  if (-1 == fileName.indexOf(".zip"))
+  if (-1 === fileName.indexOf(".zip"))
   {
     alert ("Selected file is not a .zip file.");
     return false;
@@ -266,14 +264,14 @@ function preparecodeForm()
   }
 
   //build key
-  var keyVal = "uploads/code/" + getFilenameNoExtension() + "/" + Math.uuid() + ".zip";
+  const keyVal = "uploads/code/" + getFilenameNoExtension() + "/" + Math.uuid() + ".zip";
 
   debug("keyval" + keyVal);
 
-  var formName = "codeForm";
-  var form = document.getElementById(formName);
-  var keys = form.querySelectorAll("[name=key]");
-  var keyInput = keys[0];
+  const formName = "codeForm";
+  const form = document.getElementById(formName);
+  let keys = form.querySelectorAll("[name=key]");
+  let keyInput = keys[0];
   keyInput.value = keyVal;
 
   debug("keyInput.value" + keyInput.value);
@@ -287,10 +285,10 @@ function preparecodeForm()
 function getAndValidateEmail()
 {
 
-  var email = "emailindb";
+  let email = "emailindb";
   if (!isDynamicPage())
   {
-    var emailInput = document.getElementById("email");
+    const emailInput = document.getElementById("email");
     email = emailInput.value;
 
     if (!email || email.indexOf("@") == -1)
@@ -300,10 +298,6 @@ function getAndValidateEmail()
       emailInput.focus();
       return null;
     }
-
-    var _gaq = _gaq || [];
-      _gaq.push(["_setCustomVar",1,"email", email, 1]);
-
   }
 
   return email;

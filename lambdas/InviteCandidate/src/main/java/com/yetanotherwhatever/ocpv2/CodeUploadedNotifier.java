@@ -34,27 +34,26 @@ public class CodeUploadedNotifier {
         this.fileStore = fs;
     }
 
-    public void notifyManager(String invitationId, String zipFileName) throws IOException
+    public void notifyManager(String invitationId, String downloadUrl) throws IOException
     {
         if (null == db || null == emailer || null == fileStore)
         {
             throw new IllegalStateException("CodeUploadedNotifier not initialized.");
         }
-        if (null == invitationId || null == zipFileName)
+        if (null == invitationId || null == downloadUrl)
         {
-            throw new IllegalArgumentException("invitationId and zipFileName cannot be null.");
+            throw new IllegalArgumentException("invitationId and downloadUrl cannot be null.");
         }
 
         //look up invitation
         Invitation i = db.getInvitation(invitationId);
 
         //build upload url
-        String zipfileUrl = fileStore.buildDownloadUrl(zipFileName);
-        logger.debug("Download URL: " + zipFileName);
+        logger.debug("Download URL: " + downloadUrl);
 
         //email manager
         String subject = "Coding problem solution submitted";
-        String body = buildEmailBody(i, zipfileUrl);
+        String body = buildEmailBody(i, downloadUrl);
 
         logger.debug("Emailing manager: " + i.getManagerEmail());
         logger.debug("Email subject: " + subject);
@@ -67,14 +66,14 @@ public class CodeUploadedNotifier {
     private String buildEmailBody(Invitation i, String zipFileUrl)
     {
         String body =
-                "Time: " + Utils.formatDateISO8601(new Date()) +
-                "\nCandidate: " + i.getCandidateFirstName() + " " + i.getCandidateLastName() +
-                "\nCandidate email: " + i.getCandidateEmail() +
-                "\nInvited on: " + i.getCreationDate() +
-                "\nProblem assigned: " + i.getProblemKey() +
-                "\nOutput uploaded attempts: " + i.getAttempts() +
-                "\nOutput passed: " + i.getSucceeded() +
-                "\nDownload submitted code here:" + zipFileUrl;
+                "Time: " + Utils.formatDateISO8601(new Date()) + "<br/>" +
+                "\nCandidate: " + i.getCandidateFirstName() + " " + i.getCandidateLastName() + "<br/>" +
+                "\nCandidate email: " + i.getCandidateEmail() + "<br/>" +
+                "\nInvited on: " + i.getCreationDate() + "<br/>" +
+                "\nProblem assigned: " + i.getProblemKey() + "<br/>" +
+                "\nOutput uploaded attempts: " + i.getAttempts() + "<br/>" +
+                "\nOutput passed: " + i.getSucceeded() + "<br/>" +
+                "\nDownload submitted code <a href='" + zipFileUrl + "'>here</a>";
 
         return body;
     }
