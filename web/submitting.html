@@ -4,7 +4,7 @@
 	<title>Processing...</title> 
     <meta http-equiv="Content-Type" content='text/html; charset=UTF-8' />
    
- <link rel="stylesheet" type="text/css" href="styles.css">
+ <link rel="stylesheet" type="text/css" href="/styles.css">
 
 <style>
 <!--
@@ -100,8 +100,10 @@
 
 		function showMessageAndStop(msg, cssClass)
 		{
-			$('#pleaseWait').html('<p class="' + cssClass + '">' + msg + '</p>');
 			$('#loader').hide();
+			$('#pleaseWait').text(msg);
+			$('#pleaseWait').addClass(cssClass);
+			
 			clearInterval(timer);
 		}
 
@@ -153,8 +155,8 @@
 <div>
 	<img id=loader src="/res/infiniteloginloader.gif">
 
-	<span id=pleaseWait>
-		<p>Please wait.  We are processing your request...</p>
+	<span >
+		<p id=pleaseWait>Please wait.  We are processing your request...</p>
 	</span>
 </div>
 

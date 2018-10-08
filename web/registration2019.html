@@ -4,83 +4,75 @@
 	<title>Invite Candidate to the Symantec Online Coding Problem</title>
 	<meta charset="utf-8"/>
 
+
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
 
-<script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
 
 <script type="text/javascript" src="/js/config.js" ></script>	
 <script type="text/javascript" src="/js/utils.js" ></script>	
 
 <script type="text/javascript">
 
-function prefill()
+'use strict';
+
+function validatForm()
 {
-	if (Cookies.get("manager_email") != null)
+	if (env != "ocp")
 	{
-		$('#manager_email').val(Cookies.get('manager_email'));
-		$('#remember_me').prop( "checked", Cookies.get('remember_me'));
+		//skip for testing
+		return true;
 	}
+
+	const valid = 
+		//both checkboxes required
+		$('#full_time_student').is(':checked') &&
+		$('#available_2020').is(':checked') &&
+		//email must be .edu
+		$('#email').val().endsWith('.edu');
+
+	
+	if (!valid)
+	{
+		const message = "Please fix:\n" +
+			"    -Your email must belong to a .edu domain.\n" +
+			"    -You must be full-time student in Fall, 2019\n" +
+			"    -You must be available to work full-time in 2020.";
+		
+		alert(message);
+	}
+
+	return valid;
 }
 
-function save()
+function areYouSure()
 {
-  if ($('#remember_me').is(':checked'))
-  {
-  	Cookies.set('manager_email', $('#manager_email').val());
-  	Cookies.set('remember_me', $('#remember_me').is(':checked'));
-  }
-  else
-  {
-  	Cookies.remove("manager_email", null);
-  	Cookies.remove("remember_me", null);
-  }
+	return confirm("You will have 7 days to solve your coding problem.  Ok to continue?");
 }
 
 $(document).ready(function(){
 
-	prefill();
+	prepareS3UploadForms();
 
+});
 
-	$('#invite-form').submit(function (event) {
-
-	  event.preventDefault();
-		
-	  save();
-
-	  if(!confirm("Confirm?")) {
+function prepareinternRegForm()
+{
+	  if (!validatForm())
+	  {
 	  	return;
 	  }
 
-	  $('#invite-form').hide();
-	  $('#results').html("Generating problem and emailing candidate...")
-
-	  var data = {
-	    candidateFirstName: $('#first-name').val(),
-	    candidateLastName: $('#last-name').val(),
-	    candidateEmail: $('#email').val(),
-	    managerEmail: $('#manager_email').val()
+	  if (!areYouSure())
+	  {
+	  	return;
 	  }
 
-	  $.ajax({
-	    type: 'POST',
-	    url: inviteAPIURL,
-	    dataType: 'text',
-	    contentType: 'application/json',
-	    data: JSON.stringify(data),
-	    crossDomain: true,
-	    success: function () {
-	      	$('#results').html('<span class="success">Invite succeeded.  You may wish to notify your candidate to expect an email.<br/><br/>They may need to check their junk folder, or notify <a href="mail://andrew_chang@symantec.com">andrew_chang@symantec.com</a>.</span>');
-	    },
-		error: function(XMLHttpRequest, textStatus, errorThrown) {
-	      	$('#results').html('<span class="fail">Invite failed. Please refresh the page and try again; or notify <a href="mail://andrew_chang@symantec.com">andrew_chang@symantec.com</a></span>');
+	  //TODO
+	  
+	  //generate UUID
 
-	  		$('#invite-form').show();
-		}
-	  })
-
-	});
-
-});
+	  //set metadata
+}
 
 </script>
 
@@ -103,7 +95,7 @@ body {
 	margin-left: 100px;
 }
 
-#invite-form {
+#register-form {
 	
 	border-color: red;
 }
@@ -142,57 +134,84 @@ p.formheading {
 	font-size: 18px;
 }
 
+div.formlabel {
+	padding: 0px;
+	padding-top: 5px;
+	padding-bottom: 20px;
+}
+
 </style>
 </head>
 <body>
 
 <div id="instructions">
-<p class="h1">Online Coding Invite Page<br/>Symantec Hiring Managers</p>
+<p class="h1">Thank you for your interest in Symantec!</p>
 
-<p class="h2">Instructions:</p>
-<p>Complete and submit the form below.</p>
-<p>This portal will email candidates a link to their temporary online coding problem page.</p>
-<p>Candidates will have 48 hours to complete the exercise once they have begun.</p>
-<p>You will recieve email notifications throughout the process.</p>
+<p class="h2">Welcome students!</p>
+<p><b>To register</b> for the Symantec online coding problem, please <b>complete and submit the form below.</b></p>
+	<ul>
+		<li><p>You will immediately receive an email containing a link to your personal take-home coding problem.</p></li>
+		<li><p>You must work alone and may not share your problem page with anyone.</p></li>
+		<li><p>Your problem page will expire 7 days after you receive your link.</p></li>
+	</ul>
 <p>For any questions or issues, please email <a href="mailto://andrew_chang@symantec.com">andrew_chang@symantec.com</a>.</p>
 
 </div>
 
 <br>
 
-<p class="h2">Invite candidate:</p>
-<form id="invite-form" class="invite-form">
+<p class="h2">Register to receive your online coding problem:</p>
 	<div class=candidate>
-		<p class=formheading>Candidate</p>
+		<p class=formheading>Your information</p>
+
+<!-- ************************** AUTO-GENERATED UPLOAD FORM "internRegForm" ************************** -->
+<form id='internRegForm' action='FFFFFFFFFFFF' method='post' enctype='multipart/form-data' onsubmit='return(prepareinternRegForm());'>
+	      <input type='hidden' name='key' value='uploads/internshipRegistration/${filename}'>
+	      <input type='hidden' name='acl' value='private'> 
+	      <input type='hidden' name='success_action_redirect' value='FFFFFFFFFFFF'>
+	      <input type='hidden' name='policy' value='FFFFFFFFFFFF'>
+	       <input type='hidden' name='x-amz-algorithm' value='AWS4-HMAC-SHA256'>
+	       <input type='hidden' name='x-amz-credential' value='FFFFFFFFFFFF'>
+	       <input type='hidden' name='x-amz-date' value='FFFFFFFFFFFF'>
+	       <input type='hidden' name='x-amz-storage-class' value='REDUCED_REDUNDANCY'>
+	       <input type='hidden' name='x-amz-signature' value='FFFFFFFFFFFF'>
+	       <input type='hidden' name='x-amz-meta-data' value=''>
+
+	      <!-- ADDITIONAL INPUT FIELDS -->
+
 		<p>
-		  <label for="first-name">Candidate first name:</label>
+		  <label for="first-name">First name:</label>
 		  <input type="text" id="first-name" placeholder="first name..." required/>
 		 </p>
 
 		<p>
-		  <label for="last-name">Candidate last name:</label>
+		  <label for="last-name">Last name:</label>
 		  <input type="text" id="last-name" placeholder="last name..." required/>
 		 </p>
 
 		<p>	 
-		  <label for="email">Candidate email:</label>
-		  <input class=email type="email" id="email" placeholder="email..." required/>
+		  <label for="email">Email:</label>
+		  <input class=email type="email" id="email" placeholder="email@myuniversity.edu" required/>
 		</p>
-	</div>
-	<div class=manager>
-		<p class=formheading>Hiring manager</p>
-		<p>	 
-		  <label for="manager_email">Your email:</label>
-		  <input class=email type="email" id="manager_email" placeholder="hiring manager email..." required/>
+		<div class='formlabel'>Resume: <input id='resumeFile' name='file' type='file' required> </div>
+		<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		  <input type="checkbox" id="full_time_student"/>
+		  <label for="full_time_student">I will be enrolled as a full-time student in Fall of 2019.</label>
 		</p>
-		<p>	 
-		  <input type="checkbox" id="remember_me"/>
-		  <label for="remember_me">Remember me (only check if you agree to allow this page to use cookies)</label>
-		</p>
+		<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		  <input type="checkbox" id="available_2020"/>
+		  <label for="available_2020">I will be available to work full-time in 2020.</label>
+		</p><br>
+
+
+	      <!-- END ADDITIONAL INPUT FIELDS -->
+	      <input type='submit' value='Submit'>
+    </form>
+<!-- ************************** END AUTO-GENERATED UPLOAD FORM "internRegForm" ************************** -->
+
+
 	</div>
 
-  <button type="submit">Send invite</button>
-</form>
 
 <span id="results"></span>
 
