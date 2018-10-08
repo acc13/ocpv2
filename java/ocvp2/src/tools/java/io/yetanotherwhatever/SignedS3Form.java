@@ -75,6 +75,8 @@ public class SignedS3Form
         return sign(getPolicy(), awsSecretAccessKey, dateStamp);
     }
 
+    public String getFormId() { return formId; }
+
 
 
 
@@ -83,13 +85,14 @@ public class SignedS3Form
     static final String SERVICE_NAME = "s3";
 
 
-    static protected String buildForm(String s3KeyPrefix, String additionalFields, String formId)
+    protected String buildFormHtml()
     {
         String validation = "prepare"+formId + "()";
         //TBD is stuff that is replaced on a per env (and signing expiry) basis
-        String form = "<form id='" + formId + "' action='FFFFFFFFFFFF' method='post'" +
+        String form = "<!-- ************************** AUTO-GENERATED UPLOAD FORM \"" + formId + "\" ************************** -->\n" +
+                "<form id='" + formId + "' action='FFFFFFFFFFFF' method='post'" +
                 " enctype='multipart/form-data' onsubmit='return(" + validation + ");'>\n" +
-                "\t      <input type='hidden' name='key' value='" + s3KeyPrefix + "/${filename}'>\n" +
+                "\t      <input type='hidden' name='key' value='" + keyPrefix + "/${filename}'>\n" +
                 "\t      <input type='hidden' name='acl' value='private'> \n" +
                 "\t      <input type='hidden' name='success_action_redirect' value='FFFFFFFFFFFF'>\n" +
                 "\t      <input type='hidden' name='policy' value='FFFFFFFFFFFF'>\n" +
@@ -98,11 +101,13 @@ public class SignedS3Form
                 "\t       <input type='hidden' name='x-amz-date' value='FFFFFFFFFFFF'>\n" +
                 "\t       <input type='hidden' name='x-amz-storage-class' value='REDUCED_REDUNDANCY'>\n" +
                 "\t       <input type='hidden' name='x-amz-signature' value='FFFFFFFFFFFF'>\n" +
-                "\t       <input type='hidden' name='x-amz-meta-data' value=''>\n" +
-                "\t      <!-- Include any additional input fields here -->\n" +
-                additionalFields +
-                "\t      <input type='submit' value='Upload File'>\n" +
-                "    </form>";
+                "\t       <input type='hidden' name='x-amz-meta-data' value=''>\n\n" +
+                "\t      <!-- ADDITIONAL INPUT FIELDS -->\n" +
+                additionalFields + "\n\n" +
+                "\t      <!-- END ADDITIONAL INPUT FIELDS -->\n" +
+                "\t      <input type='submit' value='Submit'>\n" +
+                "    </form>\n" +
+                "<!-- ************************** END AUTO-GENERATED UPLOAD FORM \"" + formId + "\" ************************** -->\n";
 
         return form;
     }

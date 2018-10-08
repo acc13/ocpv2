@@ -11,7 +11,7 @@ import static java.util.Calendar.OCTOBER;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 
-public class S3SignedPostFormGeneratorTest {
+public class BuildMyFormsTest {
 
     @Test
     public void oneYearFrom_plusOne_1stbday()

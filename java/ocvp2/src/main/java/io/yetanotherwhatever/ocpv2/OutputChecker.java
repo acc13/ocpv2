@@ -89,7 +89,7 @@ public class OutputChecker {
 
             if (!test.equals(expected))
             {
-                lastErr = "Output incorrect. " + line + "\n" +
+                lastErr = "Output incorrect.\n" +
                         "First error countered on line " + line + ".\n" +
                         "Expected value \"" + expected +"\" " +
                         (expected.length()==0? "(empty string) " : "") +
