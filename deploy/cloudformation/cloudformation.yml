@@ -296,8 +296,11 @@ Resources:
       Description: invite candidate, create dynamic, temporary coding exercise page.
       Code: 
         S3Bucket: deployocp
-        S3Key: lambas/InviteCandidate-1.0.zip
-      Handler: com.yetanotherwhatever.ocpv2.aws.InviteCandidateHandler::handleRequest
+        S3Key: !Join
+          - '/'
+          - - !Ref AWS::StackName
+            - lambas/OCPv2-1.0.zip
+      Handler: io.yetanotherwhatever.ocpv2.aws.LambdaHandlerInviteCandidate::handleRequest
       MemorySize: 256
       Role: 
         !Join
@@ -318,7 +321,7 @@ Resources:
               - '.'
               - - !Ref AWS::StackName
                 - yetanotherwhatever.io
-          DYNAMODB_INVITE_TABLE:             
+          DYNAMODB_REGISTRATION_TABLE:             
             !Join
               - '.'
               - - !Ref AWS::StackName
@@ -337,8 +340,11 @@ Resources:
       Description: check uploaded output against expected, save results for candidate, save results for manager
       Code: 
         S3Bucket: deployocp
-        S3Key: lambas/InviteCandidate-1.0.zip
-      Handler: com.yetanotherwhatever.ocpv2.aws.OutputUploadedHandler::handleRequest
+        S3Key: !Join
+          - '/'
+          - - !Ref AWS::StackName
+            - lambas/OCPv2-1.0.zip
+      Handler: io.yetanotherwhatever.ocpv2.aws.LambdaHandlerTestOutput::handleRequest
       MemorySize: 256
       Role: 
         !Join
@@ -354,7 +360,7 @@ Resources:
       Timeout: 30
       Environment:
         Variables:
-          DYNAMODB_INVITE_TABLE:             
+          DYNAMODB_REGISTRATION_TABLE:             
             !Join
               - '.'
               - - !Ref AWS::StackName
@@ -383,8 +389,11 @@ Resources:
       Description: notify hiring manager of solution upload, with link to .zip
       Code: 
         S3Bucket: deployocp
-        S3Key: lambas/InviteCandidate-1.0.zip
-      Handler: com.yetanotherwhatever.ocpv2.aws.CodeUploadedHandler::handleRequest
+        S3Key: !Join
+          - '/'
+          - - !Ref AWS::StackName
+            - lambas/OCPv2-1.0.zip
+      Handler: io.yetanotherwhatever.ocpv2.aws.LambdaHandlerNotifyCodeUploaded::handleRequest
       MemorySize: 256
       Role: 
         !Join
@@ -400,7 +409,7 @@ Resources:
       Timeout: 30
       Environment:
         Variables:
-          DYNAMODB_INVITE_TABLE:             
+          DYNAMODB_REGISTRATION_TABLE:             
             !Join
               - '.'
               - - !Ref AWS::StackName
@@ -418,8 +427,11 @@ Resources:
       Description: invite candidate, create dynamic, temporary coding exercise page.
       Code: 
         S3Bucket: deployocp
-        S3Key: lambas/InviteCandidate-1.0.zip
-      Handler: com.yetanotherwhatever.ocpv2.aws.GetOutputTestResultsHandler::handleRequest
+        S3Key: !Join
+          - '/'
+          - - !Ref AWS::StackName
+            - lambas/OCPv2-1.0.zip
+      Handler: io.yetanotherwhatever.ocpv2.aws.LambdaHandlerGetTestOutputResults::handleRequest
       MemorySize: 256
       Role: 
         !Join
@@ -454,8 +466,11 @@ Resources:
       Description: Register intern and send problem page
       Code: 
         S3Bucket: deployocp
-        S3Key: lambas/InviteCandidate-1.0.zip
-      Handler: com.yetanotherwhatever.ocpv2.aws.CodeUploadedHandler::handleRequest
+        S3Key: !Join
+          - '/'
+          - - !Ref AWS::StackName
+            - lambas/OCPv2-1.0.zip
+      Handler: io.yetanotherwhatever.ocpv2.aws.LambdaHandlerRegisterIntern::handleRequest
       MemorySize: 256
       Role: 
         !Join
@@ -471,7 +486,7 @@ Resources:
       Timeout: 30
       Environment:
         Variables:
-          DYNAMODB_INVITE_TABLE:             
+          DYNAMODB_REGISTRATION_TABLE:             
             !Join
               - '.'
               - - !Ref AWS::StackName

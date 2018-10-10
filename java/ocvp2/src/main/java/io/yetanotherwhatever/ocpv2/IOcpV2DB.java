@@ -1,7 +1,5 @@
 package io.yetanotherwhatever.ocpv2;
 
-import io.yetanotherwhatever.ocpv2.aws.OutputResults;
-
 import java.io.IOException;
 
 /**
@@ -9,11 +7,11 @@ import java.io.IOException;
  */
 public interface IOcpV2DB {
 
-        public void write(Invitation i) throws IOException;
+        public void write(CandidateRegistration i) throws IOException;
 
-        public void updateInvitation(String invitationId, String outputUploadDate, boolean success) throws IOException;
+        public void updateRegistration(String registrationId, String outputUploadDate, boolean success) throws IOException;
 
-        public Invitation getInvitation(String invitationId) throws IOException;
+        public CandidateRegistration getRegistration(String registrationId) throws IOException;
 
         public OutputResults getOutputResults(String outputId) throws IOException;
 

@@ -11,8 +11,7 @@ import com.amazonaws.services.dynamodbv2.document.Table;
 import com.amazonaws.services.dynamodbv2.document.spec.GetItemSpec;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.amazonaws.services.dynamodbv2.model.ResourceNotFoundException;
-import io.yetanotherwhatever.ocpv2.IOcpV2DB;
-import io.yetanotherwhatever.ocpv2.Invitation;
+import io.yetanotherwhatever.ocpv2.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -26,24 +25,24 @@ public class DynamoOcpV2DB implements IOcpV2DB {
     static final Logger logger = LogManager.getLogger(DynamoOcpV2DB.class);
 
 
-    private static final String INVITE_TABLE_NAME = System.getenv("DYNAMODB_INVITE_TABLE");
+    private static final String REGISTRATION_TABLE_NAME = System.getenv("DYNAMODB_REGISTRATION_TABLE");
     private static final String OUTPUT_UPLOAD_TABLE= System.getenv("DYNAMODB_OUTPUT_UPLOADS_TABLE");
 
-    //Invitation table attributes
-    private static final String I_FIRST = "First";
-    private static final String I_LAST = "Last";
-    private static final String I_EMAIL = "Email";
-    private static final String I_MGR_EMAIL = "ManagerEmail";
-    private static final String I_DATE = "CreatedDate";
-    private static final String I_PROBLEM_KEY = "ProblemKey";
-    private static final String I_PROBLEM_LANDING_PAGE= "LandingPageURL";
-    private static final String I_PROBLEM_GUID= "ProblemPageGuid";    //table key
-    private static final String I_SUCCEEDED = "Succeeded";
-    private static final String I_ATTEMPTS = "Attempts";
+    //Registtration table attributes
+    private static final String R_FIRST = "First";
+    private static final String R_LAST = "Last";
+    private static final String R_EMAIL = "Email";
+    private static final String R_MGR_EMAIL = "ManagerEmail";
+    private static final String R_DATE = "CreatedDate";
+    private static final String R_PROBLEM_KEY = "ProblemKey";
+    private static final String R_PROBLEM_LANDING_PAGE= "LandingPageURL";
+    private static final String R_PROBLEM_GUID= "ProblemPageGuid";    //table key
+    private static final String R_SUCCEEDED = "Succeeded";
+    private static final String R_ATTEMPTS = "Attempts";
 
     //Output upload table attributes
     private static final String O_UPLOAD_ID = "UploadId";
-    private static final String O_INVITATION_ID = I_PROBLEM_GUID;
+    private static final String O_INVITATION_ID = R_PROBLEM_GUID;
     private static final String O_RESULT = "Result";
     private static final String O_OUTPUT_UPLOAD_DATE = "UploadDate";
 
@@ -66,30 +65,31 @@ public class DynamoOcpV2DB implements IOcpV2DB {
     }
 
     @Override
-    public void write(Invitation i) throws IOException {
+    public void write(CandidateRegistration cr) throws IOException {
 
         HashMap<String,AttributeValue> item_values =
                 new HashMap<>();
 
-        item_values.put(I_FIRST, new AttributeValue(i.getCandidateFirstName()));
-        item_values.put(I_LAST, new AttributeValue(i.getCandidateLastName()));
-        item_values.put(I_EMAIL, new AttributeValue(i.getCandidateEmail()));
-        item_values.put(I_MGR_EMAIL, new AttributeValue(i.getManagerEmail()));
-        item_values.put(I_DATE, new AttributeValue(i.getCreationDate()));
+        Invitation i = cr.getInvitation();
+        item_values.put(R_FIRST, new AttributeValue(i.getCandidateFirstName()));
+        item_values.put(R_LAST, new AttributeValue(i.getCandidateLastName()));
+        item_values.put(R_EMAIL, new AttributeValue(i.getCandidateEmail()));
+        item_values.put(R_MGR_EMAIL, new AttributeValue(i.getManagerEmail()));
+        item_values.put(R_DATE, new AttributeValue(i.getInvitationDate()));
 
-        item_values.put(I_PROBLEM_GUID, new AttributeValue(i.getProblemGuid()));
-        item_values.put(I_PROBLEM_KEY, new AttributeValue(i.getProblemKey()));
-        item_values.put(I_PROBLEM_LANDING_PAGE, new AttributeValue(i.getProblemLandingPageURL()));
+        CodingProblem cp = cr.getCodingProblem();
+        item_values.put(R_PROBLEM_GUID, new AttributeValue(cp.getGuid()));
+        item_values.put(R_PROBLEM_KEY, new AttributeValue(cp.getName()));
+        item_values.put(R_PROBLEM_LANDING_PAGE, new AttributeValue(cp.getLandingPageUrl()));
 
-        item_values.put(I_SUCCEEDED, new AttributeValue("Never"));
-
-        item_values.put(I_ATTEMPTS, new AttributeValue().withN("0"));
+        item_values.put(R_SUCCEEDED, new AttributeValue("Never"));
+        item_values.put(R_ATTEMPTS, new AttributeValue().withN("0"));
 
 
         try {
-            getAmazonDynamoDB().putItem(INVITE_TABLE_NAME, item_values);
+            getAmazonDynamoDB().putItem(REGISTRATION_TABLE_NAME, item_values);
 
-            logger.info("Invitation successfully saved to DynamoDB table " + INVITE_TABLE_NAME);
+            logger.info("Registration successfully saved to DynamoDB table " + REGISTRATION_TABLE_NAME);
 
             for (String key : item_values.keySet())
             {
@@ -105,16 +105,16 @@ public class DynamoOcpV2DB implements IOcpV2DB {
     }
 
     @Override
-    public void updateInvitation(String invitationId, String outputUploadDate, boolean success) throws IOException
+    public void updateRegistration(String registrationId, String outputUploadDate, boolean success) throws IOException
     {
 
         try {
             DynamoDB ddb = new DynamoDB(getAmazonDynamoDB());
 
-            Table table = ddb.getTable(INVITE_TABLE_NAME);
+            Table table = ddb.getTable(REGISTRATION_TABLE_NAME);
 
             HashMap<String, String> expressionAttributeNames = new HashMap<String, String>();
-            expressionAttributeNames.put("#A", I_ATTEMPTS);
+            expressionAttributeNames.put("#A", R_ATTEMPTS);
 
             HashMap<String, Object> expressionAttributeValues = new HashMap<String, Object>();
             expressionAttributeValues.put(":val1", 1);
@@ -123,7 +123,7 @@ public class DynamoOcpV2DB implements IOcpV2DB {
             String updateExpression;
             if (success)
             {
-                expressionAttributeNames.put("#S", I_SUCCEEDED);
+                expressionAttributeNames.put("#S", R_SUCCEEDED);
                 expressionAttributeValues.put(":val2", outputUploadDate);
                 updateExpression = "set #A = #A + :val1, #S = :val2 "; // set last update time, increment attempts
             }
@@ -136,13 +136,13 @@ public class DynamoOcpV2DB implements IOcpV2DB {
             logger.debug(updateExpression);
 
             table.updateItem(
-                    I_PROBLEM_GUID, // key attribute name
-                    invitationId,   // key attribute value
+                    R_PROBLEM_GUID, // key attribute name
+                    registrationId,   // key attribute value
                     updateExpression,
                     expressionAttributeNames,
                     expressionAttributeValues);
 
-            logger.debug("Invitation update succeeded for record: " + invitationId);
+            logger.debug("Invitation update succeeded for record: " + registrationId);
 
         } catch (ResourceNotFoundException e) {
             throw new IOException(e);
@@ -182,37 +182,43 @@ public class DynamoOcpV2DB implements IOcpV2DB {
     }
 
     @Override
-    public Invitation getInvitation(String invitationId) throws IOException
+    public CandidateRegistration getRegistration(String registrationId) throws IOException
     {
         DynamoDB dynamoDB = new DynamoDB(getAmazonDynamoDB());
 
-        Table table = dynamoDB.getTable(INVITE_TABLE_NAME);
+        Table table = dynamoDB.getTable(REGISTRATION_TABLE_NAME);
 
-        GetItemSpec spec = new GetItemSpec().withPrimaryKey(I_PROBLEM_GUID, invitationId);
+        GetItemSpec spec = new GetItemSpec().withPrimaryKey(R_PROBLEM_GUID, registrationId);
 
         try {
-            logger.info("Attempting to read the item: '" + invitationId + "' from table: '" + INVITE_TABLE_NAME + "'");
+            logger.info("Attempting to read the item: '" + registrationId + "' from table: '" + REGISTRATION_TABLE_NAME + "'");
             Item outcome = table.getItem(spec);
             logger.info("GetItem succeeded: " + outcome);
 
             Invitation i = new Invitation();
-            i.setCandidateFirstName(outcome.getString(I_FIRST));
-            i.setCandidateLastName(outcome.getString(I_LAST));
-            i.setCandidateEmail(outcome.getString(I_EMAIL));
-            i.setManagerEmail(outcome.getString(I_MGR_EMAIL));
-            i.setCreationDate(outcome.getString(I_DATE));
-            i.setProblemGuid(outcome.getString(I_PROBLEM_GUID));
-            i.setProblemKey(outcome.getString(I_PROBLEM_KEY));
-            i.setProblemLandingPageURL(outcome.getString(I_PROBLEM_LANDING_PAGE));
-            i.setSucceeded(outcome.getString(I_SUCCEEDED));
-            i.setAttempts(outcome.getInt(I_ATTEMPTS));
+            i.setCandidateFirstName(outcome.getString(R_FIRST));
+            i.setCandidateLastName(outcome.getString(R_LAST));
+            i.setCandidateEmail(outcome.getString(R_EMAIL));
+            i.setManagerEmail(outcome.getString(R_MGR_EMAIL));
+            i.setInvitationDate(outcome.getString(R_DATE));
 
-            return i;
+            CodingProblem cp = new CodingProblem();
+            cp.setGuid(outcome.getString(R_PROBLEM_GUID));
+            cp.setName(outcome.getString(R_PROBLEM_KEY));
+            cp.setLandingPageUrl(outcome.getString(R_PROBLEM_LANDING_PAGE));
+            cp.setSucceeded(outcome.getString(R_SUCCEEDED));
+            cp.setAttempts(outcome.getInt(R_ATTEMPTS));
+
+            CandidateRegistration cr = new CandidateRegistration();
+            cr.setInvitation(i);
+            cr.setProblemPage(cp);
+
+            return cr;
 
         }
         catch (Exception e) {
-            logger.error("Unable to read item: " + invitationId +
-                    " from table: " + INVITE_TABLE_NAME);
+            logger.error("Unable to read item: " + registrationId +
+                    " from table: " + REGISTRATION_TABLE_NAME);
             logger.error(e.getMessage());
 
             throw new IOException(e);

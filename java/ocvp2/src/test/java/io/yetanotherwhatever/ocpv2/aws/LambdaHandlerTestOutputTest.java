@@ -12,7 +12,7 @@ import static org.mockito.Mockito.when;
 /**
  * Created by achang on 9/18/2018.
  */
-public class OutputUploadedHandlerTest {
+public class LambdaHandlerTestOutputTest {
 
     @Test
     public void parseRecord_wellFormedKey_parsedAsExpected()
@@ -28,7 +28,7 @@ public class OutputUploadedHandlerTest {
         when(stubS3.getObject()).thenReturn(stubS3Object);
         when(stubS3Object.getKey()).thenReturn("uploads/output/invitation_id/problem_name/upload_id.txt");
 
-        OutputUploadedHandler  mockOUH = mock(OutputUploadedHandler.class);
+        LambdaHandlerTestOutput mockOUH = mock(LambdaHandlerTestOutput.class);
         when(mockOUH.getS3WebBucketName()).thenReturn("s3WebBucketName");
         when(mockOUH.parseRecord(stubRecord)).thenCallRealMethod();
 

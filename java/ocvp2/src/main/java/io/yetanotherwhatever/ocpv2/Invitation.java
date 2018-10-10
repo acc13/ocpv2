@@ -17,43 +17,21 @@ public class Invitation {
     private String candidateLastName;
     private String candidateEmail;
     private String managerEmail;
-    private String problemKey;
-
-    public String getProblemGuid() {
-        return problemGuid;
-    }
-
-    public void setProblemGuid(String problemGuid) {
-        this.problemGuid = problemGuid;
-    }
-
-    private String problemGuid;
-    private String problemLandingPageURL;
-    private String creationDate;
-
-    public String getSucceeded() {
-        return succeeded;
-    }
-
-    public void setSucceeded(String succeeded) {
-        this.succeeded = succeeded;
-    }
-
-    public int getAttempts() {
-        return attempts;
-    }
-
-    public void setAttempts(int attempts) {
-        this.attempts = attempts;
-    }
-
-    private String succeeded = "never";
-    private int attempts = 0;
-
+    private String invitationDate;
 
     public Invitation ()
     {
-        creationDate = Utils.formatDateISO8601(new Date());
+        invitationDate = Utils.formatDateISO8601(new Date());
+    }
+
+    public void setInvitationDate(String invitationDate)
+    {
+        this.invitationDate = invitationDate;
+    }
+
+    public String getInvitationDate()
+    {
+        return invitationDate;
     }
 
     public String getCandidateFirstName() {
@@ -94,33 +72,6 @@ public class Invitation {
         this.managerEmail = managerEmail;
 
         return this;
-    }
-
-    public String getProblemKey() {
-        return problemKey;
-    }
-
-    public void setProblemKey(String problemKey) {
-        this.problemKey = problemKey;
-    }
-
-    public String getProblemLandingPageURL() {
-        return problemLandingPageURL;
-    }
-
-    public void setProblemLandingPageURL(String problemLandingPageURL) {
-        this.problemLandingPageURL = problemLandingPageURL;
-    }
-
-    public String getCreationDate()
-    {
-
-        return creationDate;
-    }
-
-    public void setCreationDate(String creationDate)
-    {
-        this.creationDate = creationDate;
     }
 
     public void validate() throws IllegalArgumentException

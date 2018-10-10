@@ -13,9 +13,9 @@ import java.io.IOException;
 /**
  * Created by achang on 9/12/2018.
  */
-public class CodeUploadedHandler  implements RequestHandler<S3Event,S3Event> {
+public class LambdaHandlerNotifyCodeUploaded implements RequestHandler<S3Event,S3Event> {
 
-    static final Logger logger = LogManager.getLogger(CodeUploadedHandler.class);
+    static final Logger logger = LogManager.getLogger(LambdaHandlerNotifyCodeUploaded.class);
 
     CodeUploadedNotifier cun = null;
 

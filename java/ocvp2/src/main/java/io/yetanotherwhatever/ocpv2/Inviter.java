@@ -20,7 +20,7 @@ public class Inviter {
 
     private IOcpV2DB db;
     private IEmailer emailer;
-    private ICodingProblem codingProblem;
+    private ICodingProblemBuilder codingProblemBuilder;
 
     public Inviter(){}
 
@@ -36,15 +36,15 @@ public class Inviter {
         return this;
     }
 
-    public Inviter setCodingProblem(ICodingProblem codingProblem)
+    public Inviter setCodingProblemBuilder(ICodingProblemBuilder codingProblemBuilder)
     {
-        this.codingProblem = codingProblem;
+        this.codingProblemBuilder = codingProblemBuilder;
         return this;
     }
 
     public void sendInvitation(Invitation invite) throws IllegalArgumentException, IOException
     {
-        if(null == db || null == codingProblem || null == emailer)
+        if(null == db || null == codingProblemBuilder || null == emailer)
         {
             throw new IllegalStateException("Inviter not initialized.");
         }
@@ -52,19 +52,20 @@ public class Inviter {
         invite.validate();
         logger.info("Invitation validated.");
 
-        codingProblem.setup();
+        CodingProblem cp = codingProblemBuilder.buildCodingProblem();
         logger.info("Coding problem page set up complete.");
 
-        invite.setProblemGuid(codingProblem.getProblemGuid());
-        invite.setProblemKey(codingProblem.getProblemKey());
-        invite.setProblemLandingPageURL(codingProblem.getLandingPageURL());
-        db.write(invite);
+        CandidateRegistration registration = new CandidateRegistration();
+        registration.setInvitation(invite);
+        registration.setProblemPage(cp);
+
+        db.write(registration);
         logger.info("Invite saved to DB.");
 
 
-        emailCandidate(invite.getCandidateEmail(), codingProblem.getLandingPageURL());
+        emailCandidate(invite.getCandidateEmail(), cp.getLandingPageUrl());
         logger.info("Candidate email sent.");
-        emailManager(invite, codingProblem);
+        emailManager(invite, cp);
         logger.info("Manager email sent.");
 
     }
@@ -80,7 +81,7 @@ public class Inviter {
         emailer.sendEmail(destEmailAddress, emailSubject, emailBody);
     }
 
-    private void emailManager(Invitation invite, ICodingProblem problem) throws IOException
+    private void emailManager(Invitation invite, CodingProblem problem) throws IOException
     {
         //notify manager
         String emailSubject =  "New coding problem registration: " +
@@ -92,9 +93,9 @@ public class Inviter {
                 "Candidate first name: " + invite.getCandidateFirstName()  + NL +
                 "Candidate last name: " + invite.getCandidateLastName() + NL +
                 "Candidate email: " + invite.getCandidateEmail() + NL +
-                "Problem key: " + problem.getProblemKey() + NL +
-                "Problem GUID: " + problem.getProblemGuid() + NL +
-                "Candidate link: <a href='" + problem.getLandingPageURL() + "'>" + problem.getLandingPageURL() + "</a>" +  NL +
+                "Problem key: " + problem.getName() + NL +
+                "Problem GUID: " + problem.getGuid() + NL +
+                "Candidate link: <a href='" + problem.getLandingPageUrl() + "'>" + problem.getLandingPageUrl() + "</a>" +  NL +
                 "Link expires: " + calcExpiry();
 
         emailer.sendEmail(invite.getManagerEmail(), emailSubject, emailBody);

@@ -1,6 +1,5 @@
 package io.yetanotherwhatever.ocpv2;
 
-import io.yetanotherwhatever.ocpv2.aws.OutputResults;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -13,27 +12,27 @@ import java.util.Date;
 /**
  * Created by achang on 9/12/2018.
  */
-public class OutputChecker {
+public class OutputTester {
 
-    static final Logger logger = LogManager.getLogger(OutputChecker.class);
+    static final Logger logger = LogManager.getLogger(OutputTester.class);
 
     IFileStore store;
     IOcpV2DB ocpv2DB;
 
     String lastErr = "";
 
-    public OutputChecker()
+    public OutputTester()
     {
 
     }
 
-    public OutputChecker setOutputStore(IFileStore store)
+    public OutputTester setOutputStore(IFileStore store)
     {
         this.store = store;
         return this;
     }
 
-    public OutputChecker setDB(IOcpV2DB db)
+    public OutputTester setDB(IOcpV2DB db)
     {
         this.ocpv2DB = db;
         return this;
@@ -57,7 +56,7 @@ public class OutputChecker {
         or.setUploadID(uploadId);
         ocpv2DB.write(or);
 
-        ocpv2DB.updateInvitation(invitationId, or.getUploadDate(), success);
+        ocpv2DB.updateRegistration(invitationId, or.getUploadDate(), success);
 
     }
 

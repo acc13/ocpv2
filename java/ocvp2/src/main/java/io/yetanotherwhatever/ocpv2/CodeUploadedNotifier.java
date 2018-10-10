@@ -45,33 +45,33 @@ public class CodeUploadedNotifier {
         }
 
         //look up invitation
-        Invitation i = db.getInvitation(invitationId);
+        CandidateRegistration cr = db.getRegistration(invitationId);
 
         //build upload url
         logger.debug("Download URL: " + downloadUrl);
 
         //email manager
         String subject = "Coding problem solution submitted";
-        String body = buildEmailBody(i, downloadUrl);
+        String body = buildEmailBody(cr, downloadUrl);
 
-        logger.debug("Emailing manager: " + i.getManagerEmail());
+        logger.debug("Emailing manager: " + cr.getInvitation().getManagerEmail());
         logger.debug("Email subject: " + subject);
         logger.debug("Email body: " + body);
 
-        emailer.sendEmail(i.getManagerEmail(), subject, body);
+        emailer.sendEmail(cr.getInvitation().getManagerEmail(), subject, body);
         logger.debug("Email successfully sent.");
     }
 
-    private String buildEmailBody(Invitation i, String zipFileUrl)
+    private String buildEmailBody(CandidateRegistration cr, String zipFileUrl)
     {
         String body =
                 "Time: " + Utils.formatDateISO8601(new Date()) + "<br/>" +
-                "\nCandidate: " + i.getCandidateFirstName() + " " + i.getCandidateLastName() + "<br/>" +
-                "\nCandidate email: " + i.getCandidateEmail() + "<br/>" +
-                "\nInvited on: " + i.getCreationDate() + "<br/>" +
-                "\nProblem assigned: " + i.getProblemKey() + "<br/>" +
-                "\nOutput uploaded attempts: " + i.getAttempts() + "<br/>" +
-                "\nOutput passed: " + i.getSucceeded() + "<br/>" +
+                "\nCandidate: " + cr.getInvitation().getCandidateFirstName() + " " + cr.getInvitation().getCandidateLastName() + "<br/>" +
+                "\nCandidate email: " + cr.getInvitation().getCandidateEmail() + "<br/>" +
+                "\nInvited on: " + cr.getInvitation().getInvitationDate() + "<br/>" +
+                "\nProblem assigned: " + cr.getCodingProblem().getName() + "<br/>" +
+                "\nOutput uploaded attempts: " + cr.getCodingProblem().getAttempts() + "<br/>" +
+                "\nOutput passed: " + cr.getCodingProblem().getSucceeded() + "<br/>" +
                 "\nDownload submitted code <a href='" + zipFileUrl + "'>here</a>";
 
         return body;

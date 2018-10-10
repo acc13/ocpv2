@@ -4,7 +4,8 @@ import com.amazonaws.AmazonServiceException;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.*;
-import io.yetanotherwhatever.ocpv2.ICodingProblem;
+import io.yetanotherwhatever.ocpv2.CodingProblem;
+import io.yetanotherwhatever.ocpv2.ICodingProblemBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -15,9 +16,9 @@ import java.util.concurrent.ThreadLocalRandom;
 /**
  * Created by achang on 9/3/2018.
  */
-public class S3CodingProblem implements ICodingProblem {
+public class S3CodingProblemBuilderBuilder implements ICodingProblemBuilder {
 
-    static final Logger logger = LogManager.getLogger(S3CodingProblem.class);
+    static final Logger logger = LogManager.getLogger(S3CodingProblemBuilderBuilder.class);
 
     final AmazonS3 S3 = AmazonS3ClientBuilder.defaultClient();
 
@@ -25,40 +26,35 @@ public class S3CodingProblem implements ICodingProblem {
     private static final String PROBLEMS_PREFIX = "problems/";
     private static final String TEMP_PAGE_PREFIX = "tp/";
 
-    private String problemKey;
-    private String problemGuid;
-    private String landingPageURL;
-
-    public String getLandingPageURL() {
-
-        return landingPageURL;
-    }
-
-    public String getProblemKey() {
-        return problemKey;
-    }
-
-    public String getProblemGuid() {
-        return problemGuid;
-    }
-
-    protected S3CodingProblem()
+    protected S3CodingProblemBuilderBuilder()
     {
-        problemGuid = UUID.randomUUID().toString();
+
     }
 
-    public void setup() throws IOException
+    @Override
+    public CodingProblem buildCodingProblem() throws IOException
     {
         try {
-            problemKey = pickAProblem();
+            CodingProblem cp = new CodingProblem();
+
+            String problemKey = pickAProblem();
+            cp.setName(problemKey);
 
             //copy files
-            String destKey = copyProblem();
+            String problemGuid = UUID.randomUUID().toString();
+            String destKey = copyProblem(problemGuid, problemKey);
+            cp.setGuid(problemGuid);
 
             //build url
-            landingPageURL = "http://"+ S3_WEB_BUCKET + "/" + destKey;
+            String landingPageURL = "http://"+ S3_WEB_BUCKET + "/" + destKey;
+            cp.setLandingPageUrl(landingPageURL);
+
+            cp.setSucceeded("Never");
+            cp.setAttempts(0);
 
             logger.info("Landing page URL: " + landingPageURL);
+
+            return cp;
 
         } catch (AmazonServiceException e)
         {
@@ -86,7 +82,7 @@ public class S3CodingProblem implements ICodingProblem {
         return r;
     }
 
-    private String copyProblem()
+    private String copyProblem(String problemGuid, String problemKey)
     {
         String destKey = TEMP_PAGE_PREFIX + problemGuid + ".html";
 
