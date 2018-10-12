@@ -1,7 +1,7 @@
 #!/bin/bash
 
 display_usage() { 
-	echo -e "\nUsage:\n$0 --env <environment/stack name> [--clean] \n" 
+	echo -e "\nUsage:\n$0 --env <environment/stack name>\n" 
     exit 1
 	} 
 
@@ -27,20 +27,20 @@ then
 	display_usage
 fi
 
+echo
+echo $0 starting
+
 DEPLOY_FOLDER="${0%/*}"
 BUCKET=deployocp
 INVITE_S3_KEY=$ENV/lambas/OCPv2-1.0.zip
 
+$DEPLOY_FOLDER/publishLambda.sh --env $ENV
 
-#copy web content first
-JAVA=$DEPLOY_FOLDER/../java
-ZIP=$JAVA/ocvp2/build/distributions/OCPv2-1.0.zip
-aws s3 cp $ZIP s3://$BUCKET/$INVITE_S3_KEY
 aws lambda update-function-code --function-name ${ENV}_RegisterIntern --s3-bucket $BUCKET --s3-key $INVITE_S3_KEY
 aws lambda update-function-code --function-name ${ENV}_InviteCandidate --s3-bucket $BUCKET --s3-key $INVITE_S3_KEY
 aws lambda update-function-code --function-name ${ENV}_TestOutput --s3-bucket $BUCKET --s3-key $INVITE_S3_KEY
 aws lambda update-function-code --function-name ${ENV}_NotifyCodeUploaded --s3-bucket $BUCKET --s3-key $INVITE_S3_KEY
 aws lambda update-function-code --function-name ${ENV}_GetTestOutputResult --s3-bucket $BUCKET --s3-key $INVITE_S3_KEY
 
+echo $0 finished
 echo
-echo Deployment ended

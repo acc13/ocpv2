@@ -30,7 +30,6 @@ public class LambdaHandlerRegisterIntern implements RequestHandler<S3Event,S3Eve
         // For each record.
         for (S3EventNotification.S3EventNotificationRecord record : s3Event.getRecords()) {
 
-
             try {
                 Invitation invitation = parseRecordMetadata(record);
                 String downloadUrl = LambdaHandlerNotifyCodeUploaded.extractS3DownloadUrl(record);

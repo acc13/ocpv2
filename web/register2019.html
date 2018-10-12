@@ -20,19 +20,16 @@
 
 function validatForm()
 {
-	if (env != "ocp")
-	{
-		//skip for testing
-		return true;
-	}
 
-	const valid = 
+	const checkboxesChecked  = 
 		//both checkboxes required
 		$('#full_time_student').is(':checked') &&
-		$('#available_2020').is(':checked') &&
-		//email must be .edu
+		$('#available_2020').is(':checked');
+
+	const eduEmail = (env != "ocp") ||	//ignore for testing
 		$('#email').val().endsWith('.edu');
 
+	const valid = checkboxesChecked && eduEmail;
 	
 	if (!valid)
 	{
@@ -62,12 +59,12 @@ function prepareinternRegForm()
 {
 	  if (!validatForm())
 	  {
-	  	return;
+	  	return false;
 	  }
 
 	  if (!areYouSure())
 	  {
-	  	return;
+	  	return false;
 	  }
 
 	  const formName = "internRegForm";

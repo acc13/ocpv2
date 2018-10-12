@@ -1,7 +1,7 @@
 #!/bin/bash
 
 display_usage() { 
-	echo -e "\nUsage:\n$0 --env <environment/stack name> [--clean] \n" 
+	echo -e "\nUsage:\n$0 --env <environment/stack name>\n" 
     exit 1
 	} 
 
@@ -27,6 +27,9 @@ then
 	display_usage
 fi
 
+echo
+echo $0 started
+
 DEPLOY_FOLDER="${0%/*}"
 CFTEMPLATE=cloudformation.yml
 BUCKET=deployocp
@@ -34,10 +37,13 @@ KEY=$ENV/cloudformation/$CFTEMPLATE
 
 STACK_NAME=$ENV
 
+$DEPLOY_FOLDER/publishLambda.sh --env $ENV
+
+
 #template validation must be run first, otherwise, new template not uploaded
 aws cloudformation update-stack --stack-name $STACK_NAME --template-url https://s3.amazonaws.com/$BUCKET/$KEY --capabilities CAPABILITY_NAMED_IAM
 aws cloudformation wait stack-update-complete --stack-name $STACK_NAME
 aws cloudformation describe-stacks --stack-name $STACK_NAME
 
+echo $0 finished
 echo
-echo Deployment ended

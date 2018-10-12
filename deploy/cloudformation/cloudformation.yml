@@ -316,6 +316,7 @@ Resources:
       Timeout: 30
       Environment:
         Variables:
+          STACK_NAME: !Ref AWS::StackName
           S3_WEB_BUCKET: 
             !Join
               - '.'
@@ -326,7 +327,6 @@ Resources:
               - '.'
               - - !Ref AWS::StackName
                 - Candidate_Registrations
-          PROBLEM_EXPIRY_IN_DAYS: 7
 
   LambdaOutputUploaded:
     Type: "AWS::Lambda::Function"
@@ -360,6 +360,7 @@ Resources:
       Timeout: 30
       Environment:
         Variables:
+          STACK_NAME: !Ref AWS::StackName
           DYNAMODB_REGISTRATION_TABLE:             
             !Join
               - '.'
@@ -409,6 +410,7 @@ Resources:
       Timeout: 30
       Environment:
         Variables:
+          STACK_NAME: !Ref AWS::StackName
           DYNAMODB_REGISTRATION_TABLE:             
             !Join
               - '.'
@@ -447,6 +449,7 @@ Resources:
       Timeout: 30
       Environment:
         Variables:
+          STACK_NAME: !Ref AWS::StackName
           DYNAMODB_OUTPUT_UPLOADS_TABLE:
             !Join
               - '.'
@@ -486,6 +489,7 @@ Resources:
       Timeout: 30
       Environment:
         Variables:
+          STACK_NAME: !Ref AWS::StackName
           S3_WEB_BUCKET: 
             !Join
               - '.'
@@ -496,7 +500,6 @@ Resources:
               - '.'
               - - !Ref AWS::StackName
                 - Candidate_Registrations
-          PROBLEM_EXPIRY_IN_DAYS: 7
 
   #########################################
   #       API Gateway 

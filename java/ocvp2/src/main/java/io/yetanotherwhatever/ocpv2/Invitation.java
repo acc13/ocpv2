@@ -130,6 +130,21 @@ public class Invitation {
 
         isValidEmail(getCandidateEmail());
         isValidManagerEmail(getManagerEmail());
+
+        typeSpecificValidation();
+    }
+
+    protected void typeSpecificValidation()
+    {
+        if(type == Type.INTERN)
+        {
+            String stack = System.getenv("STACK_NAME");
+            if (stack.equals("ocp")   //skip this check for pre prod, so we can complete the internship flow
+                    && !candidateEmail.endsWith(".edu"))
+            {
+                throw new IllegalArgumentException("Intern registered with non .edu email address: '" + candidateEmail + "'");
+            }
+        }
     }
 
 
