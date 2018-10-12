@@ -2,11 +2,10 @@ package io.yetanotherwhatever.ocpv2;
 
 public class CodingProblem {
 
-    String guid;
-    String name;
-    String landingPageUrl;
-    String succeeded;
-    int attempts;
+    private String guid;
+    private String name;
+    private String landingPageUrl;
+    private String expirationDate;
 
 
     public String getGuid() {
@@ -33,19 +32,11 @@ public class CodingProblem {
         this.landingPageUrl = landingPageUrl;
     }
 
-    public String getSucceeded() {
-        return succeeded;
+    public String getExpirationDate() {
+        return expirationDate;
     }
 
-    public void setSucceeded(String succeeded) {
-        this.succeeded = succeeded;
-    }
-
-    public int getAttempts() {
-        return attempts;
-    }
-
-    public void setAttempts(int attempts) {
-        this.attempts = attempts;
+    public void setExpirationDate(String expirationDate) {
+        this.expirationDate = expirationDate;
     }
 }

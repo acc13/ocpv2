@@ -56,7 +56,7 @@ public class OutputTester {
         or.setUploadID(uploadId);
         ocpv2DB.write(or);
 
-        ocpv2DB.updateRegistration(invitationId, or.getUploadDate(), success);
+        ocpv2DB.updateOutputTestHistory(invitationId, or.getUploadDate(), success);
 
     }
 

@@ -14,6 +14,8 @@ import org.apache.logging.log4j.Logger;
  */
 public class Inviter {
 
+    final String PROBLEM_EXPIRATION_ENV_VAR = "PROBLEM_EXPIRY_IN_DAYS";
+
     // Initialize the Log4j logger.
     static final Logger logger = LogManager.getLogger(Inviter.class);
 
@@ -55,15 +57,13 @@ public class Inviter {
         CodingProblem cp = codingProblemBuilder.buildCodingProblem();
         logger.info("Coding problem page set up complete.");
 
-        CandidateRegistration registration = new CandidateRegistration();
-        registration.setInvitation(invite);
-        registration.setProblemPage(cp);
+        CandidateWorkflow workflow = new CandidateWorkflow(invite, cp);
 
-        db.write(registration);
+        db.write(workflow);
         logger.info("Invite saved to DB.");
 
 
-        emailCandidate(invite.getCandidateEmail(), cp.getLandingPageUrl());
+        emailCandidate(invite.getCandidateEmail(), cp.getLandingPageUrl(), invite.getManagerEmail());
         logger.info("Candidate email sent.");
         emailManager(invite, cp);
         logger.info("Manager email sent.");
@@ -71,12 +71,15 @@ public class Inviter {
     }
 
     static final String NL = "<br>" + System.getProperty("line.separator");
-    private void emailCandidate(String destEmailAddress, String url) throws IOException
+    private void emailCandidate(String destEmailAddress, String url, String managerEmail) throws IOException
     {
+        final String techSupport = "andrew_chang@symantec.com";
         String emailSubject = "Welcome to the Symantec online coding problem";
         String  emailBody = "Thank you for your interest in Symantec!<br>" + NL +
                 "Here is your unique link to the online coding problem: <a href='" + url + "'>" + url + "</a>" + NL + NL +
-                "<b>WARNING: You will have 7 days to complete the coding problem, before your personalized link expires.</b>";
+                "<b>WARNING: You will have " + codingProblemBuilder.getExpirationInDays() + " days to complete the coding problem, before your personalized link expires.</b>" + NL + NL +
+                "For recruiting questions, you can email your hiring manager here: <a href='mailto:" + managerEmail + "'>" + managerEmail + "</a>." + NL +
+                "For any technical issues, please email <a href='mailto:" + techSupport + "'>" + techSupport + "</a>.";
 
         emailer.sendEmail(destEmailAddress, emailSubject, emailBody);
     }
@@ -93,6 +96,9 @@ public class Inviter {
                 "Candidate first name: " + invite.getCandidateFirstName()  + NL +
                 "Candidate last name: " + invite.getCandidateLastName() + NL +
                 "Candidate email: " + invite.getCandidateEmail() + NL +
+                "Candidate resume: " + (null != invite.getResumeUrl() && invite.getResumeUrl().length() > 0?
+                                "<a href='" + invite.getResumeUrl() + "'>" + invite.getResumeUrl() + "</a>" :
+                                "Not available.") + NL +
                 "Problem key: " + problem.getName() + NL +
                 "Problem GUID: " + problem.getGuid() + NL +
                 "Candidate link: <a href='" + problem.getLandingPageUrl() + "'>" + problem.getLandingPageUrl() + "</a>" +  NL +
@@ -106,17 +112,19 @@ public class Inviter {
         Calendar expiry = Calendar.getInstance();
 
         try {
-            int days = Integer.parseInt(System.getenv("PROBLEM_EXPIRY_IN_DAYS"));
+            int days = codingProblemBuilder.getExpirationInDays();
+
+            expiry.add(Calendar.DAY_OF_YEAR, days);
+            Date date = expiry.getTime();
+            SimpleDateFormat format = new SimpleDateFormat("MM-dd-yyyy");
+            return format.format(date);
         }
         catch(NumberFormatException e)
         {
+            //not fatal
+            logger.warn("Environment variable not set: " + PROBLEM_EXPIRATION_ENV_VAR);
             return "Error: configuration not found.";
         }
-
-        expiry.add(Calendar.DAY_OF_YEAR, 7);
-        Date date = expiry.getTime();
-        SimpleDateFormat format = new SimpleDateFormat("MM-dd-yyyy");
-        return format.format(date);
     }
 
 

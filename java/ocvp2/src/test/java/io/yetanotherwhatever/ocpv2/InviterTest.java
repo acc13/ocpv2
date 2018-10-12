@@ -1,10 +1,9 @@
 package io.yetanotherwhatever.ocpv2;
 
-import io.yetanotherwhatever.ocpv2.aws.S3CodingProblemBuilderBuilder;
+import io.yetanotherwhatever.ocpv2.aws.S3CodingProblemBuilder;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.ArgumentMatchers;
 
 import java.io.IOException;
 import java.util.List;
@@ -30,7 +29,7 @@ public class InviterTest {
     {
         mockDb = mock(IOcpV2DB.class);
         mockEmailer = mock(IEmailer.class);
-        mockCodingProblemBuilder = mock(S3CodingProblemBuilderBuilder.class);
+        mockCodingProblemBuilder = mock(S3CodingProblemBuilder.class);
 
         cp =  new CodingProblem();
         cp.setLandingPageUrl("http://fake.landingpage.somewhere.com");
@@ -38,10 +37,10 @@ public class InviterTest {
         cp.setGuid("fakeProblemGuid");
         when(mockCodingProblemBuilder.buildCodingProblem()).thenReturn(cp);
 
-        inviter = new Inviter()
-                .setDB(mockDb)
-                .setEmailer(mockEmailer)
-                .setCodingProblemBuilder(mockCodingProblemBuilder);
+        inviter = new Inviter();
+        inviter.setDB(mockDb);
+        inviter.setEmailer(mockEmailer);
+        inviter.setCodingProblemBuilder(mockCodingProblemBuilder);
 
         return inviter;
     }
@@ -75,7 +74,7 @@ public class InviterTest {
         buildInviter();
         buildGoodInvitation();
         inviter.sendInvitation(invite);
-        verify(mockDb).write(any(CandidateRegistration.class));
+        verify(mockDb).write(any(CandidateWorkflow.class));
     }
 
     @Test
@@ -159,14 +158,14 @@ public class InviterTest {
 
         inviter.sendInvitation(invite);
 
-        ArgumentCaptor<CandidateRegistration> crCaptor = ArgumentCaptor.forClass(CandidateRegistration.class);
+        ArgumentCaptor<CandidateWorkflow> crCaptor = ArgumentCaptor.forClass(CandidateWorkflow.class);
         verify(mockDb).write(crCaptor.capture());
-        CandidateRegistration candidateRegistrationArg = crCaptor.getValue();
-        assertThat(candidateRegistrationArg.getCodingProblem().getLandingPageUrl(),
+        CandidateWorkflow candidateWorkflowArg = crCaptor.getValue();
+        assertThat(candidateWorkflowArg.getCodingProblem().getLandingPageUrl(),
                 is(equalTo((cp.getLandingPageUrl()))));
-        assertThat(candidateRegistrationArg.getCodingProblem().getName(),
+        assertThat(candidateWorkflowArg.getCodingProblem().getName(),
                 is(equalTo(cp.getName())));
-        assertThat(candidateRegistrationArg.getCodingProblem().getGuid(),
+        assertThat(candidateWorkflowArg.getCodingProblem().getGuid(),
                 is(equalTo(cp.getGuid())));
     }
 }

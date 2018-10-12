@@ -486,11 +486,17 @@ Resources:
       Timeout: 30
       Environment:
         Variables:
+          S3_WEB_BUCKET: 
+            !Join
+              - '.'
+              - - !Ref AWS::StackName
+                - yetanotherwhatever.io
           DYNAMODB_REGISTRATION_TABLE:             
             !Join
               - '.'
               - - !Ref AWS::StackName
                 - Candidate_Registrations
+          PROBLEM_EXPIRY_IN_DAYS: 7
 
   #########################################
   #       API Gateway 

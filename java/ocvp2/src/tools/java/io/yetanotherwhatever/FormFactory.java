@@ -39,7 +39,7 @@ public class FormFactory {
     {
         final String FORM_ID = "internRegForm";
         final String KEY_PREFIX = "uploads/internshipRegistration";
-        final String SUCCESS_REDIRECT_PAGE = "registrationComplete.html";
+        final String SUCCESS_REDIRECT_PAGE = "registration2019complete.html";
         final String ADDITIONAL_FIELDS = "\n" +
                 "\t\t<p>\n" +
                 "\t\t  <label for=\"first-name\">First name:</label>\n" +

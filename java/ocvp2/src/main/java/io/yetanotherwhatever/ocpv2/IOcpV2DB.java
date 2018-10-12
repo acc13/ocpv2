@@ -7,11 +7,11 @@ import java.io.IOException;
  */
 public interface IOcpV2DB {
 
-        public void write(CandidateRegistration i) throws IOException;
+        public void write(CandidateWorkflow i) throws IOException;
 
-        public void updateRegistration(String registrationId, String outputUploadDate, boolean success) throws IOException;
+        public void updateOutputTestHistory(String registrationId, String outputUploadDate, boolean success) throws IOException;
 
-        public CandidateRegistration getRegistration(String registrationId) throws IOException;
+        public CandidateWorkflow getWorkflow(String registrationId) throws IOException;
 
         public OutputResults getOutputResults(String outputId) throws IOException;
 

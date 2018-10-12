@@ -61,7 +61,7 @@ public class LambdaHandlerNotifyCodeUploaded implements RequestHandler<S3Event,S
         return this.cun;
     }
 
-    private String extractS3DownloadUrl(S3EventNotification.S3EventNotificationRecord record)
+    static public String extractS3DownloadUrl(S3EventNotification.S3EventNotificationRecord record)
     {
         String bucket = record.getS3().getBucket().getName();
         String key = record.getS3().getObject().getKey();

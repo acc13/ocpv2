@@ -112,6 +112,7 @@ function getProblemName()
   return problemName;
 }
 
+//this sets the correct form input that translates into the metadata on the file stored in S3
 function setMeta(formName, myObj)
 {
   debug(JSON.stringify(myObj));

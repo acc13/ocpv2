@@ -29,20 +29,23 @@ public class DynamoOcpV2DB implements IOcpV2DB {
     private static final String OUTPUT_UPLOAD_TABLE= System.getenv("DYNAMODB_OUTPUT_UPLOADS_TABLE");
 
     //Registtration table attributes
-    private static final String R_FIRST = "First";
-    private static final String R_LAST = "Last";
-    private static final String R_EMAIL = "Email";
-    private static final String R_MGR_EMAIL = "ManagerEmail";
-    private static final String R_DATE = "CreatedDate";
-    private static final String R_PROBLEM_KEY = "ProblemKey";
-    private static final String R_PROBLEM_LANDING_PAGE= "LandingPageURL";
-    private static final String R_PROBLEM_GUID= "ProblemPageGuid";    //table key
-    private static final String R_SUCCEEDED = "Succeeded";
-    private static final String R_ATTEMPTS = "Attempts";
+    private static final String I_FIRST = "First";
+    private static final String I_LAST = "Last";
+    private static final String I_EMAIL = "Email";
+    private static final String I_MGR_EMAIL = "ManagerEmail";
+    private static final String I_DATE = "CreatedDate";
+    private static final String I_TYPE = "Type";
+    private static final String I_RESUME = "Resume";
+    private static final String CP_PROBLEM_KEY = "ProblemKey";
+    private static final String CP_PROBLEM_LANDING_PAGE = "LandingPageURL";
+    private static final String CP_PROBLEM_GUID = "ProblemPageGuid";    //table key
+    private static final String H_SUCCEEDED = "Succeeded";
+    private static final String H_ATTEMPTS = "Attempts";
+    private static final String H_CODE_URL = "CodingSolutionUrl";
 
     //Output upload table attributes
     private static final String O_UPLOAD_ID = "UploadId";
-    private static final String O_INVITATION_ID = R_PROBLEM_GUID;
+    private static final String O_INVITATION_ID = CP_PROBLEM_GUID;
     private static final String O_RESULT = "Result";
     private static final String O_OUTPUT_UPLOAD_DATE = "UploadDate";
 
@@ -65,25 +68,37 @@ public class DynamoOcpV2DB implements IOcpV2DB {
     }
 
     @Override
-    public void write(CandidateRegistration cr) throws IOException {
+    public void write(CandidateWorkflow cr) throws IOException {
 
         HashMap<String,AttributeValue> item_values =
                 new HashMap<>();
 
         Invitation i = cr.getInvitation();
-        item_values.put(R_FIRST, new AttributeValue(i.getCandidateFirstName()));
-        item_values.put(R_LAST, new AttributeValue(i.getCandidateLastName()));
-        item_values.put(R_EMAIL, new AttributeValue(i.getCandidateEmail()));
-        item_values.put(R_MGR_EMAIL, new AttributeValue(i.getManagerEmail()));
-        item_values.put(R_DATE, new AttributeValue(i.getInvitationDate()));
+        item_values.put(I_FIRST, new AttributeValue(i.getCandidateFirstName()));
+        item_values.put(I_LAST, new AttributeValue(i.getCandidateLastName()));
+        item_values.put(I_EMAIL, new AttributeValue(i.getCandidateEmail()));
+        item_values.put(I_MGR_EMAIL, new AttributeValue(i.getManagerEmail()));
+        item_values.put(I_DATE, new AttributeValue(i.getInvitationDate()));
+        item_values.put(I_TYPE, new AttributeValue().withN(Integer.toString(i.getType().getValue())));
+
+        //AWS bug - 400 validation error if null or empty :(
+        //this is not required field
+        if (null != i.getResumeUrl() && i.getResumeUrl().length() > 0)
+            item_values.put(I_RESUME, new AttributeValue(i.getResumeUrl()));
 
         CodingProblem cp = cr.getCodingProblem();
-        item_values.put(R_PROBLEM_GUID, new AttributeValue(cp.getGuid()));
-        item_values.put(R_PROBLEM_KEY, new AttributeValue(cp.getName()));
-        item_values.put(R_PROBLEM_LANDING_PAGE, new AttributeValue(cp.getLandingPageUrl()));
+        item_values.put(CP_PROBLEM_GUID, new AttributeValue(cp.getGuid()));
+        item_values.put(CP_PROBLEM_KEY, new AttributeValue(cp.getName()));
+        item_values.put(CP_PROBLEM_LANDING_PAGE, new AttributeValue(cp.getLandingPageUrl()));
 
-        item_values.put(R_SUCCEEDED, new AttributeValue("Never"));
-        item_values.put(R_ATTEMPTS, new AttributeValue().withN("0"));
+        OutputTestHistory oth = cr.getOutputTestHistory();
+        item_values.put(H_SUCCEEDED, new AttributeValue(oth.getSucceeded()));
+        item_values.put(H_ATTEMPTS, new AttributeValue().withN(Integer.toString(oth.getAttempts())));
+
+        //AWS bug - 400 validation error if null or empty :(
+        //this is not required field
+        if (null != oth.getCodeSolutionUrl() && oth.getCodeSolutionUrl().length() > 0)
+            item_values.put(H_CODE_URL, new AttributeValue(oth.getCodeSolutionUrl()));
 
 
         try {
@@ -94,6 +109,7 @@ public class DynamoOcpV2DB implements IOcpV2DB {
             for (String key : item_values.keySet())
             {
                 String val = item_values.get(key).getS();
+                val = item_values.get(key).toString();
                 logger.info(key + " : " + val);
             }
 
@@ -105,7 +121,7 @@ public class DynamoOcpV2DB implements IOcpV2DB {
     }
 
     @Override
-    public void updateRegistration(String registrationId, String outputUploadDate, boolean success) throws IOException
+    public void updateOutputTestHistory(String workflowId, String outputUploadDate, boolean success) throws IOException
     {
 
         try {
@@ -114,7 +130,7 @@ public class DynamoOcpV2DB implements IOcpV2DB {
             Table table = ddb.getTable(REGISTRATION_TABLE_NAME);
 
             HashMap<String, String> expressionAttributeNames = new HashMap<String, String>();
-            expressionAttributeNames.put("#A", R_ATTEMPTS);
+            expressionAttributeNames.put("#A", H_ATTEMPTS);
 
             HashMap<String, Object> expressionAttributeValues = new HashMap<String, Object>();
             expressionAttributeValues.put(":val1", 1);
@@ -123,7 +139,7 @@ public class DynamoOcpV2DB implements IOcpV2DB {
             String updateExpression;
             if (success)
             {
-                expressionAttributeNames.put("#S", R_SUCCEEDED);
+                expressionAttributeNames.put("#S", H_SUCCEEDED);
                 expressionAttributeValues.put(":val2", outputUploadDate);
                 updateExpression = "set #A = #A + :val1, #S = :val2 "; // set last update time, increment attempts
             }
@@ -136,13 +152,13 @@ public class DynamoOcpV2DB implements IOcpV2DB {
             logger.debug(updateExpression);
 
             table.updateItem(
-                    R_PROBLEM_GUID, // key attribute name
-                    registrationId,   // key attribute value
+                    CP_PROBLEM_GUID, // key attribute name
+                    workflowId,   // key attribute value
                     updateExpression,
                     expressionAttributeNames,
                     expressionAttributeValues);
 
-            logger.debug("Invitation update succeeded for record: " + registrationId);
+            logger.debug("Invitation update succeeded for record: " + workflowId);
 
         } catch (ResourceNotFoundException e) {
             throw new IOException(e);
@@ -182,38 +198,41 @@ public class DynamoOcpV2DB implements IOcpV2DB {
     }
 
     @Override
-    public CandidateRegistration getRegistration(String registrationId) throws IOException
+    public CandidateWorkflow getWorkflow(String registrationId) throws IOException
     {
         DynamoDB dynamoDB = new DynamoDB(getAmazonDynamoDB());
 
         Table table = dynamoDB.getTable(REGISTRATION_TABLE_NAME);
 
-        GetItemSpec spec = new GetItemSpec().withPrimaryKey(R_PROBLEM_GUID, registrationId);
+        GetItemSpec spec = new GetItemSpec().withPrimaryKey(CP_PROBLEM_GUID, registrationId);
 
         try {
             logger.info("Attempting to read the item: '" + registrationId + "' from table: '" + REGISTRATION_TABLE_NAME + "'");
             Item outcome = table.getItem(spec);
             logger.info("GetItem succeeded: " + outcome);
 
-            Invitation i = new Invitation();
-            i.setCandidateFirstName(outcome.getString(R_FIRST));
-            i.setCandidateLastName(outcome.getString(R_LAST));
-            i.setCandidateEmail(outcome.getString(R_EMAIL));
-            i.setManagerEmail(outcome.getString(R_MGR_EMAIL));
-            i.setInvitationDate(outcome.getString(R_DATE));
+            Invitation invite = new Invitation();
+            invite.setCandidateFirstName(outcome.getString(I_FIRST));
+            invite.setCandidateLastName(outcome.getString(I_LAST));
+            invite.setCandidateEmail(outcome.getString(I_EMAIL));
+            invite.setManagerEmail(outcome.getString(I_MGR_EMAIL));
+            invite.setInvitationDate(outcome.getString(I_DATE));
+            invite.setType(Invitation.Type.fromInt(outcome.getInt(I_TYPE)));
+            invite.setResumeUrl(outcome.getString(I_RESUME));
 
-            CodingProblem cp = new CodingProblem();
-            cp.setGuid(outcome.getString(R_PROBLEM_GUID));
-            cp.setName(outcome.getString(R_PROBLEM_KEY));
-            cp.setLandingPageUrl(outcome.getString(R_PROBLEM_LANDING_PAGE));
-            cp.setSucceeded(outcome.getString(R_SUCCEEDED));
-            cp.setAttempts(outcome.getInt(R_ATTEMPTS));
+            CodingProblem problem = new CodingProblem();
+            problem.setGuid(outcome.getString(CP_PROBLEM_GUID));
+            problem.setName(outcome.getString(CP_PROBLEM_KEY));
+            problem.setLandingPageUrl(outcome.getString(CP_PROBLEM_LANDING_PAGE));
 
-            CandidateRegistration cr = new CandidateRegistration();
-            cr.setInvitation(i);
-            cr.setProblemPage(cp);
+            OutputTestHistory history = new OutputTestHistory();
+            history.setSucceeded(outcome.getString(H_SUCCEEDED));
+            history.setAttempts(outcome.getInt(H_ATTEMPTS));
+            history.setCodeSolutionUrl(outcome.getString(H_CODE_URL));
 
-            return cr;
+            CandidateWorkflow workflow = new CandidateWorkflow(invite, problem, history);
+
+            return workflow;
 
         }
         catch (Exception e) {

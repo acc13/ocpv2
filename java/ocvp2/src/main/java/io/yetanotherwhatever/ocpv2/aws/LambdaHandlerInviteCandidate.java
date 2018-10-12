@@ -25,11 +25,9 @@ public class LambdaHandlerInviteCandidate {
         try {
             new Inviter()
                     .setDB(new DynamoOcpV2DB())
-                    .setCodingProblemBuilder(new S3CodingProblemBuilderBuilder())
+                    .setCodingProblemBuilder(new S3CodingProblemBuilder())
                     .setEmailer(new SESEmailHelper())
                     .sendInvitation(invitation);
-
-
 
         }
         catch(IOException e)

@@ -23,14 +23,14 @@ class SESEmailHelper implements IEmailer {
 
     private static final String SENDER = "noreply@yetanotherwhatever.io";
 
-    public void sendEmail(String email, String sub, String text) throws IOException
+    public void sendEmail(String email, String sub, String bodyHtml) throws IOException
     {
         try {
             Destination destination = new Destination().withToAddresses(new String[]{email});
             Content subject = new Content().withData(sub);
-            Content textContent = new Content().withData(text);
+            Content bodyContent = new Content().withData(bodyHtml);
 
-            Body body = new Body().withHtml(textContent);
+            Body body = new Body().withHtml(bodyContent);
             Message message = new Message()
                     .withSubject(subject)
                     .withBody(body);
@@ -43,7 +43,7 @@ class SESEmailHelper implements IEmailer {
 
             logger.info("Email sent to: " + email);
             logger.info("Email subject: " + sub);
-            logger.info("Email body: " + text);
+            logger.info("Email body: " + bodyHtml);
 
         } catch (AmazonServiceException e)
         {

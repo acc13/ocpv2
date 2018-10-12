@@ -33,15 +33,18 @@ public class LambdaHandlerRegisterIntern implements RequestHandler<S3Event,S3Eve
 
             try {
                 Invitation invitation = parseRecordMetadata(record);
+                String downloadUrl = LambdaHandlerNotifyCodeUploaded.extractS3DownloadUrl(record);
+                invitation.setResumeUrl(downloadUrl);
 
                 new Inviter()
                         .setDB(new DynamoOcpV2DB())
-                        .setCodingProblemBuilder(new S3CodingProblemBuilderBuilder())
+                        .setCodingProblemBuilder(new S3CodingProblemBuilder())
                         .setEmailer(new SESEmailHelper())
                         .sendInvitation(invitation);
             }
             catch(IOException | IllegalArgumentException | ParseException e)
             {
+                e.printStackTrace();
                 logger.error(e);
             }
 
@@ -57,14 +60,14 @@ public class LambdaHandlerRegisterIntern implements RequestHandler<S3Event,S3Eve
         String key = record.getS3().getObject().getKey();
 
         S3Object fullObject = s3Client.getObject(new GetObjectRequest(bucket, key));
-        Map<String, String> userMetadata = fullObject.getObjectMetadata().getUserMetadata();
 
+        Map<String, String> userMetadata = fullObject.getObjectMetadata().getUserMetadata();
         for (String mdKey : userMetadata.keySet())
         {
             logger.debug("Metadata " + mdKey + " : " + userMetadata.get(mdKey));
         }
 
-        String inviteJson = userMetadata.get("invitation");
+        String inviteJson = userMetadata.get("data");
 
         return parseInvitationJson(inviteJson);
     }
@@ -75,7 +78,7 @@ public class LambdaHandlerRegisterIntern implements RequestHandler<S3Event,S3Eve
 
         JSONObject event = (JSONObject)parser.parse(inviteJson);
 
-        Invitation i = new Invitation();
+        Invitation i = new Invitation(Invitation.Type.INTERN);
 
         i.setCandidateFirstName((String) event.get("candidateFirst"));
         i.setCandidateLastName((String) event.get("candidateLast"));

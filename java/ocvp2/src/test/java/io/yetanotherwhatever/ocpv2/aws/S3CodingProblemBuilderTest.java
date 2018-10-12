@@ -19,7 +19,7 @@ public class S3CodingProblemBuilderTest {
         int i = 100;
         while(0 < i--)
         {
-            counts[S3CodingProblemBuilderBuilder.pickOne(counts.length)]++;
+            counts[S3CodingProblemBuilder.pickOne(counts.length)]++;
         }
 
         for(i = 0; i < counts.length; i++)

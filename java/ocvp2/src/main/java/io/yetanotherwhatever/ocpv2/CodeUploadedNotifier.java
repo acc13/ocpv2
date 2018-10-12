@@ -45,7 +45,8 @@ public class CodeUploadedNotifier {
         }
 
         //look up invitation
-        CandidateRegistration cr = db.getRegistration(invitationId);
+        CandidateWorkflow cr = db.getWorkflow(invitationId);
+        cr.getOutputTestHistory().setCodeSolutionUrl(downloadUrl);
 
         //build upload url
         logger.debug("Download URL: " + downloadUrl);
@@ -62,17 +63,20 @@ public class CodeUploadedNotifier {
         logger.debug("Email successfully sent.");
     }
 
-    private String buildEmailBody(CandidateRegistration cr, String zipFileUrl)
+    private String buildEmailBody(CandidateWorkflow cr, String zipFileUrl)
     {
         String body =
                 "Time: " + Utils.formatDateISO8601(new Date()) + "<br/>" +
-                "\nCandidate: " + cr.getInvitation().getCandidateFirstName() + " " + cr.getInvitation().getCandidateLastName() + "<br/>" +
-                "\nCandidate email: " + cr.getInvitation().getCandidateEmail() + "<br/>" +
-                "\nInvited on: " + cr.getInvitation().getInvitationDate() + "<br/>" +
-                "\nProblem assigned: " + cr.getCodingProblem().getName() + "<br/>" +
-                "\nOutput uploaded attempts: " + cr.getCodingProblem().getAttempts() + "<br/>" +
-                "\nOutput passed: " + cr.getCodingProblem().getSucceeded() + "<br/>" +
-                "\nDownload submitted code <a href='" + zipFileUrl + "'>here</a>";
+                "\n\nCandidate: " + cr.getInvitation().getCandidateFirstName() + " " + cr.getInvitation().getCandidateLastName() + "<br/>" +
+                "\n\nCandidate email: " + cr.getInvitation().getCandidateEmail() + "<br/>" +
+                "Candidate resume: " + (null != cr.getInvitation().getResumeUrl() && cr.getInvitation().getResumeUrl().length() > 0?
+                                    "<a href='" + cr.getInvitation().getResumeUrl() + "'>" + cr.getInvitation().getResumeUrl() + "</a>" :
+                                    "Not available.") + "<br/>" +
+                "\n\nInvited on: " + cr.getInvitation().getInvitationDate() + "<br/>" +
+                "\n\nProblem assigned: " + cr.getCodingProblem().getName() + "<br/>" +
+                "\n\nOutput uploaded attempts: " + cr.getOutputTestHistory().getAttempts() + "<br/>" +
+                "\n\nCorrect output uploaded: " + cr.getOutputTestHistory().getSucceeded() + "<br/>" +
+                "\n\nDownload submitted code: <a href='" + zipFileUrl + "'>" + zipFileUrl + "</a>";
 
         return body;
     }

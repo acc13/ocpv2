@@ -8,7 +8,31 @@ import java.util.Date;
 /**
  * Created by achang on 9/3/2018.
  */
+
+
 public class Invitation {
+
+    public enum Type
+    {
+        FULL_TIME(0), INTERN(1);
+
+        private int _value;
+
+        Type(int Value) {
+            this._value = Value;
+        }
+
+        public int getValue() {
+            return _value;
+        }
+
+        public static Type fromInt(int i) {
+            for (Type b : Type .values()) {
+                if (b.getValue() == i) { return b; }
+            }
+            return null;
+        }
+    }
 
     // Initialize the Log4j logger.
     static final Logger logger = LogManager.getLogger(Invitation.class);
@@ -18,10 +42,19 @@ public class Invitation {
     private String candidateEmail;
     private String managerEmail;
     private String invitationDate;
+    private Type type;
+    private String resumeUrl;
 
     public Invitation ()
     {
         invitationDate = Utils.formatDateISO8601(new Date());
+        this.type = Type.FULL_TIME;
+    }
+
+    public Invitation (Type type)
+    {
+        this();
+        this.type = type;
     }
 
     public void setInvitationDate(String invitationDate)
@@ -72,6 +105,22 @@ public class Invitation {
         this.managerEmail = managerEmail;
 
         return this;
+    }
+
+    public Type getType() {
+        return type;
+    }
+
+    public void setType(Type type) {
+        this.type = type;
+    }
+
+    public String getResumeUrl() {
+        return resumeUrl;
+    }
+
+    public void setResumeUrl(String resumeUrl) {
+        this.resumeUrl = resumeUrl;
     }
 
     public void validate() throws IllegalArgumentException

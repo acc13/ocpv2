@@ -45,10 +45,13 @@ public class LambdaHandlerTestOutput implements RequestHandler<S3Event,S3Event> 
         return s3Event;
     }
 
+    //this is for mocking
     String getS3WebBucketName()
     {
-        return System.getenv("S3_WEB_BUCKET");
+        return S3CodingProblemBuilder.getS3WebBucket();
     }
+
+
 
     boolean parseRecord(S3EventNotification.S3EventNotificationRecord record)
     {
