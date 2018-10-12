@@ -23,7 +23,7 @@ public class SignedS3Form
 
 
     public SignedS3Form(String awsAccessKeyID, String awsSecretAccessKey, String hostedZone, String stack,
-                        String formId, String keyPrefix, String successRedirectPage, String additionalFields) {
+                        String formId, String keyPrefix, String successRedirectPage, String additionalFields, String baseUploadBucket) {
 
 
 
@@ -42,7 +42,7 @@ public class SignedS3Form
 
 
         this.s3WebBucketName = stack + "." + hostedZone;
-        this.s3UploadBucketName = stack + ".upload." + hostedZone;
+        this.s3UploadBucketName = stack + "-upload-" + baseUploadBucket;
 
         this.formId = formId;
         this.keyPrefix = keyPrefix;
@@ -60,7 +60,7 @@ public class SignedS3Form
     }
 
     public String getAction() {
-        return "http://" + s3UploadBucketName + ".s3.amazonaws.com/";
+        return "https://" + s3UploadBucketName + ".s3.amazonaws.com/";
     }
 
     public String getSuccessRedirect() {

@@ -30,27 +30,24 @@ then
     display_usage
 fi
 
-BUCKET=deployocp
-DEPLOY_DIR="${0%/*}"
-CFPROPS=cloudformation.yml
-CFPROPS_PATH=$DEPLOY_DIR/cloudformation/$CFPROPS
-KEY=cloudformation/$CFPROPS
+echo
+echo $0 started
 
-LAMBDAS=$DEPLOY_DIR/../lambdas
-ZIP=$LAMBDAS/InviteCandidate/build/distributions/InviteCandidate-1.0.zip
+DEPLOY_FOLDER="${0%/*}"
+CFTEMPLATE=cloudformation.yml
+BUCKET=deployocp
+KEY=$ENV/cloudformation/$CFTEMPLATE
 
 STACK_NAME=$ENV
 
 if [[ $skip != "true" ]]
 then
-	aws s3 mb s3://$BUCKET
-	aws s3 cp $CFPROPS_PATH s3://$BUCKET/$KEY
-	#aws s3 cp $ZIP s3://$BUCKET/$INVITE_S3_KEY
+    $DEPLOY_FOLDER/publishLambda.sh --env $ENV
 fi
 
 aws cloudformation create-stack --stack-name $STACK_NAME --template-url https://s3.amazonaws.com/$BUCKET/$KEY --capabilities CAPABILITY_NAMED_IAM
 aws cloudformation wait stack-create-complete --stack-name $STACK_NAME
 aws cloudformation describe-stacks --stack-name $STACK_NAME
 
+echo $0 finished
 echo
-echo Deployment ended

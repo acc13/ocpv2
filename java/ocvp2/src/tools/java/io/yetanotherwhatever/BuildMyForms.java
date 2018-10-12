@@ -25,7 +25,7 @@ public class BuildMyForms {
 
         //PARSE ARGS
 
-        String awsAccessKeyID = null, awsSecretAccessKey = null, hostedZone = null;
+        String awsAccessKeyID = null, awsSecretAccessKey = null, hostedZone = null, baseUploadBucket = null;
         ArrayList<String> stackNames  = null;
 
         try {
@@ -33,30 +33,31 @@ public class BuildMyForms {
             awsSecretAccessKey = args[1];
             hostedZone = args[2];
             stackNames = new ArrayList<>(Arrays.asList(args[3].split(":")));
+            baseUploadBucket = args[4];
         } catch (ArrayIndexOutOfBoundsException e) {
             System.out.println("Usage: " + System.getProperty("sun.java.command") +
                     " <access_key_id> <secret_access_key> <hosted_zone> <colon_delimited_stack_names>");
             System.exit(1);
         }
 
-        generateHtml(awsAccessKeyID, awsSecretAccessKey, hostedZone);
+        generateHtml(awsAccessKeyID, awsSecretAccessKey, hostedZone, baseUploadBucket);
 
-        generateJS(awsAccessKeyID, awsSecretAccessKey, hostedZone, stackNames);
+        generateJS(awsAccessKeyID, awsSecretAccessKey, hostedZone, stackNames, baseUploadBucket);
 
     }
 
-    private static void generateHtml(String awsAccessKeyID, String awsSecretAccessKey, String hostedZone)
+    private static void generateHtml(String awsAccessKeyID, String awsSecretAccessKey, String hostedZone, String baseUploadBucket)
     {
 
         //this is kind of hacky... but building the html templates doesn't require the stackName field
         String stackName = "";
 
         //output "empty" forms
-        System.out.println(FormFactory.buildOutputTestForm(awsAccessKeyID, awsSecretAccessKey, hostedZone, stackName).buildFormHtml());
+        System.out.println(FormFactory.buildOutputTestForm(awsAccessKeyID, awsSecretAccessKey, hostedZone, stackName, baseUploadBucket).buildFormHtml());
 
-        System.out.println(FormFactory.buildCodeUploadForm(awsAccessKeyID, awsSecretAccessKey, hostedZone, stackName).buildFormHtml());
+        System.out.println(FormFactory.buildCodeUploadForm(awsAccessKeyID, awsSecretAccessKey, hostedZone, stackName, baseUploadBucket).buildFormHtml());
 
-        System.out.println(FormFactory.buildInternshipRegistrationForm(awsAccessKeyID, awsSecretAccessKey, hostedZone, stackName).buildFormHtml());
+        System.out.println(FormFactory.buildInternshipRegistrationForm(awsAccessKeyID, awsSecretAccessKey, hostedZone, stackName, baseUploadBucket).buildFormHtml());
 
     }
 
@@ -83,7 +84,7 @@ public class BuildMyForms {
 
     }
 
-    private static void generateJS(String awsAccessKeyID, String awsSecretAccessKey, String hostedZone, ArrayList<String> stackNames)
+    private static void generateJS(String awsAccessKeyID, String awsSecretAccessKey, String hostedZone, ArrayList<String> stackNames, String baseUploadBucket)
     {
 
         System.out.println("/************************** AUTO-GENERATED FORM SETUP JS **************************/");
@@ -95,13 +96,13 @@ public class BuildMyForms {
 
             System.out.println("\t\tcase '" + stack + "':");
 
-            SignedS3Form outputForm = FormFactory.buildOutputTestForm(awsAccessKeyID, awsSecretAccessKey, hostedZone, stack);
+            SignedS3Form outputForm = FormFactory.buildOutputTestForm(awsAccessKeyID, awsSecretAccessKey, hostedZone, stack, baseUploadBucket);
             String updateOutputFormJS = generateJsToUpdateSingleForm(outputForm);
 
-            SignedS3Form codeForm = FormFactory.buildCodeUploadForm(awsAccessKeyID, awsSecretAccessKey, hostedZone, stack);
+            SignedS3Form codeForm = FormFactory.buildCodeUploadForm(awsAccessKeyID, awsSecretAccessKey, hostedZone, stack, baseUploadBucket);
             String updateCodeFormJS = generateJsToUpdateSingleForm(codeForm);
 
-            SignedS3Form internRegForm = FormFactory.buildInternshipRegistrationForm(awsAccessKeyID, awsSecretAccessKey, hostedZone, stack);
+            SignedS3Form internRegForm = FormFactory.buildInternshipRegistrationForm(awsAccessKeyID, awsSecretAccessKey, hostedZone, stack, baseUploadBucket);
             String updateInternRegForm = generateJsToUpdateSingleForm(internRegForm);
 
             System.out.println(updateOutputFormJS);

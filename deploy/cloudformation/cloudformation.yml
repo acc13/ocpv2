@@ -33,17 +33,18 @@ Resources:
 
   S3UploadBucket:
     Type: 'AWS::S3::Bucket'
-    DependsOn: 
-      - LambdaOutputUploaded
+    DependsOn:
       - S3InvokeLambdaOutputUploadedPermission
+      - S3InvokeLambdaCodeUploadedPermission
+      - S3InvokeLambdaRegisterInternPermission
     Properties:
       AccessControl: PublicRead
       BucketName: 
         !Join
-          - '.'
+          - '-'
           - - !Ref AWS::StackName
             - upload
-            - yetanotherwhatever.io
+            - yetanotherwhatever
       NotificationConfiguration:
         LambdaConfigurations:             
           - Function: 
@@ -93,6 +94,7 @@ Resources:
             Principal: "*"
 
 
+
   #######################################
   #       Permissions & Roles
   #######################################
@@ -114,10 +116,10 @@ Resources:
             - - "arn:aws:s3:::"
               -
                 !Join
-                  - '.'
+                  - '-'
                   - - !Ref AWS::StackName
                     - upload
-                    - yetanotherwhatever.io
+                    - yetanotherwhatever
 
   #S3 may invoke LambdaCodeUploaded
   S3InvokeLambdaCodeUploadedPermission: 
@@ -136,10 +138,10 @@ Resources:
             - - "arn:aws:s3:::"
               -
                 !Join
-                  - '.'
+                  - '-'
                   - - !Ref AWS::StackName
                     - upload
-                    - yetanotherwhatever.io
+                    - yetanotherwhatever
   
   #S3 may invoke LambdaRegisterIntern
   S3InvokeLambdaRegisterInternPermission: 
@@ -158,11 +160,41 @@ Resources:
             - - "arn:aws:s3:::"
               -
                 !Join
-                  - '.'
+                  - '-'
                   - - !Ref AWS::StackName
                     - upload
-                    - yetanotherwhatever.io
+                    - yetanotherwhatever
 
+  #Lambdas may assume role ocpv2.<stackname>.lambda
+  LambdaRole: 
+      Type: "AWS::IAM::Role"
+      Properties: 
+        RoleName: 
+          !Join
+            - '.'
+            - - ocpv2
+              - !Ref AWS::StackName
+              - lambda
+        AssumeRolePolicyDocument: 
+          Version: "2012-10-17"
+          Statement: 
+            - 
+              Effect: "Allow"
+              Principal: 
+                Service: 
+                  - "lambda.amazonaws.com"
+              Action: 
+                - "sts:AssumeRole"
+        Path: "/"
+        Policies: 
+          - 
+            PolicyName: "root"
+            PolicyDocument: 
+              Version: "2012-10-17"
+              Statement: 
+                - Effect: "Allow"
+                  Action: "*"
+                  Resource: "*"
   #API gateway may invoke LambdaInviteUser
   RedirectPermissionsInvitations:
     Type: 'AWS::Lambda::Permission'
@@ -286,7 +318,8 @@ Resources:
   #######################################
   LambdaInviteUser:
     Type: "AWS::Lambda::Function"
-    DependsOn : LambdaRole
+    DependsOn : 
+      - LambdaRole
     Properties: 
       FunctionName: 
         !Join
@@ -330,7 +363,8 @@ Resources:
 
   LambdaOutputUploaded:
     Type: "AWS::Lambda::Function"
-    DependsOn : LambdaRole
+    DependsOn : 
+      - LambdaRole
     Properties: 
       FunctionName: 
         !Join
@@ -380,7 +414,8 @@ Resources:
 
   LambdaCodeUploaded:
     Type: "AWS::Lambda::Function"
-    DependsOn : LambdaRole
+    DependsOn : 
+      - LambdaRole
     Properties: 
       FunctionName: 
         !Join
@@ -459,7 +494,8 @@ Resources:
 
   LambdaRegisterIntern:
     Type: "AWS::Lambda::Function"
-    DependsOn : LambdaRole
+    DependsOn : 
+      - LambdaRole
     Properties: 
       FunctionName: 
         !Join

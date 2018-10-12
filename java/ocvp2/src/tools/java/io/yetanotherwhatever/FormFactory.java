@@ -2,7 +2,7 @@ package io.yetanotherwhatever;
 
 public class FormFactory {
 
-    static public SignedS3Form buildCodeUploadForm(String awsAccessKeyID, String awsSecretAccessKey, String hostedZone, String stack)
+    static public SignedS3Form buildCodeUploadForm(String awsAccessKeyID, String awsSecretAccessKey, String hostedZone, String stack, String baseUploadBucket)
     {
 
         final String SUCCESS_REDIRECT_PAGE = "thanks.html";
@@ -17,11 +17,11 @@ public class FormFactory {
         final String FORM_ID = "codeForm";
 
         return new SignedS3Form(awsAccessKeyID, awsSecretAccessKey, hostedZone, stack,
-                FORM_ID, KEY_PREFIX, SUCCESS_REDIRECT_PAGE, ADDITIONAL_FIELDS);
+                FORM_ID, KEY_PREFIX, SUCCESS_REDIRECT_PAGE, ADDITIONAL_FIELDS, baseUploadBucket);
     }
 
 
-    static public SignedS3Form buildOutputTestForm(String awsAccessKeyID, String awsSecretAccessKey, String hostedZone, String stack)
+    static public SignedS3Form buildOutputTestForm(String awsAccessKeyID, String awsSecretAccessKey, String hostedZone, String stack, String baseUploadBucket)
     {
         final String FORM_ID = "outputForm";
         final String KEY_PREFIX = "uploads/output";
@@ -31,11 +31,11 @@ public class FormFactory {
                 "      \n" +
                 "      <br>\n";
         return new SignedS3Form(awsAccessKeyID, awsSecretAccessKey, hostedZone, stack,
-                FORM_ID, KEY_PREFIX, SUCCESS_REDIRECT_PAGE, ADDITIONAL_FIELDS);
+                FORM_ID, KEY_PREFIX, SUCCESS_REDIRECT_PAGE, ADDITIONAL_FIELDS, baseUploadBucket);
     }
 
 
-    static public SignedS3Form buildInternshipRegistrationForm(String awsAccessKeyID, String awsSecretAccessKey, String hostedZone, String stack)
+    static public SignedS3Form buildInternshipRegistrationForm(String awsAccessKeyID, String awsSecretAccessKey, String hostedZone, String stack, String baseUploadBucket)
     {
         final String FORM_ID = "internRegForm";
         final String KEY_PREFIX = "uploads/internshipRegistration";
@@ -66,6 +66,6 @@ public class FormFactory {
                 "\t\t</p><br>\n";
 
         return new SignedS3Form(awsAccessKeyID, awsSecretAccessKey, hostedZone, stack,
-                FORM_ID, KEY_PREFIX, SUCCESS_REDIRECT_PAGE, ADDITIONAL_FIELDS);
+                FORM_ID, KEY_PREFIX, SUCCESS_REDIRECT_PAGE, ADDITIONAL_FIELDS, baseUploadBucket);
     }
 }
