@@ -62,6 +62,14 @@ Resources:
                 Rules:
                   - Name: prefix
                     Value: 'uploads/code/'
+          - Function: 
+              Fn::GetAtt: [LambdaRegisterIntern, Arn]
+            Event: s3:ObjectCreated:*
+            Filter:
+              S3Key:
+                Rules:
+                  - Name: prefix
+                    Value: 'uploads/internshipRegistration/'
 
   AllowPublicDownloadFromUploadBucketPolicy: 
     Type: AWS::S3::BucketPolicy
@@ -89,6 +97,7 @@ Resources:
   #       Permissions & Roles
   #######################################
 
+  #S3 may invoke LambdaOutputUploaded
   S3InvokeLambdaOutputUploadedPermission: 
       Type: AWS::Lambda::Permission
       DependsOn:  LambdaOutputUploaded 
@@ -110,6 +119,7 @@ Resources:
                     - upload
                     - yetanotherwhatever.io
 
+  #S3 may invoke LambdaCodeUploaded
   S3InvokeLambdaCodeUploadedPermission: 
       Type: AWS::Lambda::Permission
       DependsOn:  LambdaCodeUploaded 
@@ -130,7 +140,30 @@ Resources:
                   - - !Ref AWS::StackName
                     - upload
                     - yetanotherwhatever.io
+  
+  #S3 may invoke LambdaRegisterIntern
+  S3InvokeLambdaRegisterInternPermission: 
+      Type: AWS::Lambda::Permission
+      DependsOn:  LambdaRegisterIntern 
+      Properties: 
+        Action: lambda:InvokeFunction
+        FunctionName: 
+          Fn::GetAtt: [LambdaRegisterIntern, Arn]
+        Principal: s3.amazonaws.com
+        SourceAccount: 
+          Ref: AWS::AccountId
+        SourceArn: 
+          !Join
+            - ''
+            - - "arn:aws:s3:::"
+              -
+                !Join
+                  - '.'
+                  - - !Ref AWS::StackName
+                    - upload
+                    - yetanotherwhatever.io
 
+  #API gateway may invoke LambdaInviteUser
   RedirectPermissionsInvitations:
     Type: 'AWS::Lambda::Permission'
     Properties:
@@ -139,6 +172,7 @@ Resources:
       Principal: apigateway.amazonaws.com
       SourceArn: !Sub arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${OCPv2API}/*
 
+  #API gateway may invoke LambdaGetTestOutputResult
   RedirectPermissionsResults:
     Type: 'AWS::Lambda::Permission'
     Properties:
@@ -150,6 +184,7 @@ Resources:
       SourceArn: !Sub "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${OCPv2API}/*/*/*/*"
 
 
+  #Lambdas may assume role ocpv2.<stackname>.lambda
   LambdaRole: 
       Type: "AWS::IAM::Role"
       Properties: 
@@ -200,7 +235,7 @@ Resources:
         !Join
           - '.'
           - - !Ref AWS::StackName
-            - Candidate_Invitations
+            - Candidate_Registrations
       ProvisionedThroughput:
         ReadCapacityUnits: 5
         WriteCapacityUnits: 5
@@ -261,8 +296,11 @@ Resources:
       Description: invite candidate, create dynamic, temporary coding exercise page.
       Code: 
         S3Bucket: deployocp
-        S3Key: lambas/InviteCandidate-1.0.zip
-      Handler: com.yetanotherwhatever.ocpv2.aws.InviteCandidateHandler::handleRequest
+        S3Key: !Join
+          - '/'
+          - - !Ref AWS::StackName
+            - lambas/OCPv2-1.0.zip
+      Handler: io.yetanotherwhatever.ocpv2.aws.LambdaHandlerInviteCandidate::handleRequest
       MemorySize: 256
       Role: 
         !Join
@@ -278,17 +316,17 @@ Resources:
       Timeout: 30
       Environment:
         Variables:
+          STACK_NAME: !Ref AWS::StackName
           S3_WEB_BUCKET: 
             !Join
               - '.'
               - - !Ref AWS::StackName
                 - yetanotherwhatever.io
-          DYNAMODB_INVITE_TABLE:             
+          DYNAMODB_REGISTRATION_TABLE:             
             !Join
               - '.'
               - - !Ref AWS::StackName
-                - Candidate_Invitations
-          PROBLEM_EXPIRY_IN_DAYS: 7
+                - Candidate_Registrations
 
   LambdaOutputUploaded:
     Type: "AWS::Lambda::Function"
@@ -302,8 +340,11 @@ Resources:
       Description: check uploaded output against expected, save results for candidate, save results for manager
       Code: 
         S3Bucket: deployocp
-        S3Key: lambas/InviteCandidate-1.0.zip
-      Handler: com.yetanotherwhatever.ocpv2.aws.OutputUploadedHandler::handleRequest
+        S3Key: !Join
+          - '/'
+          - - !Ref AWS::StackName
+            - lambas/OCPv2-1.0.zip
+      Handler: io.yetanotherwhatever.ocpv2.aws.LambdaHandlerTestOutput::handleRequest
       MemorySize: 256
       Role: 
         !Join
@@ -319,11 +360,12 @@ Resources:
       Timeout: 30
       Environment:
         Variables:
-          DYNAMODB_INVITE_TABLE:             
+          STACK_NAME: !Ref AWS::StackName
+          DYNAMODB_REGISTRATION_TABLE:             
             !Join
               - '.'
               - - !Ref AWS::StackName
-                - Candidate_Invitations
+                - Candidate_Registrations
           DYNAMODB_OUTPUT_UPLOADS_TABLE:
             !Join
               - '.'
@@ -348,8 +390,11 @@ Resources:
       Description: notify hiring manager of solution upload, with link to .zip
       Code: 
         S3Bucket: deployocp
-        S3Key: lambas/InviteCandidate-1.0.zip
-      Handler: com.yetanotherwhatever.ocpv2.aws.CodeUploadedHandler::handleRequest
+        S3Key: !Join
+          - '/'
+          - - !Ref AWS::StackName
+            - lambas/OCPv2-1.0.zip
+      Handler: io.yetanotherwhatever.ocpv2.aws.LambdaHandlerNotifyCodeUploaded::handleRequest
       MemorySize: 256
       Role: 
         !Join
@@ -365,11 +410,12 @@ Resources:
       Timeout: 30
       Environment:
         Variables:
-          DYNAMODB_INVITE_TABLE:             
+          STACK_NAME: !Ref AWS::StackName
+          DYNAMODB_REGISTRATION_TABLE:             
             !Join
               - '.'
               - - !Ref AWS::StackName
-                - Candidate_Invitations
+                - Candidate_Registrations
 
   LambdaGetTestOutputResult:
     Type: "AWS::Lambda::Function"
@@ -383,8 +429,11 @@ Resources:
       Description: invite candidate, create dynamic, temporary coding exercise page.
       Code: 
         S3Bucket: deployocp
-        S3Key: lambas/InviteCandidate-1.0.zip
-      Handler: com.yetanotherwhatever.ocpv2.aws.GetOutputTestResultsHandler::handleRequest
+        S3Key: !Join
+          - '/'
+          - - !Ref AWS::StackName
+            - lambas/OCPv2-1.0.zip
+      Handler: io.yetanotherwhatever.ocpv2.aws.LambdaHandlerGetTestOutputResults::handleRequest
       MemorySize: 256
       Role: 
         !Join
@@ -400,12 +449,57 @@ Resources:
       Timeout: 30
       Environment:
         Variables:
+          STACK_NAME: !Ref AWS::StackName
           DYNAMODB_OUTPUT_UPLOADS_TABLE:
             !Join
               - '.'
               - - !Ref AWS::StackName
                 - Output_Uploads
 
+
+  LambdaRegisterIntern:
+    Type: "AWS::Lambda::Function"
+    DependsOn : LambdaRole
+    Properties: 
+      FunctionName: 
+        !Join
+          - '_'
+          - - !Ref AWS::StackName
+            - RegisterIntern
+      Description: Register intern and send problem page
+      Code: 
+        S3Bucket: deployocp
+        S3Key: !Join
+          - '/'
+          - - !Ref AWS::StackName
+            - lambas/OCPv2-1.0.zip
+      Handler: io.yetanotherwhatever.ocpv2.aws.LambdaHandlerRegisterIntern::handleRequest
+      MemorySize: 256
+      Role: 
+        !Join
+          - '/'
+          - - !Sub arn:aws:iam::${AWS::AccountId}:role
+            - 
+              !Join
+                - '.'
+                - - ocpv2
+                  - !Ref AWS::StackName
+                  - lambda
+      Runtime: java8
+      Timeout: 30
+      Environment:
+        Variables:
+          STACK_NAME: !Ref AWS::StackName
+          S3_WEB_BUCKET: 
+            !Join
+              - '.'
+              - - !Ref AWS::StackName
+                - yetanotherwhatever.io
+          DYNAMODB_REGISTRATION_TABLE:             
+            !Join
+              - '.'
+              - - !Ref AWS::StackName
+                - Candidate_Registrations
 
   #########################################
   #       API Gateway 

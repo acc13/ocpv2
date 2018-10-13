@@ -1,10 +1,9 @@
 package io.yetanotherwhatever.ocpv2;
 
-import io.yetanotherwhatever.ocpv2.aws.S3CodingProblem;
+import io.yetanotherwhatever.ocpv2.aws.S3CodingProblemBuilder;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.ArgumentMatchers;
 
 import java.io.IOException;
 import java.util.List;
@@ -23,25 +22,25 @@ public class InviterTest {
     Invitation invite;
     IOcpV2DB mockDb;
     IEmailer mockEmailer;
-    ICodingProblem mockCodingProblem;
+    ICodingProblemBuilder mockCodingProblemBuilder;
+    CodingProblem cp;
 
-    private Inviter buildInviter()
+    private Inviter buildInviter() throws IOException
     {
         mockDb = mock(IOcpV2DB.class);
         mockEmailer = mock(IEmailer.class);
-        mockCodingProblem = mock(S3CodingProblem.class);
+        mockCodingProblemBuilder = mock(S3CodingProblemBuilder.class);
 
-        String landingPageURL = "http://fake.landingpage.somewhere.com";
-        String problemKey = "fakeProblemKey";
-        String problemGuid= "fakeProblemGuid";
-        when(mockCodingProblem.getLandingPageURL()).thenReturn(landingPageURL);
-        when(mockCodingProblem.getProblemKey()).thenReturn(problemKey);
-        when(mockCodingProblem.getProblemGuid()).thenReturn(problemGuid);
+        cp =  new CodingProblem();
+        cp.setLandingPageUrl("http://fake.landingpage.somewhere.com");
+        cp.setName("fakeProblemKey");
+        cp.setGuid("fakeProblemGuid");
+        when(mockCodingProblemBuilder.buildCodingProblem()).thenReturn(cp);
 
-        inviter = new Inviter()
-                .setDB(mockDb)
-                .setEmailer(mockEmailer)
-                .setCodingProblem(mockCodingProblem);
+        inviter = new Inviter();
+        inviter.setDB(mockDb);
+        inviter.setEmailer(mockEmailer);
+        inviter.setCodingProblemBuilder(mockCodingProblemBuilder);
 
         return inviter;
     }
@@ -75,7 +74,7 @@ public class InviterTest {
         buildInviter();
         buildGoodInvitation();
         inviter.sendInvitation(invite);
-        verify(mockDb).write(ArgumentMatchers.eq(invite));
+        verify(mockDb).write(any(CandidateWorkflow.class));
     }
 
     @Test
@@ -84,7 +83,7 @@ public class InviterTest {
         buildInviter();
         buildGoodInvitation();
         inviter.sendInvitation(invite);
-        verify(mockCodingProblem).setup();
+        verify(mockCodingProblemBuilder).buildCodingProblem();
     }
 
     @Test
@@ -108,7 +107,7 @@ public class InviterTest {
         verify(mockEmailer, times(2)).sendEmail(anyString(), anyString(), emailBodyTextCaptor.capture());
         List<String> capturedEmailBodies = emailBodyTextCaptor.getAllValues();
         assertThat(capturedEmailBodies.get(0),  //candidate email sent first
-                containsString(mockCodingProblem.getLandingPageURL()));
+                containsString(cp.getLandingPageUrl()));
     }
 
     @Test
@@ -144,11 +143,11 @@ public class InviterTest {
         List<String> capturedEmailBodies = emailBodyTextCaptor.getAllValues();
         String managerEmailBody = capturedEmailBodies.get(1); //manager email sent second
         assertThat(managerEmailBody,
-                containsString(mockCodingProblem.getLandingPageURL()));
+                containsString(cp.getLandingPageUrl()));
         assertThat(managerEmailBody,
-                containsString(mockCodingProblem.getProblemKey()));
+                containsString(cp.getName()));
         assertThat(managerEmailBody,
-                containsString(mockCodingProblem.getProblemGuid()));
+                containsString(cp.getGuid()));
     }
 
     @Test
@@ -159,14 +158,14 @@ public class InviterTest {
 
         inviter.sendInvitation(invite);
 
-        ArgumentCaptor<Invitation> inviteCaptor = ArgumentCaptor.forClass(Invitation.class);
-        verify(mockDb).write(inviteCaptor.capture());
-        Invitation inviteArg = inviteCaptor.getValue();
-        assertThat(inviteArg.getProblemLandingPageURL(),
-                is(equalTo((mockCodingProblem.getLandingPageURL()))));
-        assertThat(inviteArg.getProblemKey(),
-                is(equalTo(mockCodingProblem.getProblemKey())));
-        assertThat(inviteArg.getProblemGuid(),
-                is(equalTo(mockCodingProblem.getProblemGuid())));
+        ArgumentCaptor<CandidateWorkflow> crCaptor = ArgumentCaptor.forClass(CandidateWorkflow.class);
+        verify(mockDb).write(crCaptor.capture());
+        CandidateWorkflow candidateWorkflowArg = crCaptor.getValue();
+        assertThat(candidateWorkflowArg.getCodingProblem().getLandingPageUrl(),
+                is(equalTo((cp.getLandingPageUrl()))));
+        assertThat(candidateWorkflowArg.getCodingProblem().getName(),
+                is(equalTo(cp.getName())));
+        assertThat(candidateWorkflowArg.getCodingProblem().getGuid(),
+                is(equalTo(cp.getGuid())));
     }
 }

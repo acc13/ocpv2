@@ -1,5 +1,6 @@
 package io.yetanotherwhatever.ocpv2.aws;
 
+import io.yetanotherwhatever.ocpv2.OutputResults;
 import io.yetanotherwhatever.ocpv2.OutputTestResultGetter;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -15,7 +16,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class GetOutputTestResultsHandlerTest {
+public class GetOutputTestResultsHandlerTestGetTestOutputResults {
 
     private JSONObject createEvent(String outputId) throws ParseException
     {

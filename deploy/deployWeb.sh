@@ -30,6 +30,9 @@ then
 	display_usage
 fi
 
+echo
+echo $0 starting
+
 
 #CONSTANTS
 DEPLOY_FOLDER="${0%/*}"
@@ -44,5 +47,5 @@ fi
 #copy web content first
 aws s3 sync $DEPLOY_FOLDER/../web s3://$BUCKET_NAME --content-type "text/html" --acl public-read
 
+echo $0 finished
 echo
-echo Deployment ended.

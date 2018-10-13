@@ -3,7 +3,7 @@
 display_usage() { 
 	echo -e "\nUsage:\n$0 --env <environment/stack name>\n" 
     exit 1
-	} 
+} 
 
 # idiomatic parameter and option handling in sh
 while test $# -gt 0
@@ -27,24 +27,15 @@ then
 	display_usage
 fi
 
-echo
-echo $0 starting
+echo 
+echo $0 started
 
 DEPLOY_FOLDER="${0%/*}"
-CFTEMPLATE=cloudformation.yml
-CFTEMPLATE_PATH=$DEPLOY_FOLDER/cloudformation/$CFTEMPLATE
-BUCKET=deployocp
-KEY=$ENV/cloudformation/$CFTEMPLATE
 
-TEST_STACK_NAME=test
-
-
-
-aws s3 mb s3://$BUCKET
-echo "bucket $BUCKET created"
-aws s3 cp $CFTEMPLATE_PATH s3://$BUCKET/$KEY
-echo "template $CFTEMPLATE uploaded"
-aws cloudformation validate-template --template-url https://s3.amazonaws.com/$BUCKET/$KEY
+$DEPLOY_FOLDER/validateCFTemplate.sh --env $ENV
+$DEPLOY_FOLDER/deployStack.sh --env $ENV
+$DEPLOY_FOLDER/deployWeb.sh --env $ENV
+$DEPLOY_FOLDER/deployLambda.sh --env $ENV
 
 echo $0 finished
 echo

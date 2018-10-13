@@ -9,7 +9,7 @@ import static org.hamcrest.core.IsNot.not;
 /**
  * Created by achang on 9/9/2018.
  */
-public class S3CodingProblemTest {
+public class S3CodingProblemBuilderTest {
 
     @Test
     public void pickOne_works()
@@ -19,7 +19,7 @@ public class S3CodingProblemTest {
         int i = 100;
         while(0 < i--)
         {
-            counts[S3CodingProblem.pickOne(counts.length)]++;
+            counts[S3CodingProblemBuilder.pickOne(counts.length)]++;
         }
 
         for(i = 0; i < counts.length; i++)

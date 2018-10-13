@@ -8,7 +8,31 @@ import java.util.Date;
 /**
  * Created by achang on 9/3/2018.
  */
+
+
 public class Invitation {
+
+    public enum Type
+    {
+        FULL_TIME(0), INTERN(1);
+
+        private int _value;
+
+        Type(int Value) {
+            this._value = Value;
+        }
+
+        public int getValue() {
+            return _value;
+        }
+
+        public static Type fromInt(int i) {
+            for (Type b : Type .values()) {
+                if (b.getValue() == i) { return b; }
+            }
+            return null;
+        }
+    }
 
     // Initialize the Log4j logger.
     static final Logger logger = LogManager.getLogger(Invitation.class);
@@ -17,43 +41,30 @@ public class Invitation {
     private String candidateLastName;
     private String candidateEmail;
     private String managerEmail;
-    private String problemKey;
-
-    public String getProblemGuid() {
-        return problemGuid;
-    }
-
-    public void setProblemGuid(String problemGuid) {
-        this.problemGuid = problemGuid;
-    }
-
-    private String problemGuid;
-    private String problemLandingPageURL;
-    private String creationDate;
-
-    public String getSucceeded() {
-        return succeeded;
-    }
-
-    public void setSucceeded(String succeeded) {
-        this.succeeded = succeeded;
-    }
-
-    public int getAttempts() {
-        return attempts;
-    }
-
-    public void setAttempts(int attempts) {
-        this.attempts = attempts;
-    }
-
-    private String succeeded = "never";
-    private int attempts = 0;
-
+    private String invitationDate;
+    private Type type;
+    private String resumeUrl;
 
     public Invitation ()
     {
-        creationDate = Utils.formatDateISO8601(new Date());
+        invitationDate = Utils.formatDateISO8601(new Date());
+        this.type = Type.FULL_TIME;
+    }
+
+    public Invitation (Type type)
+    {
+        this();
+        this.type = type;
+    }
+
+    public void setInvitationDate(String invitationDate)
+    {
+        this.invitationDate = invitationDate;
+    }
+
+    public String getInvitationDate()
+    {
+        return invitationDate;
     }
 
     public String getCandidateFirstName() {
@@ -96,31 +107,20 @@ public class Invitation {
         return this;
     }
 
-    public String getProblemKey() {
-        return problemKey;
+    public Type getType() {
+        return type;
     }
 
-    public void setProblemKey(String problemKey) {
-        this.problemKey = problemKey;
+    public void setType(Type type) {
+        this.type = type;
     }
 
-    public String getProblemLandingPageURL() {
-        return problemLandingPageURL;
+    public String getResumeUrl() {
+        return resumeUrl;
     }
 
-    public void setProblemLandingPageURL(String problemLandingPageURL) {
-        this.problemLandingPageURL = problemLandingPageURL;
-    }
-
-    public String getCreationDate()
-    {
-
-        return creationDate;
-    }
-
-    public void setCreationDate(String creationDate)
-    {
-        this.creationDate = creationDate;
+    public void setResumeUrl(String resumeUrl) {
+        this.resumeUrl = resumeUrl;
     }
 
     public void validate() throws IllegalArgumentException
@@ -130,6 +130,21 @@ public class Invitation {
 
         isValidEmail(getCandidateEmail());
         isValidManagerEmail(getManagerEmail());
+
+        typeSpecificValidation();
+    }
+
+    protected void typeSpecificValidation()
+    {
+        if(type == Type.INTERN)
+        {
+            String stack = System.getenv("STACK_NAME");
+            if (stack.equals("ocp")   //skip this check for pre prod, so we can complete the internship flow
+                    && !candidateEmail.endsWith(".edu"))
+            {
+                throw new IllegalArgumentException("Intern registered with non .edu email address: '" + candidateEmail + "'");
+            }
+        }
     }
 
 

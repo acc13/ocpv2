@@ -5,7 +5,7 @@ import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.amazonaws.services.lambda.runtime.events.S3Event;
 import com.amazonaws.services.s3.event.S3EventNotification;
 
-import io.yetanotherwhatever.ocpv2.OutputChecker;
+import io.yetanotherwhatever.ocpv2.OutputTester;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -14,12 +14,12 @@ import java.io.IOException;
 /**
  * Created by achang on 9/12/2018.
  */
-public class OutputUploadedHandler implements RequestHandler<S3Event,S3Event> {
+public class LambdaHandlerTestOutput implements RequestHandler<S3Event,S3Event> {
 
     String invitationId, testFileName, expectedFileName, uploadId;
 
     // Initialize the Log4j logger.
-    static final Logger logger = LogManager.getLogger(OutputUploadedHandler.class);
+    static final Logger logger = LogManager.getLogger(LambdaHandlerTestOutput.class);
 
     public S3Event handleRequest(S3Event s3Event, Context context) {
 
@@ -27,7 +27,7 @@ public class OutputUploadedHandler implements RequestHandler<S3Event,S3Event> {
         for (S3EventNotification.S3EventNotificationRecord record : s3Event.getRecords()) {
             try {
 
-                OutputChecker oc = new OutputChecker();
+                OutputTester oc = new OutputTester();
                 oc.setDB(new DynamoOcpV2DB());
                 oc.setOutputStore(new S3FileStoreImpl());
 
@@ -45,10 +45,13 @@ public class OutputUploadedHandler implements RequestHandler<S3Event,S3Event> {
         return s3Event;
     }
 
+    //this is for mocking
     String getS3WebBucketName()
     {
-        return System.getenv("S3_WEB_BUCKET");
+        return S3CodingProblemBuilder.getS3WebBucket();
     }
+
+
 
     boolean parseRecord(S3EventNotification.S3EventNotificationRecord record)
     {

@@ -13,13 +13,13 @@ import static org.junit.Assert.assertFalse;
 /**
  * Created by achang on 9/17/2018.
  */
-public class OutputCheckerTest {
+public class OutputTesterTest {
 
     final static String NL= System.getProperty("line.separator");
 
     boolean doStreamsMatch(InputStream a, InputStream b) throws IOException
     {
-        OutputChecker oc = new OutputChecker();
+        OutputTester oc = new OutputTester();
 
         return oc.doStreamsMatch(a, b);
     }

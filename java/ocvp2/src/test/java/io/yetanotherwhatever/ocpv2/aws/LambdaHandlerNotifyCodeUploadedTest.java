@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
-public class CodeUploadedHandlerTest {
+public class LambdaHandlerNotifyCodeUploadedTest {
 
 
 
@@ -47,7 +47,7 @@ public class CodeUploadedHandlerTest {
         CodeUploadedNotifier un = mock(CodeUploadedNotifier.class);
         doAnswer((i) -> { return null;} ).when(un).notifyManager(anyString(), anyString());
 
-        CodeUploadedHandler handler = new CodeUploadedHandler();
+        LambdaHandlerNotifyCodeUploaded handler = new LambdaHandlerNotifyCodeUploaded();
         handler.setCodeUploadedNotifier(un);
 
         //test

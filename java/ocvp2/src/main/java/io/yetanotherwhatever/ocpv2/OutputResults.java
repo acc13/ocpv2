@@ -1,4 +1,4 @@
-package io.yetanotherwhatever.ocpv2.aws;
+package io.yetanotherwhatever.ocpv2;
 
 import io.yetanotherwhatever.ocpv2.Utils;
 

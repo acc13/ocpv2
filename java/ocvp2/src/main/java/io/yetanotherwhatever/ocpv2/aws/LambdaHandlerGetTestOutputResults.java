@@ -19,9 +19,9 @@ import java.io.*;
 //see: https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-create-api-as-simple-proxy-for-lambda.html#api-gateway-proxy-integration-lambda-function-java
 
 
-public class GetOutputTestResultsHandler implements RequestStreamHandler {
+public class LambdaHandlerGetTestOutputResults implements RequestStreamHandler {
 
-    static final Logger logger = LogManager.getLogger(GetOutputTestResultsHandler.class);
+    static final Logger logger = LogManager.getLogger(LambdaHandlerGetTestOutputResults.class);
 
     JSONParser parser = new JSONParser();
 

@@ -27,24 +27,16 @@ then
 	display_usage
 fi
 
-echo
 echo $0 starting
 
 DEPLOY_FOLDER="${0%/*}"
-CFTEMPLATE=cloudformation.yml
-CFTEMPLATE_PATH=$DEPLOY_FOLDER/cloudformation/$CFTEMPLATE
 BUCKET=deployocp
-KEY=$ENV/cloudformation/$CFTEMPLATE
-
-TEST_STACK_NAME=test
+INVITE_S3_KEY=$ENV/lambas/OCPv2-1.0.zip
 
 
-
-aws s3 mb s3://$BUCKET
-echo "bucket $BUCKET created"
-aws s3 cp $CFTEMPLATE_PATH s3://$BUCKET/$KEY
-echo "template $CFTEMPLATE uploaded"
-aws cloudformation validate-template --template-url https://s3.amazonaws.com/$BUCKET/$KEY
+#copy web content first
+JAVA=$DEPLOY_FOLDER/../java
+ZIP=$JAVA/ocvp2/build/distributions/OCPv2-1.0.zip
+aws s3 cp $ZIP s3://$BUCKET/$INVITE_S3_KEY
 
 echo $0 finished
-echo

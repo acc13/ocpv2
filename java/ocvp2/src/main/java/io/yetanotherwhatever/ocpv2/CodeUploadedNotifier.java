@@ -45,34 +45,38 @@ public class CodeUploadedNotifier {
         }
 
         //look up invitation
-        Invitation i = db.getInvitation(invitationId);
+        CandidateWorkflow cr = db.getWorkflow(invitationId);
+        cr.getOutputTestHistory().setCodeSolutionUrl(downloadUrl);
 
         //build upload url
         logger.debug("Download URL: " + downloadUrl);
 
         //email manager
         String subject = "Coding problem solution submitted";
-        String body = buildEmailBody(i, downloadUrl);
+        String body = buildEmailBody(cr, downloadUrl);
 
-        logger.debug("Emailing manager: " + i.getManagerEmail());
+        logger.debug("Emailing manager: " + cr.getInvitation().getManagerEmail());
         logger.debug("Email subject: " + subject);
         logger.debug("Email body: " + body);
 
-        emailer.sendEmail(i.getManagerEmail(), subject, body);
+        emailer.sendEmail(cr.getInvitation().getManagerEmail(), subject, body);
         logger.debug("Email successfully sent.");
     }
 
-    private String buildEmailBody(Invitation i, String zipFileUrl)
+    private String buildEmailBody(CandidateWorkflow cr, String zipFileUrl)
     {
         String body =
                 "Time: " + Utils.formatDateISO8601(new Date()) + "<br/>" +
-                "\nCandidate: " + i.getCandidateFirstName() + " " + i.getCandidateLastName() + "<br/>" +
-                "\nCandidate email: " + i.getCandidateEmail() + "<br/>" +
-                "\nInvited on: " + i.getCreationDate() + "<br/>" +
-                "\nProblem assigned: " + i.getProblemKey() + "<br/>" +
-                "\nOutput uploaded attempts: " + i.getAttempts() + "<br/>" +
-                "\nOutput passed: " + i.getSucceeded() + "<br/>" +
-                "\nDownload submitted code <a href='" + zipFileUrl + "'>here</a>";
+                "\n\nCandidate: " + cr.getInvitation().getCandidateFirstName() + " " + cr.getInvitation().getCandidateLastName() + "<br/>" +
+                "\n\nCandidate email: " + cr.getInvitation().getCandidateEmail() + "<br/>" +
+                "Candidate resume: " + (null != cr.getInvitation().getResumeUrl() && cr.getInvitation().getResumeUrl().length() > 0?
+                                    "<a href='" + cr.getInvitation().getResumeUrl() + "'>" + cr.getInvitation().getResumeUrl() + "</a>" :
+                                    "Not available.") + "<br/>" +
+                "\n\nInvited on: " + cr.getInvitation().getInvitationDate() + "<br/>" +
+                "\n\nProblem assigned: " + cr.getCodingProblem().getName() + "<br/>" +
+                "\n\nOutput uploaded attempts: " + cr.getOutputTestHistory().getAttempts() + "<br/>" +
+                "\n\nCorrect output uploaded: " + cr.getOutputTestHistory().getSucceeded() + "<br/>" +
+                "\n\nDownload submitted code: <a href='" + zipFileUrl + "'>" + zipFileUrl + "</a>";
 
         return body;
     }
