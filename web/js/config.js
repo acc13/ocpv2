@@ -34,10 +34,10 @@ let ocpv2RestAPIId = "rz34guof5h";
 
 switch(env) {
         case 'test':
-              ocpv2RestAPIId = "rz34guof5h";
+              ocpv2RestAPIId = "n8p3qg8w4c";
               break;
         case 'ocp':
-              ocpv2RestAPIId = "0e5jqclkvb";
+              ocpv2RestAPIId = "e7r30esi5h";
               break;
         case 'stage':
               ocpv2RestAPIId = "j17gdoueah";
