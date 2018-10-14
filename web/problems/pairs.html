@@ -195,17 +195,15 @@ var problemName = "pairs"
 
 <div class=WordSection1>
 
-<p class=MsoTitle>Coding Problem "Twisted pair"</p>
+<p class=MsoTitle>Coding Problem "Twisted pairs"</p>
 
 <p class=MsoNormal>&nbsp;</p>
 
 <h1>What is a twisted pair?</h1>
 
-<p class=MsoNormal>	A "twisted pair" is a string containing multiple occurrences of two distinct character values in strictly alternating occurrence.
-</p>
+<p class=MsoNormal>	A "twisted pair" is a string containing two distinct characters in strictly alternating occurrence.</p>
 
-<p class=MsoNormal>Each character must occur least twice (the minimum length of a twisted pair would be 4).
-</p>
+<p class=MsoNormal>Each character must occur at least twice (the minimum length of a twisted pair is 4).</p>
 
 <p class=MsoNormal>	Here are some examples of twisted pairs:</p>
 
@@ -325,13 +323,13 @@ var problemName = "pairs"
 
 <h1>Your program</h1>
 
-<p class=MsoNormal>Write a routine called  <span class=Code>findPair()</span> which takes a string argument and returns a twisted pair contained in the string by iteratively removing all instances of a set of characters until a twisted pair remains.</p>
+<p class=MsoNormal>Write a function called  <span class=Code>findPair()</span> which takes a string argument and returns a twisted pair contained in the string by iteratively removing all instances of a set of characters until a twisted pair remains.</p>
 
 <p class=MsoNormal>If no twisted pair is possible, then the output should be an empty string.</p>
 
 <p class=MsoNormal>Note: when removing a character, all instances of that character must be removed.</p>
 
-<p class=MsoNormal>For example, given an input string of "abcabdacdb", <span class=Code>findPair()</span> would remove all instances of 'c' and 'd', which result in a string "ababab", which is a valid twisted pair which <span class=Code>findPair()</span> should return.</p>
+<p class=MsoNormal>For example, given an input string of "abcabdacdb", <span class=Code>findPair()</span> would remove all instances of 'c' and 'd', which results in the string "ababab", which is a valid twisted pair which <span class=Code>findPair()</span> should return.</p>
 
 <p class=MsoNormal>&nbsp;</p>
 
@@ -342,8 +340,7 @@ var problemName = "pairs"
 
 <p class=MsoNormal><a href="/inputs/pairs-in.txt">The test input file can be downloaded here.</a></p>
 
-<p class=MsoNormal>Each line contains an input string
-for which a twisted pair must be calculated.</p>
+<p class=MsoNormal>Each line contains an input string to pass into <span class=Code>findPair()</span></p>
 
 <p class=MsoNormal>Each input string:</p>
 
@@ -351,8 +348,8 @@ for which a twisted pair must be calculated.</p>
 <ul>
 
 <li><p class=MsoListParagraphCxSpFirst style='text-indent:-.25in'>will be composed of ascii characters only</p></li>
-<li><p class=MsoListParagraphCxSpFirst style='text-indent:-.25in'>will never contain multiple twisted pairs (ie. input string = "ababcdcd", which contains two possible answers: "abab" and "cdcd"), so this case may be ignored (each input will contain one and only one correct answer).</p></li>
-<li><p class=MsoListParagraphCxSpFirst style='text-indent:-.25in'>should exclude trailing and preceding whitespace</p></li>
+<li><p class=MsoListParagraphCxSpFirst style='text-indent:-.25in'>will never contain multiple twisted pairs (ie. input string = "ababcdcd", which contains two possible answers: "abab" and "cdcd"); each input will contain one and only one correct answer.</p></li>
+<li><p class=MsoListParagraphCxSpFirst style='text-indent:-.25in'><span class=Code>findPair()</span> should ignore trailing and preceding whitespace</p></li>
 </ul>
 
 <p class=MsoNormal>&nbsp;</p>
@@ -396,7 +393,7 @@ for which a twisted pair must be calculated.</p>
 <p class=MsoNormal>Each line should contain...</p>
 
 <ul>
-<li><p class=MsoListParagraphCxSpFirst style='text-indent:-.25in'>a twisted pair calculated from the corresponding line in the input file.</p></li>
+<li><p class=MsoListParagraphCxSpFirst style='text-indent:-.25in'>the result from passing each corresponding line in the input file to <span class=Code>findPair()</span>.</p></li>
 <li><p class=MsoListParagraphCxSpFirst style='text-indent:-.25in'>If no twisted pair is possible, print an empty line.</p></li>
 </ul>
 
@@ -441,8 +438,8 @@ for which a twisted pair must be calculated.</p>
 <h1>We will evaluate your solution for:</h1>
 
 <ul>
-	<li>Correctness - Test your output using the link above.  Include the correct output with your code.</li>
-	<li>Cleanliness - Your code should be readable, maintainable and production ready.</li>
+	<li class=MsoNormal>Correctness - Test your output using the link above.  Include the correct output with your code.</li>
+	<li class=MsoNormal>Cleanliness - Your code should be readable, maintainable and production ready.</li>
 </ul>
 
 <p class=MsoNormal>&nbsp;</p>
@@ -454,10 +451,10 @@ for which a twisted pair must be calculated.</p>
 <p class=MsoNormal>If your test output successfully passes
 
 <ul>
-	<li>Zip up your code (source only, without binaries).</li>
-	<li>Include your resume.</li>
-	<li>Include your output.</li>
-	<li>Submit using the form below.</li>	
+	<li class=MsoNormal>Zip up your code (source only, without binaries).</li>
+	<li class=MsoNormal>Include your resume.</li>
+	<li class=MsoNormal>Include your output.</li>
+	<li class=MsoNormal>Submit using the form below.</li>	
 </ul>
 
  </p>
