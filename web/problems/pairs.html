@@ -2,7 +2,7 @@
 
 <head>
 <meta http-equiv=Content-Type content="text/html; charset=utf-8">
-<title>Coding Problem: "Gakkify"</title>
+<title>Coding Problem: "Twisted pairs"</title>
 
 <style>
 <!--
@@ -182,7 +182,7 @@ input.fixThis {border: solid; border-color: red;}
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
 
 <script>
-var problemName = "gakky"
+var problemName = "pairs"
 </script>
 
 <script type="text/javascript" src="/js/config.js" ></script>
@@ -195,19 +195,19 @@ var problemName = "gakky"
 
 <div class=WordSection1>
 
-<p class=MsoTitle>Coding Problem "Gakkify"</p>
+<p class=MsoTitle>Coding Problem "Twisted pair"</p>
 
 <p class=MsoNormal>&nbsp;</p>
 
-<h1>What is a Gakky?</h1>
+<h1>What is a twisted pair?</h1>
 
-<p class=MsoNormal>	A "gakky" is a string containing multiple occurrences of two distinct character values in strictly alternating occurrence.
+<p class=MsoNormal>	A "twisted pair" is a string containing multiple occurrences of two distinct character values in strictly alternating occurrence.
 </p>
 
-<p class=MsoNormal>Each character must occur least twice (the minimum length of a gakky would be 4).
+<p class=MsoNormal>Each character must occur least twice (the minimum length of a twisted pair would be 4).
 </p>
 
-<p class=MsoNormal>	Here are some examples of gakkies:</p>
+<p class=MsoNormal>	Here are some examples of twisted pairs:</p>
 
 <p class=MsoNormal>
 <table class=MsoNormalTable border=1 cellspacing=0 cellpadding=0
@@ -236,7 +236,7 @@ var problemName = "gakky"
 </table>
 </p>
 
-<p class=MsoNormal>	Here are some examples that are not gakkies:</p>
+<p class=MsoNormal>	Here are some examples that are not twisted pairs:</p>
 <p class=MsoNormal> 
 <table class=MsoNormalTable border=1 cellspacing=0 cellpadding=0
  style='margin-left:51.0pt;border-collapse:collapse;border:none'>
@@ -325,13 +325,13 @@ var problemName = "gakky"
 
 <h1>Your program</h1>
 
-<p class=MsoNormal>Write a routine called  <span class=Code>gakkify()</span> which takes a string argument and returns a gakky contained in the string by iteratively removing all instances of a set of characters until a gakky remains.</p>
+<p class=MsoNormal>Write a routine called  <span class=Code>findPair()</span> which takes a string argument and returns a twisted pair contained in the string by iteratively removing all instances of a set of characters until a twisted pair remains.</p>
 
-<p class=MsoNormal>If no gakky is possible, then the output should be an empty string.</p>
+<p class=MsoNormal>If no twisted pair is possible, then the output should be an empty string.</p>
 
 <p class=MsoNormal>Note: when removing a character, all instances of that character must be removed.</p>
 
-<p class=MsoNormal>For example, given an input string of "abcabdacdb", <span class=Code>gakkify()</span> would remove all instances of 'c' and 'd', which result in a string "ababab", which is a valid gakky which <span class=Code>gakkify()</span> should return.</p>
+<p class=MsoNormal>For example, given an input string of "abcabdacdb", <span class=Code>findPair()</span> would remove all instances of 'c' and 'd', which result in a string "ababab", which is a valid twisted pair which <span class=Code>findPair()</span> should return.</p>
 
 <p class=MsoNormal>&nbsp;</p>
 
@@ -340,10 +340,10 @@ var problemName = "gakky"
 
 <h1>Input</h1>
 
-<p class=MsoNormal><a href="http://yetanotherwhatever.io/inputs/gakky-in.txt">The test input file can be downloaded here.</a></p>
+<p class=MsoNormal><a href="/inputs/pairs-in.txt">The test input file can be downloaded here.</a></p>
 
 <p class=MsoNormal>Each line contains an input string
-for which a gakky must be calculated.</p>
+for which a twisted pair must be calculated.</p>
 
 <p class=MsoNormal>Each input string:</p>
 
@@ -351,7 +351,7 @@ for which a gakky must be calculated.</p>
 <ul>
 
 <li><p class=MsoListParagraphCxSpFirst style='text-indent:-.25in'>will be composed of ascii characters only</p></li>
-<li><p class=MsoListParagraphCxSpFirst style='text-indent:-.25in'>will never contain multiple gakkies (ie. input string = "ababcdcd", which contains two possible answers: "abab" and "cdcd"), so this case may be ignored (each input will contain one and only one correct answer).</p></li>
+<li><p class=MsoListParagraphCxSpFirst style='text-indent:-.25in'>will never contain multiple twisted pairs (ie. input string = "ababcdcd", which contains two possible answers: "abab" and "cdcd"), so this case may be ignored (each input will contain one and only one correct answer).</p></li>
 <li><p class=MsoListParagraphCxSpFirst style='text-indent:-.25in'>should exclude trailing and preceding whitespace</p></li>
 </ul>
 
@@ -396,8 +396,8 @@ for which a gakky must be calculated.</p>
 <p class=MsoNormal>Each line should contain...</p>
 
 <ul>
-<li><p class=MsoListParagraphCxSpFirst style='text-indent:-.25in'>a gakky calculated from the corresponding line in the input file.</p></li>
-<li><p class=MsoListParagraphCxSpFirst style='text-indent:-.25in'>If no gakky is possible, print an empty line.</p></li>
+<li><p class=MsoListParagraphCxSpFirst style='text-indent:-.25in'>a twisted pair calculated from the corresponding line in the input file.</p></li>
+<li><p class=MsoListParagraphCxSpFirst style='text-indent:-.25in'>If no twisted pair is possible, print an empty line.</p></li>
 </ul>
 
 
@@ -436,36 +436,59 @@ for which a gakky must be calculated.</p>
 
 <p class=MsoNormal>&nbsp;</p>
 
+
+
+<h1>We will evaluate your solution for:</h1>
+
+<ul>
+	<li>Correctness - Test your output using the link above.  Include the correct output with your code.</li>
+	<li>Cleanliness - Your code should be readable, maintainable and production ready.</li>
+</ul>
+
+<p class=MsoNormal>&nbsp;</p>
+
+
+
 <h1><a name="submit">Submitting Your Solution</a></h1>
 
-<p class=MsoNormal>If your test output successfully passes, please zip up your code (source only, please - no binaries) and submit it using the form below.</p>
-<p class=MsoNormal><b>Please include your resume in your .zip.</b></p>
-<p class=MsoNormal>Once we've recieved it, someone from our team will be contacting you shortly.</p>
+<p class=MsoNormal>If your test output successfully passes
+
+<ul>
+	<li>Zip up your code (source only, without binaries).</li>
+	<li>Include your resume.</li>
+	<li>Include your output.</li>
+	<li>Submit using the form below.</li>	
+</ul>
+
+ </p>
+<p class=MsoNormal>After you submit your code, output and resume, someone from our team will be contacting you.</p>
 
 
-<!-- AUTO-GENERATED CODE UPLOAD FORM -->
-<form id='codeForm' action='FFFFFFFFFFFF' method='post' enctype='multipart/form-data' onsubmit='return(preparecodeForm());'>
-	      <input type='hidden' name='key' value='uploads/code/${filename}'>
-	      <input type='hidden' name='acl' value='private'> 
-	      <input type='hidden' name='success_action_redirect' value='FFFFFFFFFFFF'>
-	      <input type='hidden' name='policy' value='FFFFFFFFFFFF'>
-	       <input type='hidden' name='x-amz-algorithm' value='AWS4-HMAC-SHA256'>
-	       <input type='hidden' name='x-amz-credential' value='FFFFFFFFFFFF'>
-	       <input type='hidden' name='x-amz-date' value='FFFFFFFFFFFF'>
-	       <input type='hidden' name='x-amz-storage-class' value='REDUCED_REDUNDANCY'>
-	       <input type='hidden' name='x-amz-signature' value='FFFFFFFFFFFF'>
-	       <input type='hidden' name='x-amz-meta-data' value=''>
-	      <!-- Include any additional input fields here -->
+<div id=submit_code class=uploadDiv>
 
-	      <div class='formlabel'>File to upload: <input id='codeFile' name='file' type='file'> </div>
-	      <br> 
-	      <div class='formlabel' id='emaildiv'>Your email address (preferably the same one as on your resume):
-	      <br>
-	      <input id='email' name='email' type='text'>
-	      <br><br></div>
-	      <input type='submit' value='Upload File'>
-    </form>
-<!-- END AUTO-GENERATED CODE UPLOAD FORM -->
+	<!-- AUTO-GENERATED CODE UPLOAD FORM -->
+	<form id='codeForm' action='FFFFFFFFFFFF' method='post' enctype='multipart/form-data' onsubmit='return(preparecodeForm());'>
+		      <input type='hidden' name='key' value='uploads/code/${filename}'>
+		      <input type='hidden' name='acl' value='private'> 
+		      <input type='hidden' name='success_action_redirect' value='FFFFFFFFFFFF'>
+		      <input type='hidden' name='policy' value='FFFFFFFFFFFF'>
+		       <input type='hidden' name='x-amz-algorithm' value='AWS4-HMAC-SHA256'>
+		       <input type='hidden' name='x-amz-credential' value='FFFFFFFFFFFF'>
+		       <input type='hidden' name='x-amz-date' value='FFFFFFFFFFFF'>
+		       <input type='hidden' name='x-amz-storage-class' value='REDUCED_REDUNDANCY'>
+		       <input type='hidden' name='x-amz-signature' value='FFFFFFFFFFFF'>
+		       <input type='hidden' name='x-amz-meta-data' value=''>
+		      <!-- Include any additional input fields here -->
+
+		      <div class='formlabel'>File to upload: <input id='codeFile' name='file' type='file'> </div>
+		      <br> 
+		      <div class='formlabel' id='emaildiv'>Your email address (preferably the same one as on your resume):
+		      <br>
+		      <input id='email' name='email' type='text'>
+		      <br><br></div>
+		      <input type='submit' value='Upload File'>
+	    </form>
+	<!-- END AUTO-GENERATED CODE UPLOAD FORM -->
 
 
 </div>

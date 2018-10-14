@@ -45,7 +45,8 @@ then
 fi
 
 #copy web content first
-aws s3 sync $DEPLOY_FOLDER/../web s3://$BUCKET_NAME --content-type "text/html" --acl public-read
+aws s3 sync $DEPLOY_FOLDER/../web s3://$BUCKET_NAME --content-type "text/html" --acl public-read --exclude *inputs/*
+aws s3 sync $DEPLOY_FOLDER/../web s3://$BUCKET_NAME --content-type "application/txt" --content-disposition "attachment" --acl public-read --include *inputs/*
 
 echo $0 finished
 echo
