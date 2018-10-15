@@ -217,7 +217,7 @@ function preparecodeForm()
     return false;
   }
   
-  if (!confirm("Did you include your resume in your .zip file?"))
+  if (!confirm("Did you include your code, resume and output in your .zip file?"))
   {
     return false;
   }
