@@ -37,8 +37,6 @@ KEY=$ENV/cloudformation/$CFTEMPLATE
 
 STACK_NAME=$ENV
 
-$DEPLOY_FOLDER/publishLambda.sh --env $ENV
-
 
 #template validation must be run first, otherwise, new template not uploaded
 aws cloudformation update-stack --stack-name $STACK_NAME --template-url https://s3.amazonaws.com/$BUCKET/$KEY --capabilities CAPABILITY_NAMED_IAM

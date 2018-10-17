@@ -32,7 +32,7 @@ public class LambdaHandlerRegisterIntern implements RequestHandler<S3Event,S3Eve
 
             try {
                 Invitation invitation = parseRecordMetadata(record);
-                String downloadUrl = LambdaHandlerNotifyCodeUploaded.extractS3DownloadUrl(record);
+                String downloadUrl = new S3FileStoreImpl().buildDownloadUrl(record);
                 invitation.setResumeUrl(downloadUrl);
 
                 new Inviter()
@@ -44,7 +44,6 @@ public class LambdaHandlerRegisterIntern implements RequestHandler<S3Event,S3Eve
             catch(IOException | IllegalArgumentException | ParseException e)
             {
                 e.printStackTrace();
-                logger.error(e);
             }
 
         }
