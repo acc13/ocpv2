@@ -38,7 +38,7 @@ public class LambdaHandlerTestOutput implements RequestHandler<S3Event,S3Event> 
                 logger.debug("Output check complete.");
 
             } catch (IOException | IllegalArgumentException e) {
-                logger.error(e);
+                e.printStackTrace();
             }
         }
 

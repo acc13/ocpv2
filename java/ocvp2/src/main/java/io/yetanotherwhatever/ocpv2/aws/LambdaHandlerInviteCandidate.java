@@ -54,12 +54,12 @@ public class LambdaHandlerInviteCandidate {
         }
         catch(IOException e)
         {
-            logger.error(e);
+            e.printStackTrace();
             return buildResponse(500, e);
         }
         catch (IllegalArgumentException e)
         {
-            logger.error(e);
+            e.printStackTrace();
             return buildResponse(400, e);
         }
 

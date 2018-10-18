@@ -1,14 +1,19 @@
 package io.yetanotherwhatever.ocpv2.aws;
 
+import com.amazonaws.HttpMethod;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.amazonaws.services.lambda.runtime.events.S3Event;
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.event.S3EventNotification;
+import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
 import io.yetanotherwhatever.ocpv2.CodeUploadedNotifier;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
+import java.net.URL;
 
 /**
  * Created by achang on 9/12/2018.
@@ -17,7 +22,9 @@ public class LambdaHandlerNotifyCodeUploaded implements RequestHandler<S3Event,S
 
     static final Logger logger = LogManager.getLogger(LambdaHandlerNotifyCodeUploaded.class);
 
-    CodeUploadedNotifier cun = null;
+    protected CodeUploadedNotifier codeUploadNotifier = null;
+
+    protected S3FileStoreImpl s3FileStore = null;
 
     public S3Event handleRequest(S3Event s3Event, Context context) {
 
@@ -31,7 +38,7 @@ public class LambdaHandlerNotifyCodeUploaded implements RequestHandler<S3Event,S
                 un.setFileStore(new S3FileStoreImpl());
 
                 String invitationId = extractInvitationId(record);
-                String downloadUrl = extractS3DownloadUrl(record);
+                String downloadUrl = getS3FileStore().buildDownloadUrl(record);
 
                 un.notifyManager(invitationId, downloadUrl);
 
@@ -39,40 +46,32 @@ public class LambdaHandlerNotifyCodeUploaded implements RequestHandler<S3Event,S
                 logger.debug("Code upload notification complete.");
 
             } catch (IOException | IllegalArgumentException e) {
-                logger.error(e);
+                e.printStackTrace();
             }
         }
 
         return s3Event;
     }
 
-    protected void setCodeUploadedNotifier(CodeUploadedNotifier cun)
+    //for unit testing
+    protected S3FileStoreImpl getS3FileStore()
     {
-        this.cun = cun;
+        if (null == s3FileStore)
+        {
+            s3FileStore = new S3FileStoreImpl();
+        }
+
+        return s3FileStore;
     }
 
     protected CodeUploadedNotifier getCodeUploadedNotifier()
     {
-        if (null == this.cun)
+        if (null == this.codeUploadNotifier)
         {
-            this.cun = new CodeUploadedNotifier();
+            this.codeUploadNotifier = new CodeUploadedNotifier();
         }
 
-        return this.cun;
-    }
-
-    static public String extractS3DownloadUrl(S3EventNotification.S3EventNotificationRecord record)
-    {
-        String bucket = record.getS3().getBucket().getName();
-        String key = record.getS3().getObject().getKey();
-
-        logger.debug("Code upload at s3 bucket: '" + bucket + "' key: '" + key + "'");
-
-        String downloadUrl = S3FileStoreImpl.buildDownloadUrl(bucket, key);
-
-        logger.debug("Download URL: " + downloadUrl);
-
-        return downloadUrl;
+        return this.codeUploadNotifier;
     }
 
     private String extractInvitationId(S3EventNotification.S3EventNotificationRecord record)

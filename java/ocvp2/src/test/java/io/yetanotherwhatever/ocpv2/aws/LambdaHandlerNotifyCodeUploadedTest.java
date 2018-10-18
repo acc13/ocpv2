@@ -44,16 +44,22 @@ public class LambdaHandlerNotifyCodeUploadedTest {
         String key = "uploads/code/invitationId/filename.zip";
         S3Event s3Event = buildS3Event("bucket", key);
 
+        //no need to send email
         CodeUploadedNotifier un = mock(CodeUploadedNotifier.class);
         doAnswer((i) -> { return null;} ).when(un).notifyManager(anyString(), anyString());
+        //stub, else fails
+        S3FileStoreImpl s3FS = mock(S3FileStoreImpl.class);
+        doAnswer((i) -> { return "downloadURL";} ).when(s3FS).buildDownloadUrl(any());
+
 
         LambdaHandlerNotifyCodeUploaded handler = new LambdaHandlerNotifyCodeUploaded();
-        handler.setCodeUploadedNotifier(un);
+        handler.codeUploadNotifier = un;
+        handler.s3FileStore = s3FS;
 
         //test
         handler.handleRequest(s3Event, null);
 
         //verify
-        verify(un).notifyManager("invitationId", "https://s3.amazonaws.com/bucket/uploads/code/invitationId/filename.zip");
+        verify(un).notifyManager("invitationId", "downloadURL");
     }
 }
