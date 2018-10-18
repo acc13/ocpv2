@@ -1,8 +1,7 @@
 package io.yetanotherwhatever.ocpv2.aws;
 
 
-import io.yetanotherwhatever.ocpv2.Invitation;
-import io.yetanotherwhatever.ocpv2.Inviter;
+import io.yetanotherwhatever.ocpv2.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import com.amazonaws.services.lambda.runtime.Context;
@@ -19,14 +18,37 @@ public class LambdaHandlerInviteCandidate {
     // Initialize the Log4j logger.
     static final Logger logger = LogManager.getLogger(LambdaHandlerInviteCandidate.class);
 
+    private IOcpV2DB db;
+    private ICodingProblemBuilder problemBuilder;
+    private IEmailer emailHelper;
+
+    private JSONObject lastResponseJson;
+
+    LambdaHandlerInviteCandidate()
+    {
+        db = new DynamoOcpV2DB();
+        problemBuilder = new S3CodingProblemBuilder();
+        emailHelper = new SESEmailHelper();
+    }
+
+    //for test injection
+    protected LambdaHandlerInviteCandidate(IOcpV2DB db,
+                                 ICodingProblemBuilder problemBuilder,
+                                 IEmailer emailHelper)
+    {
+        this.db = db;
+        this.problemBuilder = problemBuilder;
+        this.emailHelper = emailHelper;
+    }
+
     public String handleRequest(Invitation invitation, Context context) {
 
 
         try {
             new Inviter()
-                    .setDB(new DynamoOcpV2DB())
-                    .setCodingProblemBuilder(new S3CodingProblemBuilder())
-                    .setEmailer(new SESEmailHelper())
+                    .setDB(db)
+                    .setCodingProblemBuilder(problemBuilder)
+                    .setEmailer(emailHelper)
                     .sendInvitation(invitation);
 
         }
@@ -69,6 +91,14 @@ public class LambdaHandlerInviteCandidate {
 
         logger.debug(responseJson.toJSONString());
 
+        //for testing
+        lastResponseJson = responseJson;
+
         return responseJson.toJSONString();
+    }
+
+    protected JSONObject getLastResponseJson()
+    {
+        return lastResponseJson;
     }
 }

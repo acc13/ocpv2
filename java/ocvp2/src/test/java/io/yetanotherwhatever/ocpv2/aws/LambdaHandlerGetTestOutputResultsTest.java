@@ -16,7 +16,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class GetOutputTestResultsHandlerTestGetTestOutputResults {
+public class LambdaHandlerGetTestOutputResultsTest {
 
     private JSONObject createEvent(String outputId) throws ParseException
     {
