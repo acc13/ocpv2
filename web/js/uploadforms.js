@@ -215,12 +215,7 @@ function preparecodeForm()
   {
     alert ("Selected file is not a .zip file.");
     return false;
-  }
-  
-  if (!confirm("Did you include your code, resume and output in your .zip file?"))
-  {
-    return false;
-  }
+  }  
 
   //build key
   const keyVal = "uploads/code/" + getFilenameNoExtension() + "/" + Math.uuid() + ".zip";
