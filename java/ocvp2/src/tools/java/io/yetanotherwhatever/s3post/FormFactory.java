@@ -1,4 +1,4 @@
-package io.yetanotherwhatever;
+package io.yetanotherwhatever.s3post;
 
 public class FormFactory {
 

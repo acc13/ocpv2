@@ -1,12 +1,12 @@
-package io.yetanotherwhatever;
+package io.yetanotherwhatever.s3post;
 
 
 import org.junit.Test;
 
 import java.util.Calendar;
 
-import static io.yetanotherwhatever.SignedS3Form.b64Encode;
-import static io.yetanotherwhatever.SignedS3Form.yearsFromToday;
+import static io.yetanotherwhatever.s3post.SignedS3Form.b64Encode;
+import static io.yetanotherwhatever.s3post.SignedS3Form.yearsFromToday;
 import static java.util.Calendar.OCTOBER;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;

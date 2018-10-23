@@ -1,4 +1,4 @@
-package io.yetanotherwhatever;
+package io.yetanotherwhatever.s3post;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;

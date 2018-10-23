@@ -1,4 +1,4 @@
-package io.yetanotherwhatever;
+package io.yetanotherwhatever.s3post;
 
 import java.util.ArrayList;
 import java.util.Arrays;
