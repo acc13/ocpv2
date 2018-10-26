@@ -33,9 +33,10 @@ public class CandidateWorkflow {
         this.outputTestHistory = history;
     }
 
-    public void setInvitation(Invitation invite)
+    public CandidateWorkflow setInvitation(Invitation invite)
     {
         this.invitation = invite;
+        return this;
     }
 
     public Invitation getInvitation()
@@ -43,8 +44,9 @@ public class CandidateWorkflow {
         return invitation;
     }
 
-    public void setCodingProblem(CodingProblem codingProblem) {
+    public CandidateWorkflow setCodingProblem(CodingProblem codingProblem) {
         this.codingProblem = codingProblem;
+        return this;
     }
 
     public CodingProblem getCodingProblem()
@@ -52,9 +54,10 @@ public class CandidateWorkflow {
         return codingProblem;
     }
 
-    public void setOutputTestHistory(OutputTestHistory outputTestHistory)
+    public CandidateWorkflow setOutputTestHistory(OutputTestHistory outputTestHistory)
     {
         this.outputTestHistory = outputTestHistory;
+        return this;
     }
 
     public OutputTestHistory getOutputTestHistory() {

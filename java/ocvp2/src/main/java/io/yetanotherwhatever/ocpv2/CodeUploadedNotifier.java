@@ -21,19 +21,22 @@ public class CodeUploadedNotifier {
     {
     }
 
-    public void setDb(IOcpV2DB db) {
+    public CodeUploadedNotifier setDb(IOcpV2DB db) {
         this.db = db;
+        return this;
     }
 
-    public void setEmailer(IEmailer emailer) {
+    public CodeUploadedNotifier setEmailer(IEmailer emailer) {
         this.emailer = emailer;
+        return this;
     }
 
-    public void setFileStore(IFileStore fs) {
+    public CodeUploadedNotifier setFileStore(IFileStore fs) {
         this.fileStore = fs;
+        return this;
     }
 
-    public void notifyManager(String invitationId, String downloadUrl) throws IOException
+    public boolean notifyManager(String invitationId, String downloadUrl) throws IOException
     {
         if (null == db || null == emailer || null == fileStore)
         {
@@ -45,25 +48,35 @@ public class CodeUploadedNotifier {
         }
 
         //look up invitation
-        CandidateWorkflow cr = db.getWorkflow(invitationId);
-        cr.getOutputTestHistory().setCodeSolutionUrl(downloadUrl);
+        CandidateWorkflow cw = db.getWorkflow(invitationId);
+        cw.getOutputTestHistory().setCodeSolutionUrl(downloadUrl);
 
         //build upload url
         logger.debug("Download URL: " + downloadUrl);
 
         //email manager
-        String subject = "Coding problem solution submitted";
-        String body = buildEmailBody(cr, downloadUrl);
+        String subject = buildEmailSubject(cw);
+        String body = buildEmailBody(cw, downloadUrl);
 
-        logger.debug("Emailing manager: " + cr.getInvitation().getManagerEmail());
+        logger.debug("Emailing manager: " + cw.getInvitation().getManagerEmail());
         logger.debug("Email subject: " + subject);
         logger.debug("Email body: " + body);
 
-        emailer.sendEmail(cr.getInvitation().getManagerEmail(), subject, body);
+        emailer.sendEmail(cw.getInvitation().getManagerEmail(), subject, body);
         logger.debug("Email successfully sent.");
+
+        return true;
     }
 
-    private String buildEmailBody(CandidateWorkflow cr, String zipFileUrl)
+    protected String buildEmailSubject(CandidateWorkflow cw)
+    {
+        return "Coding problem solution submitted: "
+                + cw.getInvitation().getCandidateFirstName() + " "
+                + cw.getInvitation().getCandidateLastName() + ", "
+                + cw.getInvitation().getCandidateEmail();
+    }
+
+    protected String buildEmailBody(CandidateWorkflow cr, String zipFileUrl)
     {
         String body =
                 "Time: " + Utils.formatDateISO8601(new Date()) + "<br/>" +

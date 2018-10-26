@@ -15,7 +15,7 @@ import java.io.IOException;
 /**
  * Created by achang on 9/3/2018.
  */
-class SESEmailHelper implements IEmailer {
+public class SESEmailHelper implements IEmailer {
 
     static final Logger logger = LogManager.getLogger(SESEmailHelper.class);
 
@@ -23,7 +23,7 @@ class SESEmailHelper implements IEmailer {
 
     private static final String SENDER = "noreply@yetanotherwhatever.io";
 
-    public void sendEmail(String email, String sub, String bodyHtml) throws IOException
+    public boolean sendEmail(String email, String sub, String bodyHtml) throws IOException
     {
         try {
             Destination destination = new Destination().withToAddresses(new String[]{email});
@@ -49,6 +49,8 @@ class SESEmailHelper implements IEmailer {
         {
             throw new IOException(e);
         }
+
+        return true;
     }
 
     //lazy load

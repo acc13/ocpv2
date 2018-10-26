@@ -121,7 +121,7 @@ public class DynamoOcpV2DB implements IOcpV2DB {
     }
 
     @Override
-    public void updateOutputTestHistory(String workflowId, String outputUploadDate, boolean success) throws IOException
+    public void updateOutputTestHistory(String problemPageId, String outputUploadDate, boolean success) throws IOException
     {
 
         try {
@@ -153,12 +153,12 @@ public class DynamoOcpV2DB implements IOcpV2DB {
 
             table.updateItem(
                     CP_PROBLEM_GUID, // key attribute name
-                    workflowId,   // key attribute value
+                    problemPageId,   // key attribute value
                     updateExpression,
                     expressionAttributeNames,
                     expressionAttributeValues);
 
-            logger.debug("Invitation update succeeded for record: " + workflowId);
+            logger.debug("Invitation update succeeded for record: " + problemPageId);
 
         } catch (ResourceNotFoundException e) {
             throw new IOException(e);
@@ -198,16 +198,16 @@ public class DynamoOcpV2DB implements IOcpV2DB {
     }
 
     @Override
-    public CandidateWorkflow getWorkflow(String registrationId) throws IOException
+    public CandidateWorkflow getWorkflow(String problemPageId) throws IOException
     {
         DynamoDB dynamoDB = new DynamoDB(getAmazonDynamoDB());
 
         Table table = dynamoDB.getTable(REGISTRATION_TABLE_NAME);
 
-        GetItemSpec spec = new GetItemSpec().withPrimaryKey(CP_PROBLEM_GUID, registrationId);
+        GetItemSpec spec = new GetItemSpec().withPrimaryKey(CP_PROBLEM_GUID, problemPageId);
 
         try {
-            logger.info("Attempting to read the item: '" + registrationId + "' from table: '" + REGISTRATION_TABLE_NAME + "'");
+            logger.info("Attempting to read the item: '" + problemPageId + "' from table: '" + REGISTRATION_TABLE_NAME + "'");
             Item outcome = table.getItem(spec);
             logger.info("GetItem succeeded: " + outcome);
 
@@ -236,7 +236,7 @@ public class DynamoOcpV2DB implements IOcpV2DB {
 
         }
         catch (Exception e) {
-            logger.error("Unable to read item: " + registrationId +
+            logger.error("Unable to read item: " + problemPageId +
                     " from table: " + REGISTRATION_TABLE_NAME);
             logger.error(e.getMessage());
 

@@ -9,11 +9,11 @@ public interface IOcpV2DB {
 
         public void write(CandidateWorkflow i) throws IOException;
 
-        public void updateOutputTestHistory(String registrationId, String outputUploadDate, boolean success) throws IOException;
+        public void updateOutputTestHistory(String problemPageId, String outputUploadDate, boolean success) throws IOException;
 
-        public CandidateWorkflow getWorkflow(String registrationId) throws IOException;
+        public CandidateWorkflow getWorkflow(String problemPageId) throws IOException;
 
-        public OutputResults getOutputResults(String outputId) throws IOException;
+        public OutputResults getOutputResults(String uploadId) throws IOException;
 
         public void write(OutputResults or) throws IOException;
 }
