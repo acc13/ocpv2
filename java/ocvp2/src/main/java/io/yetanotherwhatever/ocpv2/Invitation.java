@@ -131,24 +131,22 @@ public class Invitation {
         isValidEmail(getCandidateEmail());
         isValidManagerEmail(getManagerEmail());
 
-        typeSpecificValidation();
-    }
-
-    protected void typeSpecificValidation()
-    {
         if(type == Type.INTERN)
         {
-            String stack = System.getenv("STACK_NAME");
-            if (stack.equals("ocp")   //skip this check for pre prod, so we can complete the internship flow
-                    && !candidateEmail.endsWith(".edu"))
-            {
-                throw new IllegalArgumentException("Intern registered with non .edu email address: '" + candidateEmail + "'");
-            }
+            isValidInternEmail(getCandidateEmail());
+        }
+    }
+
+    public void isValidInternEmail(String candidateEmail) throws IllegalArgumentException
+    {
+        if (!candidateEmail.endsWith(".edu"))
+        {
+            throw new IllegalArgumentException("Intern registered with non .edu email address: '" + candidateEmail + "'");
         }
     }
 
 
-    protected static void isValidName(String name) throws IllegalArgumentException
+    protected void isValidName(String name) throws IllegalArgumentException
     {
         //just check length for now
         if (name == null || name.length() == 0 || name.length() > 100)
@@ -161,7 +159,7 @@ public class Invitation {
 
     //soft fail for this
     //its own method, to make unit testing easier
-    protected static boolean isValidNameWarningOnly(String name)
+    protected boolean isValidNameWarningOnly(String name)
     {
         final String whitelistPattern = "[a-zA-Z\\.\\- \']+";
 
@@ -175,7 +173,7 @@ public class Invitation {
         return true;
     }
 
-    protected static void isValidEmail(String email) throws IllegalArgumentException
+    protected void isValidEmail(String email) throws IllegalArgumentException
     {
         //just check length for now
         if (email == null || email.length() == 0 || email.length() > 100)
@@ -184,7 +182,7 @@ public class Invitation {
         }
     }
 
-    protected static void isValidManagerEmail(String email)
+    protected void isValidManagerEmail(String email)
     {
         //TODO
         //manager whitelist - subscribed to online coding problem portal
@@ -197,7 +195,7 @@ public class Invitation {
         isValidManagerEmailWarningOnly(email);
     }
 
-    protected static boolean isValidManagerEmailWarningOnly(String managerEmail){
+    protected boolean isValidManagerEmailWarningOnly(String managerEmail){
 
         final String whitelistPattern = "[a-zA-Z0-9_]+@symantec.com";
         if (!managerEmail.matches(whitelistPattern)){

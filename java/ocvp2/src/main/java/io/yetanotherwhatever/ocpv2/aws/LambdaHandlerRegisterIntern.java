@@ -43,7 +43,7 @@ public class LambdaHandlerRegisterIntern implements RequestHandler<S3Event,S3Eve
             }
             catch(IOException | IllegalArgumentException | ParseException e)
             {
-                e.printStackTrace();
+                logger.error(e.getMessage(), e);
             }
 
         }

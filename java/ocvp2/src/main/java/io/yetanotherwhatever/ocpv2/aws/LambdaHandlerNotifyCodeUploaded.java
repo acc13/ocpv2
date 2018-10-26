@@ -46,7 +46,7 @@ public class LambdaHandlerNotifyCodeUploaded implements RequestHandler<S3Event,S
                 logger.debug("Code upload notification complete.");
 
             } catch (IOException | IllegalArgumentException e) {
-                e.printStackTrace();
+                logger.error(e.getMessage(), e);
             }
         }
 

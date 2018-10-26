@@ -317,6 +317,13 @@ Resources:
                   - lambda
       Runtime: java8
       Timeout: 30
+      Tags: 
+        - 
+          Key: "Application"
+          Value: "ocpv2"
+        - 
+          Key: "Stack"
+          Value: !Ref AWS::StackName
       Environment:
         Variables:
           STACK_NAME: !Ref AWS::StackName
@@ -362,6 +369,13 @@ Resources:
                   - lambda
       Runtime: java8
       Timeout: 30
+      Tags: 
+        - 
+          Key: "Application"
+          Value: "ocpv2"
+        - 
+          Key: "Stack"
+          Value: !Ref AWS::StackName
       Environment:
         Variables:
           STACK_NAME: !Ref AWS::StackName
@@ -413,6 +427,13 @@ Resources:
                   - lambda
       Runtime: java8
       Timeout: 30
+      Tags: 
+        - 
+          Key: "Application"
+          Value: "ocpv2"
+        - 
+          Key: "Stack"
+          Value: !Ref AWS::StackName
       Environment:
         Variables:
           STACK_NAME: !Ref AWS::StackName
@@ -452,6 +473,13 @@ Resources:
                   - lambda
       Runtime: java8
       Timeout: 30
+      Tags: 
+        - 
+          Key: "Application"
+          Value: "ocpv2"
+        - 
+          Key: "Stack"
+          Value: !Ref AWS::StackName
       Environment:
         Variables:
           STACK_NAME: !Ref AWS::StackName
@@ -493,6 +521,13 @@ Resources:
                   - lambda
       Runtime: java8
       Timeout: 30
+      Tags: 
+        - 
+          Key: "Application"
+          Value: "ocpv2"
+        - 
+          Key: "Stack"
+          Value: !Ref AWS::StackName
       Environment:
         Variables:
           STACK_NAME: !Ref AWS::StackName

@@ -55,13 +55,13 @@ public class OutputTestResultGetter {
         }
         catch (IOException e)
         {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
             statusCode = HTTP_SERVER_ERROR;
             exception = e.toString();
         }
         catch(IllegalArgumentException e)
         {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
             statusCode = HTTP_INVALID;
             exception = e.toString();
         }

@@ -24,7 +24,7 @@ public class LambdaHandlerInviteCandidate {
 
     private JSONObject lastResponseJson;
 
-    LambdaHandlerInviteCandidate()
+    public LambdaHandlerInviteCandidate()
     {
         db = new DynamoOcpV2DB();
         problemBuilder = new S3CodingProblemBuilder();
@@ -54,12 +54,12 @@ public class LambdaHandlerInviteCandidate {
         }
         catch(IOException e)
         {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
             return buildResponse(500, e);
         }
         catch (IllegalArgumentException e)
         {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
             return buildResponse(400, e);
         }
 

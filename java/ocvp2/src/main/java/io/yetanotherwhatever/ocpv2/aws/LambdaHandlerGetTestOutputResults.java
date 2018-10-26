@@ -41,7 +41,7 @@ public class LambdaHandlerGetTestOutputResults implements RequestStreamHandler {
         }
         catch (ParseException e)
         {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
             responseJson = buildResponseJson(HTTP_INVALID, null, e.toString());
         }
 

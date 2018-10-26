@@ -41,6 +41,11 @@ public class LambdaHandlerGetTestOutputResultsTest {
         return eventJ;
     }
 
+    private  JSONObject createInvalidEvent() throws ParseException
+    {
+        return createEvent(null);
+    }
+
     @Test
     public void handler_resultsFound_success() throws ParseException, IOException
     {
@@ -82,7 +87,7 @@ public class LambdaHandlerGetTestOutputResultsTest {
     @Test
     public void handler_invalidRequest_400() throws ParseException, IOException
     {
-        JSONObject event = createEvent(null);
+        JSONObject event = createInvalidEvent();
 
         OutputTestResultGetter getter = new OutputTestResultGetter();
         DynamoOcpV2DB db = mock(DynamoOcpV2DB.class);
