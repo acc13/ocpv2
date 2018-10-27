@@ -32,10 +32,10 @@ echo $0 started
 
 DEPLOY_FOLDER="${0%/*}"
 
-$DEPLOY_FOLDER/validateCFTemplate.sh --env $ENV
-$DEPLOY_FOLDER/deployStack.sh --env $ENV
-$DEPLOY_FOLDER/deployWeb.sh --env $ENV
-$DEPLOY_FOLDER/deployLambda.sh --env $ENV
+./validateCFTemplate.sh --env $ENV
+./deployStack.sh --env $ENV
+./deployWeb.sh --env $ENV
+./deployLambda.sh --env $ENV
 
 echo $0 finished
 echo
