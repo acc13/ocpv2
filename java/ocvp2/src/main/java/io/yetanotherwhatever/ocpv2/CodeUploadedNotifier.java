@@ -50,6 +50,7 @@ public class CodeUploadedNotifier {
         //look up invitation
         CandidateWorkflow cw = db.getWorkflow(invitationId);
         cw.getOutputTestHistory().setCodeSolutionUrl(downloadUrl);
+        db.write(cw);
 
         //build upload url
         logger.debug("Download URL: " + downloadUrl);
