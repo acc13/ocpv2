@@ -17,9 +17,10 @@ public class OutputTestHistory {
         return succeeded;
     }
 
-    public void setSucceeded(String succeeded)
+    public OutputTestHistory setSucceeded(String succeeded)
     {
         this.succeeded = succeeded;
+        return this;
     }
 
     public int getAttempts()
@@ -27,16 +28,18 @@ public class OutputTestHistory {
         return attempts;
     }
 
-    public void setAttempts(int attempts)
+    public OutputTestHistory setAttempts(int attempts)
     {
         this.attempts = attempts;
+        return this;
     }
 
     public String getCodeSolutionUrl() {
         return codeSolutionUrl;
     }
 
-    public void setCodeSolutionUrl(String codeSolutionUrl) {
+    public OutputTestHistory setCodeSolutionUrl(String codeSolutionUrl) {
         this.codeSolutionUrl = codeSolutionUrl;
+        return this;
     }
 }

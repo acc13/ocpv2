@@ -1,6 +1,7 @@
 package io.yetanotherwhatever.ocpv2;
 
-
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 /*this class represents the state of the candidates progress through the coding problem.
 The stages are:
@@ -62,5 +63,35 @@ public class CandidateWorkflow {
 
     public OutputTestHistory getOutputTestHistory() {
         return outputTestHistory;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+
+        // If the object is compared with itself then return true
+        if (o == this) {
+            return true;
+        }
+
+        /* Check if o is an instance of Complex or not
+          "null instanceof [type]" also returns false */
+        if (!(o instanceof CandidateWorkflow)) {
+            return false;
+        }
+
+        // typecast o to Complex so that we can compare data members
+        CandidateWorkflow c = (CandidateWorkflow) o;
+
+        // Compare the data members and return accordingly
+        return new EqualsBuilder()
+                    .append(codingProblem, c.getCodingProblem())
+                    .isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(17, 31)
+                        .append(codingProblem)
+                        .toHashCode();
     }
 }

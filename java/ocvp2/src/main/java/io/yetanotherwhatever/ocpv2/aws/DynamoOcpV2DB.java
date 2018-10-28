@@ -108,8 +108,7 @@ public class DynamoOcpV2DB implements IOcpV2DB {
 
             for (String key : item_values.keySet())
             {
-                String val = item_values.get(key).getS();
-                val = item_values.get(key).toString();
+                String val = item_values.get(key).toString();
                 logger.info(key + " : " + val);
             }
 

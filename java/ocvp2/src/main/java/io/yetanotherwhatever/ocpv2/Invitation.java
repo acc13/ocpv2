@@ -1,5 +1,7 @@
 package io.yetanotherwhatever.ocpv2;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -207,5 +209,37 @@ public class Invitation {
         }
 
         return true;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+
+        // If the object is compared with itself then return true
+        if (o == this) {
+            return true;
+        }
+
+        /* Check if o is an instance of Complex or not
+          "null instanceof [type]" also returns false */
+        if (!(o instanceof Invitation)) {
+            return false;
+        }
+
+        // typecast o to Complex so that we can compare data members
+        Invitation i = (Invitation) o;
+
+        // Compare the data members and return accordingly
+        return new EqualsBuilder()
+                .append(this.getCandidateEmail(), i.getCandidateEmail())
+                .append(this.getManagerEmail(), i.getManagerEmail())
+                .isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(17, 31)
+                .append(getCandidateEmail())
+                .append(getManagerEmail())
+                .toHashCode();
     }
 }
