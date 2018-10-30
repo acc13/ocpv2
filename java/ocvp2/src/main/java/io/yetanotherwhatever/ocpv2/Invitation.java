@@ -59,9 +59,10 @@ public class Invitation {
         this.type = type;
     }
 
-    public void setInvitationDate(String invitationDate)
+    public Invitation setInvitationDate(String invitationDate)
     {
         this.invitationDate = invitationDate;
+        return this;
     }
 
     public String getInvitationDate()
@@ -113,16 +114,18 @@ public class Invitation {
         return type;
     }
 
-    public void setType(Type type) {
+    public Invitation setType(Type type) {
         this.type = type;
+        return this;
     }
 
     public String getResumeUrl() {
         return resumeUrl;
     }
 
-    public void setResumeUrl(String resumeUrl) {
+    public Invitation setResumeUrl(String resumeUrl) {
         this.resumeUrl = resumeUrl;
+        return this;
     }
 
     public void validate() throws IllegalArgumentException

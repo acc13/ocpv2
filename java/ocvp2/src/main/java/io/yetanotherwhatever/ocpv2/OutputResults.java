@@ -24,14 +24,16 @@ public class OutputResults {
         return uploadDate;
     }
 
-    public void setUploadDate(Date uploadDate)
+    public OutputResults setUploadDate(Date uploadDate)
     {
         this.uploadDate = Utils.formatDateISO8601(uploadDate);
+        return this;
     }
 
-    public void setUploadDate(String uploadDate)
+    public OutputResults setUploadDate(String uploadDate)
     {
         this.uploadDate = uploadDate;
+        return this;
     }
 
     public String getResults()
@@ -39,9 +41,10 @@ public class OutputResults {
         return results;
     }
 
-    public void setResults(String results)
+    public OutputResults setResults(String results)
     {
         this.results = results;
+        return this;
     }
 
     public String getInvitationId()
@@ -49,9 +52,10 @@ public class OutputResults {
         return invitationId;
     }
 
-    public void setInvitationId(String invitationId)
+    public OutputResults setInvitationId(String invitationId)
     {
         this.invitationId = invitationId;
+        return this;
     }
 
     public String getUploadID()
@@ -59,9 +63,10 @@ public class OutputResults {
         return uploadID;
     }
 
-    public void setUploadID(String uploadID)
+    public OutputResults setUploadID(String uploadID)
     {
         this.uploadID = uploadID;
+        return this;
     }
 
 }
