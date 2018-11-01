@@ -4,8 +4,11 @@ import io.yetanotherwhatever.ocpv2.*;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.util.List;
 
+import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
 
@@ -160,5 +163,55 @@ public class DynamoOcpV2DbTest {
         assertThat(readOR.getUploadID(), is(equalTo(or.getUploadID())));
 
         db.delete(or);
+    }
+
+    private CandidateWorkflow createCandidateWorkflow(String candidateEmail, String managerEmail, String id)
+    {
+        Invitation i = new Invitation()
+                .setCandidateEmail(candidateEmail)
+                .setManagerEmail(managerEmail);
+        CodingProblem cp = new CodingProblem()
+                .setGuid(id);
+        OutputTestHistory oth = new OutputTestHistory();
+
+        return new CandidateWorkflow(i, cp, oth);
+    }
+
+    @Test
+    public void listInterns_addedInternInvites_appearInQueriedList() throws IOException
+    {
+        DynamoOcpV2DB db = new DynamoOcpV2DB();
+
+        CandidateWorkflow cwf1 = createCandidateWorkflow("candidate1", "manager1", "id1");
+        CandidateWorkflow cwf2 = createCandidateWorkflow("candidate2", "manager2", "id2");
+        CandidateWorkflow cwf3 = createCandidateWorkflow("candidate3", "manager3", "id3");
+
+        cwf1.getInvitation().setType(Invitation.Type.INTERN);
+        cwf2.getInvitation().setType(Invitation.Type.INTERN);
+        cwf3.getInvitation().setType(Invitation.Type.INTERN);
+
+        db.delete(cwf1);
+        db.delete(cwf2);
+        db.delete(cwf3);
+
+        List<CandidateWorkflow> internList = db.listAllInterns();
+
+        assertThat(internList, not(hasItem(cwf1)));
+        assertThat(internList, not(hasItem(cwf2)));
+        assertThat(internList, not(hasItem(cwf3)));
+
+        db.write(cwf1);
+        db.write(cwf2);
+        db.write(cwf3);
+
+        internList = db.listAllInterns();
+
+        assertThat(internList, hasItem(cwf1));
+        assertThat(internList, hasItem(cwf2));
+        assertThat(internList, hasItem(cwf3));
+
+        db.delete(cwf1);
+        db.delete(cwf2);
+        db.delete(cwf3);
     }
 }

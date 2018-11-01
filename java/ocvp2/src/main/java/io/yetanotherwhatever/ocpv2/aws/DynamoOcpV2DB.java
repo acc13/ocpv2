@@ -6,18 +6,18 @@ import com.amazonaws.AmazonServiceException;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
-import com.amazonaws.services.dynamodbv2.document.DeleteItemOutcome;
-import com.amazonaws.services.dynamodbv2.document.DynamoDB;
-import com.amazonaws.services.dynamodbv2.document.Item;
-import com.amazonaws.services.dynamodbv2.document.Table;
+import com.amazonaws.services.dynamodbv2.document.*;
 import com.amazonaws.services.dynamodbv2.document.spec.GetItemSpec;
+import com.amazonaws.services.dynamodbv2.document.spec.QuerySpec;
+import com.amazonaws.services.dynamodbv2.document.utils.ValueMap;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.amazonaws.services.dynamodbv2.model.ResourceNotFoundException;
+import com.amazonaws.services.dynamodbv2.model.ScanRequest;
 import io.yetanotherwhatever.ocpv2.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.HashMap;
+import java.util.*;
 
 /**
  * Created by achang on 9/3/2018.
@@ -257,27 +257,7 @@ public class DynamoOcpV2DB implements IOcpV2DB {
             Item outcome = table.getItem(spec);
             logger.info("GetItem succeeded: " + outcome);
 
-            Invitation invite = new Invitation();
-            invite.setCandidateFirstName(getItemString(outcome, I_FIRST));
-            invite.setCandidateLastName(getItemString(outcome, I_LAST));
-            invite.setCandidateEmail(getItemString(outcome, I_EMAIL));
-            invite.setManagerEmail(getItemString(outcome, I_MGR_EMAIL));
-            invite.setInvitationDate(getItemString(outcome, I_DATE));
-            invite.setType(Invitation.Type.fromInt(outcome.getInt(I_TYPE)));
-            invite.setResumeUrl(getItemString(outcome, I_RESUME));
-
-            CodingProblem problem = new CodingProblem();
-            problem.setGuid(getItemString(outcome, CP_PROBLEM_GUID_PRIMARY_KEY));
-            problem.setName(getItemString(outcome, CP_PROBLEM_KEY));
-            problem.setLandingPageUrl(getItemString(outcome, CP_PROBLEM_LANDING_PAGE));
-            problem.setExpirationDate(getItemString(outcome, CP_EXPIRATION_DATE));
-
-            OutputTestHistory history = new OutputTestHistory();
-            history.setSucceeded(getItemString(outcome, H_SUCCEEDED));
-            history.setAttempts(outcome.getInt(H_ATTEMPTS));
-            history.setCodeSolutionUrl(getItemString(outcome, H_CODE_URL));
-
-            CandidateWorkflow workflow = new CandidateWorkflow(invite, problem, history);
+            CandidateWorkflow workflow = itemToCandidateWorkflow(outcome);
 
             return workflow;
 
@@ -344,5 +324,55 @@ public class DynamoOcpV2DB implements IOcpV2DB {
 
             throw new IOException(e);
         }
+    }
+
+    public List<CandidateWorkflow> listAllInterns()
+    {
+        DynamoDB dynamoDB = new DynamoDB(getAmazonDynamoDB());
+
+        Table table = dynamoDB.getTable(REGISTRATION_TABLE_NAME);
+
+        Map<String, Object> expressionAttributeValues = new HashMap<>();
+        expressionAttributeValues.put(":type", Invitation.Type.INTERN.getValue());
+        Map<String, String> expressionAttributeNames = new HashMap<>();
+        expressionAttributeNames.put("#type", I_TYPE);
+
+        ItemCollection<ScanOutcome> items = table.scan("#type = :type", // FilterExpression
+                expressionAttributeNames,
+                expressionAttributeValues);
+
+        Iterator<Item> iterator = items.iterator();
+        ArrayList<CandidateWorkflow> wfList = new ArrayList<>();
+        while (iterator.hasNext()) {
+            Item item = iterator.next();
+            wfList.add(itemToCandidateWorkflow(item));
+        }
+
+        return wfList;
+    }
+
+    private CandidateWorkflow itemToCandidateWorkflow(Item item)
+    {
+        Invitation invite = new Invitation();
+        invite.setCandidateFirstName(getItemString(item, I_FIRST));
+        invite.setCandidateLastName(getItemString(item, I_LAST));
+        invite.setCandidateEmail(getItemString(item, I_EMAIL));
+        invite.setManagerEmail(getItemString(item, I_MGR_EMAIL));
+        invite.setInvitationDate(getItemString(item, I_DATE));
+        invite.setType(Invitation.Type.fromInt(item.getInt(I_TYPE)));
+        invite.setResumeUrl(getItemString(item, I_RESUME));
+
+        CodingProblem problem = new CodingProblem();
+        problem.setGuid(getItemString(item, CP_PROBLEM_GUID_PRIMARY_KEY));
+        problem.setName(getItemString(item, CP_PROBLEM_KEY));
+        problem.setLandingPageUrl(getItemString(item, CP_PROBLEM_LANDING_PAGE));
+        problem.setExpirationDate(getItemString(item, CP_EXPIRATION_DATE));
+
+        OutputTestHistory history = new OutputTestHistory();
+        history.setSucceeded(getItemString(item, H_SUCCEEDED));
+        history.setAttempts(item.getInt(H_ATTEMPTS));
+        history.setCodeSolutionUrl(getItemString(item, H_CODE_URL));
+
+        return new CandidateWorkflow(invite, problem, history);
     }
 }
