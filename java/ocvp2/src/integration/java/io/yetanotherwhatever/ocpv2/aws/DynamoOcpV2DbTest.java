@@ -188,7 +188,7 @@ public class DynamoOcpV2DbTest {
 
         cwf1.getInvitation().setType(Invitation.Type.INTERN);
         cwf2.getInvitation().setType(Invitation.Type.INTERN);
-        cwf3.getInvitation().setType(Invitation.Type.INTERN);
+        cwf3.getInvitation().setType(Invitation.Type.FULL_TIME);
 
         db.delete(cwf1);
         db.delete(cwf2);
@@ -208,7 +208,7 @@ public class DynamoOcpV2DbTest {
 
         assertThat(internList, hasItem(cwf1));
         assertThat(internList, hasItem(cwf2));
-        assertThat(internList, hasItem(cwf3));
+        assertThat(internList, not(hasItem(cwf3))); //full time invite
 
         db.delete(cwf1);
         db.delete(cwf2);

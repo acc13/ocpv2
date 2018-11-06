@@ -1,6 +1,7 @@
 package io.yetanotherwhatever.ocpv2;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
  * Created by achang on 9/3/2018.
@@ -16,4 +17,6 @@ public interface IOcpV2DB {
         public OutputResults getOutputResults(String uploadId) throws IOException;
 
         public void write(OutputResults or) throws IOException;
+
+        public List<CandidateWorkflow> listAllInterns();
 }

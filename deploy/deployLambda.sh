@@ -41,6 +41,7 @@ aws lambda update-function-code --function-name ${ENV}_InviteCandidate --s3-buck
 aws lambda update-function-code --function-name ${ENV}_TestOutput --s3-bucket $BUCKET --s3-key $INVITE_S3_KEY
 aws lambda update-function-code --function-name ${ENV}_NotifyCodeUploaded --s3-bucket $BUCKET --s3-key $INVITE_S3_KEY
 aws lambda update-function-code --function-name ${ENV}_GetTestOutputResult --s3-bucket $BUCKET --s3-key $INVITE_S3_KEY
+aws lambda update-function-code --function-name ${ENV}_ListInterns --s3-bucket $BUCKET --s3-key $INVITE_S3_KEY
 
 echo $0 finished
 echo

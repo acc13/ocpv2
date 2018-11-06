@@ -166,7 +166,7 @@ Resources:
                     - yetanotherwhatever
 
   #API gateway may invoke LambdaInviteUser
-  RedirectPermissionsInvitations:
+  RedirectPermissionsInviteUser:
     Type: 'AWS::Lambda::Permission'
     Properties:
       FunctionName: !Ref LambdaInviteUser
@@ -175,7 +175,7 @@ Resources:
       SourceArn: !Sub arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${OCPv2API}/*
 
   #API gateway may invoke LambdaGetTestOutputResult
-  RedirectPermissionsResults:
+  RedirectPermissionsGetTestOutputResults:
     Type: 'AWS::Lambda::Permission'
     Properties:
       FunctionName: !Ref LambdaGetTestOutputResult
@@ -184,6 +184,15 @@ Resources:
       #those last 4 * are for .../stage/method/resource/resource
       #ie. test/GET/outputtestresult/{outputid}
       SourceArn: !Sub "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${OCPv2API}/*/*/*/*"
+
+  #API gateway may invoke LambdaListInterns
+  RedirectPermissionsListInterns:
+    Type: 'AWS::Lambda::Permission'
+    Properties:
+      FunctionName: !Ref LambdaListInterns
+      Action: 'lambda:InvokeFunction'
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${OCPv2API}/*"
 
 
   #Lambdas may assume role ocpv2.<stackname>.lambda
@@ -542,6 +551,53 @@ Resources:
               - - !Ref AWS::StackName
                 - Candidate_Registrations
 
+
+  LambdaListInterns:
+    Type: "AWS::Lambda::Function"
+    DependsOn : LambdaRole
+    Properties: 
+      FunctionName: 
+        !Join
+          - '_'
+          - - !Ref AWS::StackName
+            - ListInterns
+      Description: invite candidate, create dynamic, temporary coding exercise page.
+      Code: 
+        S3Bucket: deployocp
+        S3Key: !Join
+          - '/'
+          - - !Ref AWS::StackName
+            - lambas/OCPv2-1.0.zip
+      Handler: io.yetanotherwhatever.ocpv2.aws.LambdaHandlerGetInternCandidates::handleRequest
+      MemorySize: 256
+      Role: 
+        !Join
+          - '/'
+          - - !Sub arn:aws:iam::${AWS::AccountId}:role
+            - 
+              !Join
+                - '.'
+                - - ocpv2
+                  - !Ref AWS::StackName
+                  - lambda
+      Runtime: java8
+      Timeout: 30
+      Tags: 
+        - 
+          Key: "Application"
+          Value: "ocpv2"
+        - 
+          Key: "Stack"
+          Value: !Ref AWS::StackName
+      Environment:
+        Variables:
+          STACK_NAME: !Ref AWS::StackName
+          DYNAMODB_REGISTRATION_TABLE:             
+            !Join
+              - '.'
+              - - !Ref AWS::StackName
+                - Candidate_Registrations
+
   #########################################
   #       API Gateway 
   #########################################
@@ -731,6 +787,87 @@ Resources:
             method.response.header.Access-Control-Allow-Origin: true
           StatusCode: '200'
 
+  #################  INTERNS RESOURCE AND METHODS #################
+  ListInternsResource:
+    Type: "AWS::ApiGateway::Resource"
+    DependsOn : OCPv2API
+    Properties:
+      ParentId:
+        Fn::GetAtt:
+          - "OCPv2API"
+          - "RootResourceId"
+      PathPart: "interns"
+      RestApiId:
+        Ref: OCPv2API
+
+  ListInternsMethod:
+    Type: "AWS::ApiGateway::Method"
+    DependsOn: 
+      - ListInternsResource
+      - LambdaListInterns
+    Properties:
+      HttpMethod: "GET"
+      AuthorizationType: "NONE"
+      ResourceId:
+        Ref: ListInternsResource
+      RestApiId:
+        Ref: OCPv2API
+      Integration:
+        Type: "AWS_PROXY"
+        Uri:
+          Fn::Join:
+            - ""
+            - - "arn:aws:apigateway:"
+              - !Ref "AWS::Region"
+              - ":lambda:path/"
+              - "/2015-03-31/functions/"
+              - !GetAtt [LambdaListInterns, Arn]
+              - "/invocations"
+        IntegrationHttpMethod: "POST"
+        IntegrationResponses: 
+          - ResponseParameters:
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+            ResponseTemplates:
+              application/json: ''
+            StatusCode : 200
+      MethodResponses:
+          - ResponseModels:
+              application/json: Empty
+            ResponseParameters:
+              method.response.header.Access-Control-Allow-Origin: true
+            StatusCode: 200 
+
+  #Enable CORS
+  ListInternsCORSOptionsMethod:
+    Type: "AWS::ApiGateway::Method" 
+    DependsOn : ListInternsResource
+    Properties:
+      ResourceId: !Ref ListInternsResource
+      RestApiId: !Ref OCPv2API
+      AuthorizationType: NONE
+      HttpMethod: OPTIONS
+      Integration:
+        Type: MOCK
+        IntegrationResponses:
+          - ResponseParameters:
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+              method.response.header.Access-Control-Allow-Methods: "'GET,OPTIONS'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+            ResponseTemplates:
+              application/json: ''
+            StatusCode: '200'
+        PassthroughBehavior: NEVER
+        RequestTemplates:
+          application/json: '{"statusCode": 200}'
+      MethodResponses:
+        - ResponseModels:
+            application/json: Empty
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Headers: true
+            method.response.header.Access-Control-Allow-Methods: true
+            method.response.header.Access-Control-Allow-Origin: true
+          StatusCode: '200'
+
 
   # API gateway stage and deployment configuration. 
   # We use a new logical ID for the deployment each time we update the CF template
@@ -738,10 +875,10 @@ Resources:
   # so to reflect any changes it needs to be recreated and the new deployment bound to the stage.
   OCPv2APIStage:
     Type: 'AWS::ApiGateway::Stage'
-    DependsOn : OCPv2APIDeploymentStage1
+    DependsOn : OCPv2APIDeploymentStage
     Properties:
       RestApiId: !Ref OCPv2API
-      DeploymentId: !Ref OCPv2APIDeploymentStage1
+      DeploymentId: !Ref OCPv2APIDeploymentStage
       StageName: !Ref AWS::StackName
       MethodSettings:
           - ResourcePath: /*
@@ -751,7 +888,7 @@ Resources:
             MetricsEnabled: true          
 
   #update/modify logical name to triger new deployment  
-  OCPv2APIDeploymentStage1:
+  OCPv2APIDeploymentStage:
     Type: 'AWS::ApiGateway::Deployment'
     Properties:
       RestApiId: !Ref OCPv2API
