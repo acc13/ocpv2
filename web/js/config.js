@@ -173,3 +173,4 @@ const stage = env;
 const restAPIBaseURL = "https://" + ocpv2RestAPIId + ".execute-api.us-east-1.amazonaws.com/" + stage;
 const inviteAPIURL = restAPIBaseURL + '/invitation';
 const getRessultsAPIURL = restAPIBaseURL + '/outputtestresult';
+const listInternsAPIURL = restAPIBaseURL + '/interns';

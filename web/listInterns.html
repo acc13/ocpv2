@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>List Interns</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
+        crossorigin="anonymous">
+    <style>
+        #filterDiv
+        {
+            display: none;
+        }
+    </style>
+
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+
+    <script type="text/javascript" src="/js/config.js" ></script>
+
+    <script type="text/javascript">
+
+
+
+        const parseInternListResults = function (results) {
+
+            const workflowList = results.result;
+
+            const candidate = workflowList.map(e => buildCandidateInfo(e));
+            const details = workflowList.map(e => buildCandidateDetails(e));
+            const coding = workflowList.map(e => buildCodingDetails(e));
+
+            let output = "";
+            for (let i in workflowList)
+            {
+                output +=
+                    "<tr><td>\n" +
+                    candidate[i] +
+                    "</td><td>\n" +
+                    details[i] +
+                    "</td><td>\n" +
+                    coding[i] +
+                    "</td></tr>\n";
+            }
+
+            return output;
+        };
+
+        const buildCandidateInfo = function (workflow) {
+
+            const invitation = workflow.invitation;
+
+            let output = "<div>\n";
+            output += "<p>First: " + invitation.candidateFirst + "</p>\n";
+            output += "<p>Last: " + invitation.candidateLast + "</p>\n";
+            output += "<p>Email: " + invitation.candidateEmail + "</p>\n";
+            output += "</div>\n";
+
+            return output;
+        };
+
+        const buildCodingDetails = function (workflow) {
+
+            const codingProblem= workflow.codingProblem;
+            const outputHistory = workflow.outputTestHistory;
+
+            let output = "<div>\n";
+            output += "<p>Problem assigned: " + codingProblem.name+ "</p>\n";
+            output += "<p>Output test attempts: " + outputHistory.attempts + "</p>\n";
+            output += "<p>Correct output uploaded: " + outputHistory.succeeded+ "</p>\n";
+            if (outputHistory.solutionURL == undefined || outputHistory.solutionURL.size == 0)
+            {
+                output += "<p>Solution has not been submitted.</p>\n";
+            }
+            else
+            {
+                output += "<p><a href='" + outputHistory.solutionURL + "'>Download source code</a></p>\n";
+            }
+
+            output += "</div>\n";
+
+            return output;
+        };
+
+        const buildCandidateDetails = function (workflow) {
+
+            const invitation = workflow.invitation;
+
+            let output = "<div>\n";
+            output += "<p>Registered: " + invitation.registrationDate + "</p>\n";
+            output += "<p><a href='" + invitation.resumeURL + "'>Download resume</a></p\n>";
+            output += "</div>\n";
+
+            return output;
+        };
+
+        const buildCandidateTable = function() {
+
+            var displayResources = $("#display-resources");
+
+            displayResources.text("Loading data (please be patient, lambda cold start can be slow)...");
+
+            $("#retrieve-resources").hide();
+
+            let api = "";
+            try {
+                api = listInternsAPIURL;
+            } catch (e) {
+                if (e instanceof ReferenceError) {
+                    api = "https://n8p3qg8w4c.execute-api.us-east-1.amazonaws.com/test/interns";
+                }
+            }
+
+            $.ajax({
+                type: "GET",
+                url: api,
+                success: function(result) {
+                    console.log(result);
+
+                    let output = "";
+
+                    output += "<table id='candidateTable'><thead><tr><th>Candidate</th><th>Details</th><th>Coding</th></thead><tbody id=candidateRows>";
+
+                    output += parseInternListResults(result);
+
+                    output += "</tbody></table>";
+
+                    displayResources.html(output);
+                    $("table").addClass("table");
+
+                    $("#filterDiv").show();
+                }
+            });
+        }
+
+        const filterTableRows = function(inputTag)
+        {
+            var rows = $("#candidateRows").find("tr").hide();
+
+            var data = inputTag.value.split(" ");
+            $.each(data, function (i, v) {
+
+                rows.filter(function () {
+
+                    const tds = $("td", this);
+
+                    const td = tds[0].innerHTML.toUpperCase();
+
+                    return  td.includes("FIRST: " + v.toUpperCase()) ||
+                        td.includes("LAST: " + v.toUpperCase()) ||
+                        td.includes("EMAIL: " + v.toUpperCase());
+                }).show();
+            });
+
+        }
+
+
+		$(document).ready(function() {
+
+			$("#retrieve-resources").click(function() {
+                buildCandidateTable();
+			});
+
+
+
+            $("#searchInput").keyup(function() {
+                filterTableRows(this);
+            });
+		});
+
+	</script>
+</head>
+
+<body class="col-md-12">
+    <h1>Intern candidate uploads</h1>
+
+    <br/>
+    <div id="filterDiv">
+        <label for="searchInput">Filter by First, Last or Email: &nbsp;&nbsp;&nbsp;&nbsp;</label><input type="text" id=searchInput name="searchInput"><br>
+    </div>
+    <br/>
+    <div id="display-resources">
+    </div>
+    <a href="#" class="btn btn-primary" id="retrieve-resources">Retrieve List</a>
+</body>
+
+</html>
