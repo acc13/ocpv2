@@ -214,4 +214,28 @@ public class DynamoOcpV2DbTest {
         db.delete(cwf2);
         db.delete(cwf3);
     }
+
+    @Test
+    public void writeCandidateWorkflow_overwrite_updates() throws IOException
+    {
+        CandidateWorkflow cwf1 = createCandidateWorkflow("blahcandidate7", "manager7", "blah7");
+
+        DynamoOcpV2DB db = new DynamoOcpV2DB();
+
+        db.delete(cwf1);
+        db.write(cwf1);
+
+        CandidateWorkflow firstRead = db.getWorkflow("blah7");
+
+        System.out.println("New cw has a solution url of: " + firstRead.getOutputTestHistory().getCodeSolutionUrl());
+
+        firstRead.getOutputTestHistory().setCodeSolutionUrl("downloadfoo70");
+        db.write(firstRead);
+
+        CandidateWorkflow secondRead = db.getWorkflow("blah7");
+
+        assertThat(secondRead.getOutputTestHistory().getCodeSolutionUrl(), is(equalTo("downloadfoo70")));
+
+        db.delete(cwf1);
+    }
 }

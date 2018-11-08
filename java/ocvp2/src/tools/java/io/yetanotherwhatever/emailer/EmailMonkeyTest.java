@@ -1,13 +1,10 @@
 package io.yetanotherwhatever.emailer;
 
 import org.junit.Test;
-import org.mockito.Matchers;
 
 import java.util.ArrayList;
 
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 public class EmailMonkeyTest {
 
@@ -23,6 +20,6 @@ public class EmailMonkeyTest {
         EmailMonkey em = spy(new EmailMonkey());
         em.emailAll(cl);
 
-        verify(em, times(3)).email(Matchers.any(Contact.class));
+        verify(em, times(3)).email(any(Contact.class));
     }
 }
