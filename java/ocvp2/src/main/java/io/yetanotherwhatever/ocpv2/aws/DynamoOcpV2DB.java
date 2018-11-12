@@ -10,6 +10,8 @@ import com.amazonaws.services.dynamodbv2.document.*;
 import com.amazonaws.services.dynamodbv2.document.spec.GetItemSpec;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.amazonaws.services.dynamodbv2.model.ResourceNotFoundException;
+import com.amazonaws.services.dynamodbv2.model.ScanRequest;
+import com.amazonaws.services.dynamodbv2.model.ScanResult;
 import io.yetanotherwhatever.ocpv2.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -335,6 +337,31 @@ public class DynamoOcpV2DB implements IOcpV2DB {
         expressionAttributeNames.put("#type", I_TYPE);
 
         ItemCollection<ScanOutcome> items = table.scan("#type = :type", // FilterExpression
+                expressionAttributeNames,
+                expressionAttributeValues);
+
+        Iterator<Item> iterator = items.iterator();
+        ArrayList<CandidateWorkflow> wfList = new ArrayList<>();
+        while (iterator.hasNext()) {
+            Item item = iterator.next();
+            wfList.add(itemToCandidateWorkflow(item));
+        }
+
+        return wfList;
+    }
+
+    public List<CandidateWorkflow> listAllRegistrations()
+    {
+        DynamoDB dynamoDB = new DynamoDB(getAmazonDynamoDB());
+
+        Table table = dynamoDB.getTable(REGISTRATION_TABLE_NAME);
+
+        Map<String, Object> expressionAttributeValues = new HashMap<>();
+        expressionAttributeValues.put(":type", 10);
+        Map<String, String> expressionAttributeNames = new HashMap<>();
+        expressionAttributeNames.put("#type", I_TYPE);
+
+        ItemCollection<ScanOutcome> items = table.scan("#type < :type", // FilterExpression
                 expressionAttributeNames,
                 expressionAttributeValues);
 
