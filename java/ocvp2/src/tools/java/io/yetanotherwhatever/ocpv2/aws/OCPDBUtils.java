@@ -20,7 +20,7 @@ import java.util.List;
 import static java.util.Calendar.MONTH;
 import static java.util.stream.Collectors.toList;
 
-public class RepairInternSolutionUrls {
+public class OCPDBUtils {
 
     public void repairEmptySolutionUrls() {
 
@@ -30,7 +30,7 @@ public class RepairInternSolutionUrls {
 
         List<CandidateWorkflow> toRepair = interns.stream()
                 .filter(i -> i.getOutputTestHistory().getCodeSolutionUrl() == null ||
-                i.getOutputTestHistory().getCodeSolutionUrl().length() == 0)
+                        i.getOutputTestHistory().getCodeSolutionUrl().length() == 0)
                 .filter(i -> registeredBeforeFix(i))
                 .collect(toList());
 
@@ -40,7 +40,7 @@ public class RepairInternSolutionUrls {
 
         toRepair.stream()
                 .filter(i -> i.getOutputTestHistory().getCodeSolutionUrl() != null
-                    && i.getOutputTestHistory().getCodeSolutionUrl().length() > 0)
+                        && i.getOutputTestHistory().getCodeSolutionUrl().length() > 0)
                 .forEach(i -> saveRecord(db, i));
     }
 
@@ -110,7 +110,7 @@ public class RepairInternSolutionUrls {
         boolean beforeFix = false;
         try {
             beforeFix = Utils.unformatDateISO8601(intern.getInvitation().getInvitationDate()).get(MONTH) == Calendar.OCTOBER
-                &&  Utils.unformatDateISO8601(intern.getInvitation().getInvitationDate()).get(Calendar.DAY_OF_MONTH) <= 26;
+                    &&  Utils.unformatDateISO8601(intern.getInvitation().getInvitationDate()).get(Calendar.DAY_OF_MONTH) <= 26;
         } catch (ParseException e) {
             e.printStackTrace();
         }
@@ -169,12 +169,24 @@ public class RepairInternSolutionUrls {
                 .forEach(i -> printIntern(i));
     }
 
+    public void internReport()
+    {
+        DynamoOcpV2DB db = new DynamoOcpV2DB();
+
+        List<CandidateWorkflow> interns = db.listAllInterns();
+        interns = interns.stream()
+                .filter(i -> !i.getInvitation().getCandidateEmail().contains("hotmail.com") && !i.getInvitation().getCandidateEmail().contains("cornell.edu")).collect(toList());
+
+        System.out.println("Interns registered: " + interns.stream().count());
+        System.out.println("Interns submitted coding problem: " +
+                interns.stream().filter(i -> i.getOutputTestHistory().getCodeSolutionUrl() != null   && i.getOutputTestHistory().getCodeSolutionUrl().length() > 0).count());
+    }
+
 
     static public void main(String[] args) throws ParseException
     {
-        RepairInternSolutionUrls repair = new RepairInternSolutionUrls();
+        OCPDBUtils repair = new OCPDBUtils();
 
-        //repair.findDupeRegistartions();
-        repair.repairCurtailedUrls();
+        repair.internReport();
     }
 }

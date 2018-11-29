@@ -35,6 +35,13 @@ version '1.0'
             )
 
             toolsCompile (
+                    sourceSets.main.output,
+                    sourceSets.test.output,
+                    configurations.compile,
+                    configurations.testCompile,
+                    configurations.runtime,
+                    configurations.testRuntime,
+
                     group: 'junit', name: 'junit', version: '4.12',
                     'org.junit.jupiter:junit-jupiter-api:5.3.0',
                     'org.mockito:mockito-core:2.21.0'
