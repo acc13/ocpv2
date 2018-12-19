@@ -22,6 +22,10 @@ import static java.util.stream.Collectors.toList;
 
 public class OCPDBUtils {
 
+    // fix intern registration records that did not
+    // properly update the outputTestHistory
+    // (records created prior to fix made in commit 9802c334ec58264891845310be76a1868e06ead9
+    // https://github.com/acc13/ocpv2/commit/9802c334ec58264891845310be76a1868e06ead9
     public void repairEmptySolutionUrls() {
 
         DynamoOcpV2DB db = new DynamoOcpV2DB();
@@ -31,12 +35,12 @@ public class OCPDBUtils {
         List<CandidateWorkflow> toRepair = interns.stream()
                 .filter(i -> i.getOutputTestHistory().getCodeSolutionUrl() == null ||
                         i.getOutputTestHistory().getCodeSolutionUrl().length() == 0)
-                .filter(i -> registeredBeforeFix(i))
+                .filter(i -> didInternRegisterBeforeFix(i))
                 .collect(toList());
 
-        List<S3ObjectSummary> solutions = loadSolutions();
+        List<S3ObjectSummary> solutions = listSolutionsPostedToS3();
 
-        toRepair.stream().forEach(i -> updateWorkflow(solutions, i));
+        toRepair.stream().forEach(i -> fixInternCodeUploadUrl(solutions, i));
 
         toRepair.stream()
                 .filter(i -> i.getOutputTestHistory().getCodeSolutionUrl() != null
@@ -44,7 +48,7 @@ public class OCPDBUtils {
                 .forEach(i -> saveRecord(db, i));
     }
 
-    public void repairCurtailedUrls() {
+    public void fixBrokenInternCodeUploadUrls() {
 
         DynamoOcpV2DB db = new DynamoOcpV2DB();
 
@@ -54,9 +58,9 @@ public class OCPDBUtils {
                 .filter(i -> partialUrl(i))
                 .collect(toList());
 
-        List<S3ObjectSummary> solutions = loadSolutions();
+        List<S3ObjectSummary> solutions = listSolutionsPostedToS3();
 
-        toRepair.stream().forEach(i -> updateWorkflow(solutions, i));
+        toRepair.stream().forEach(i -> fixInternCodeUploadUrl(solutions, i));
 
         toRepair.stream()
                 .forEach(i -> saveRecord(db, i));
@@ -68,7 +72,7 @@ public class OCPDBUtils {
                 intern.getOutputTestHistory().getCodeSolutionUrl().startsWith("uploads");
     }
 
-    private void updateWorkflow(List<S3ObjectSummary> solutions, CandidateWorkflow intern)
+    private void fixInternCodeUploadUrl(List<S3ObjectSummary> solutions, CandidateWorkflow intern)
     {
         S3ObjectSummary solution = solutions.stream().filter(o -> o.getKey().contains(intern.getCodingProblem().getGuid()))
                 .reduce((a, b) -> (a.getLastModified().compareTo(b.getLastModified()) > 0 ? a : b))
@@ -86,7 +90,7 @@ public class OCPDBUtils {
     {
         try {
             db.write(intern);
-            printIntern(intern);
+            printInternDetails(intern);
         }
         catch (IOException e)
         {
@@ -94,7 +98,7 @@ public class OCPDBUtils {
         }
     }
 
-    private void printIntern(CandidateWorkflow intern)
+    private void printInternDetails(CandidateWorkflow intern)
     {
         System.out.println(intern.getInvitation().getInvitationDate()
                 + " " + intern.getInvitation().getCandidateEmail()
@@ -105,7 +109,10 @@ public class OCPDBUtils {
         System.out.println();
     }
 
-    private boolean registeredBeforeFix(CandidateWorkflow intern)
+    // bug was fixed on 10/26/2018
+    // github commit 9802c334ec58264891845310be76a1868e06ead9
+    // https://github.com/acc13/ocpv2/commit/9802c334ec58264891845310be76a1868e06ead9
+    private boolean didInternRegisterBeforeFix(CandidateWorkflow intern)
     {
         boolean beforeFix = false;
         try {
@@ -118,7 +125,7 @@ public class OCPDBUtils {
         return beforeFix;
     }
 
-    private List<S3ObjectSummary> loadSolutions()
+    private List<S3ObjectSummary> listSolutionsPostedToS3()
     {
         String bucketName = "ocp-upload-yetanotherwhatever";
 
@@ -150,7 +157,7 @@ public class OCPDBUtils {
         return null;
     }
 
-    public void findDupeRegistartions()     {
+    public void printDupeInternRegistrations()     {
 
         DynamoOcpV2DB db = new DynamoOcpV2DB();
 
@@ -166,10 +173,10 @@ public class OCPDBUtils {
         System.out.println("foo" + cleanup.size());
 
         cleanup.stream()
-                .forEach(i -> printIntern(i));
+                .forEach(i -> printInternDetails(i));
     }
 
-    public void internReport()
+    public void printInternCounts()
     {
         DynamoOcpV2DB db = new DynamoOcpV2DB();
 
@@ -182,11 +189,38 @@ public class OCPDBUtils {
                 interns.stream().filter(i -> i.getOutputTestHistory().getCodeSolutionUrl() != null   && i.getOutputTestHistory().getCodeSolutionUrl().length() > 0).count());
     }
 
+    public void internExportToCsv()
+    {
+        DynamoOcpV2DB db = new DynamoOcpV2DB();
+
+        List<CandidateWorkflow> interns = db.listAllInterns();
+
+        System.out.println("First,Last,Email,Registration Date,Code Solution,Problem Name");
+
+        interns.stream()
+                .filter(i -> !i.getInvitation().getCandidateEmail().contains("hotmail.com") && !i.getInvitation().getCandidateEmail().contains("cornell.edu"))
+                .forEach(i -> printInternCsv(i));
+    }
+
+    private void printInternCsv(CandidateWorkflow i) {
+
+        String csv = String.join(",",
+                i.getInvitation().getCandidateFirstName(),
+                i.getInvitation().getCandidateLastName(),
+                i.getInvitation().getCandidateEmail(),
+                i.getInvitation().getInvitationDate().substring(0, 10),
+                i.getOutputTestHistory().getCodeSolutionUrl(),
+                i.getCodingProblem().getName());
+
+
+        System.out.println(csv);
+    }
+
 
     static public void main(String[] args) throws ParseException
     {
         OCPDBUtils repair = new OCPDBUtils();
 
-        repair.internReport();
+        repair.internExportToCsv();
     }
 }
