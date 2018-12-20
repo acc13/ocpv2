@@ -4,91 +4,9 @@
 	<title>Invite Candidate to the Symantec Online Coding Problem</title>
 	<meta charset="utf-8"/>
 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
-
-<script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
-
-<script type="text/javascript" src="/js/config.js" ></script>	
-<script type="text/javascript" src="/js/utils.js" ></script>	
-
-<script type="text/javascript">
-
-function prefill()
-{
-	if (Cookies.get("manager_email") != null)
-	{
-		$('#manager_email').val(Cookies.get('manager_email'));
-		$('#remember_me').prop( "checked", Cookies.get('remember_me'));
-	}
-}
-
-function save()
-{
-  if ($('#remember_me').is(':checked'))
-  {
-  	Cookies.set('manager_email', $('#manager_email').val());
-  	Cookies.set('remember_me', $('#remember_me').is(':checked'));
-  }
-  else
-  {
-  	Cookies.remove("manager_email", null);
-  	Cookies.remove("remember_me", null);
-  }
-}
-
-$(document).ready(function(){
-
-	prefill();
-
-
-	$('#invite-form').submit(function (event) {
-
-	  event.preventDefault();
-		
-	  save();
-
-	  if (!($('#manager_email').val().includes("symantec.com")))
-	  {
-	  	alert("Manager must have a symantec.com email.");
-	  	return false;
-	  }
-
-	  if(!confirm("Confirm?")) {
-	  	return true;
-	  }
-
-	  $('#invite-form').hide();
-	  $('#results').html("Generating problem and emailing candidate...")
-
-	  var data = {
-	    candidateFirstName: $('#first-name').val(),
-	    candidateLastName: $('#last-name').val(),
-	    candidateEmail: $('#email').val(),
-	    managerEmail: $('#manager_email').val()
-	  }
-
-	  $.ajax({
-	    type: 'POST',
-	    url: inviteAPIURL,
-	    dataType: 'text',
-	    contentType: 'application/json',
-	    data: JSON.stringify(data),
-	    crossDomain: true,
-	    success: function () {
-	      	$('#results').html('<span class="success">Invite succeeded.  You may wish to notify your candidate to expect an email.<br/><br/>They may need to check their junk folder, or notify <a href="mail://andrew_chang@symantec.com">andrew_chang@symantec.com</a>.</span>');
-	    },
-		error: function(XMLHttpRequest, textStatus, errorThrown) {
-	      	$('#results').html('<span class="fail">Invite failed. Please refresh the page and try again; or notify <a href="mail://andrew_chang@symantec.com">andrew_chang@symantec.com</a></span>');
-
-	  		$('#invite-form').show();
-		}
-	  })
-
-	});
-
-});
-
-</script>
+<script type="text/javascript" src="js/config.js" ></script>	
+<script type="text/javascript" src="js/utils.js" ></script>
+<script type="text/javascript" src="js/bundle.js" ></script>
 
 <style>
 p.h1 {

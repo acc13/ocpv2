@@ -1,0 +1,17 @@
+{
+  "name": "webtests",
+  "version": "1.0.0",
+  "description": "web unit tests",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest",
+    "build": "browserify invite.module.js -o ../js/bundle.js"
+  },
+  "author": "Andrew Chang",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "browserify": "^16.2.3",
+    "jquery": "^3.1.1",
+    "js-cookie": "^2.2.0"
+  }
+}

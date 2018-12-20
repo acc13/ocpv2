@@ -41,12 +41,14 @@ BUCKET_NAME=$ENV.$HOSTED_ZONE
 
 if [[ $CLEAN = "true" ]]
 then
-	aws s3 rm s3://$BUCKET_NAME --recursive
+	aws s3 rm s3://$BUCKET_NAME --recursive --exclude "tp/*"
 fi
 
 #copy web content first
-aws s3 sync $DEPLOY_FOLDER/../web s3://$BUCKET_NAME --content-type "text/html" --acl public-read --exclude *inputs/*
-aws s3 sync $DEPLOY_FOLDER/../web s3://$BUCKET_NAME --content-type "application/txt" --content-disposition "attachment" --acl public-read --include *inputs/*
+#html, css, js files should be content-type text/html
+aws s3 sync $DEPLOY_FOLDER/../web s3://$BUCKET_NAME --content-type "text/html" --acl public-read --exclude "_tests_*" --exclude "inputs*"
+#whereas the input files, we want the link to work as a file download
+aws s3 sync $DEPLOY_FOLDER/../web s3://$BUCKET_NAME --content-type "application/txt" --content-disposition "attachment" --acl public-read --include "*inputs/*" --exclude "_tests_*"
 
 echo $0 finished
 echo
