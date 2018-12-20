@@ -1,6 +1,7 @@
 package io.yetanotherwhatever.ocpv2.aws;
 
 import com.amazonaws.AmazonServiceException;
+import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.*;
@@ -28,7 +29,8 @@ public class S3CodingProblemBuilder implements ICodingProblemBuilder {
 
     static final Logger logger = LogManager.getLogger(S3CodingProblemBuilder.class);
 
-    final AmazonS3 S3 = AmazonS3ClientBuilder.defaultClient();
+    final AmazonS3 S3 = AmazonS3ClientBuilder.standard()
+            .withRegion(Regions.US_EAST_1).build();
 
     private static final String S3_WEB_BUCKET = System.getenv("S3_WEB_BUCKET");
     private static final String PROBLEMS_PREFIX = "problems/";
@@ -119,7 +121,7 @@ public class S3CodingProblemBuilder implements ICodingProblemBuilder {
         return r;
     }
 
-    private String copyProblem(String problemGuid, String problemKey)
+    protected String copyProblem(String problemGuid, String problemKey)
     {
         String destKey = TEMP_PAGE_PREFIX + problemGuid + ".html";
 

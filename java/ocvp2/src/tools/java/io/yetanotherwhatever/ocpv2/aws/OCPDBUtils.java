@@ -9,13 +9,14 @@ import com.amazonaws.services.s3.model.ListObjectsV2Request;
 import com.amazonaws.services.s3.model.ListObjectsV2Result;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
 import io.yetanotherwhatever.ocpv2.CandidateWorkflow;
+import io.yetanotherwhatever.ocpv2.Invitation;
 import io.yetanotherwhatever.ocpv2.Utils;
 
 import java.io.IOException;
 import java.text.ParseException;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.util.Calendar.MONTH;
 import static java.util.stream.Collectors.toList;
@@ -216,11 +217,41 @@ public class OCPDBUtils {
         System.out.println(csv);
     }
 
+    public void rebuildProblemPages(String pagesToFix) {
+
+        DynamoOcpV2DB db = new DynamoOcpV2DB();
+        List<CandidateWorkflow> interns = db.listAllRegistrations();
+
+        String[] ids = pagesToFix.split(",");
+
+        System.out.println("ids length = " + ids.length);
+
+        List<CandidateWorkflow> brokenPages = interns.stream()
+                .filter(i -> Arrays.asList(ids).contains(i.getCodingProblem().getGuid()))
+                .collect(Collectors.toList());
+
+        System.out.println("pages to repair = " + brokenPages.size());
+
+        brokenPages.stream()
+                .forEach(i -> System.out.println(i.getInvitation().getCandidateEmail()));
+
+        brokenPages.stream()
+                .forEach(i -> System.out.println(i.getCodingProblem().getLandingPageUrl()));
+
+        S3CodingProblemBuilder probBuiklder = new S3CodingProblemBuilder();
+        brokenPages.stream()
+                .forEach(i -> probBuiklder.copyProblem(i.getCodingProblem().getGuid(),
+                        i.getCodingProblem().getName()));
+    }
+
 
     static public void main(String[] args) throws ParseException
     {
         OCPDBUtils repair = new OCPDBUtils();
 
         repair.internExportToCsv();
+
     }
+
+
 }
