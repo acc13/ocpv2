@@ -1,6 +1,6 @@
 const $ = require('jquery');
 const Cookies = require('js-cookie');
-const invite = require('./invite.module.js');
+const invite = require('./invite.js');
 
 
 jest
@@ -8,6 +8,16 @@ jest
 	.dontMock('jquery');
 
 const html = require('fs').readFileSync('../invite.html').toString();
+
+beforeEach(() => {
+  
+	document.documentElement.innerHTML = html;  
+
+	invite.sendUserInvite = jest.fn().mockImplementation(() => {
+		//do nothing
+	});
+
+});
 
 
 test("forgetManagerInfo() clears manager email and remember me cookie", () => {
@@ -26,8 +36,7 @@ test("forgetManagerInfo() clears manager email and remember me cookie", () => {
 })
 
 test("optionallySaveManagerInfo() saves cookies if checkbox checked", () => {
-	document.documentElement.innerHTML = html;
-
+	
 	invite.forgetManagerInfo();
 
 	$('#remember_me').prop('checked', true);
@@ -41,44 +50,23 @@ test("optionallySaveManagerInfo() saves cookies if checkbox checked", () => {
 
 
 test("optionallySaveManagerInfo() calls forgetManagerInfo() if 'remember me' unchecked", () => {
-	document.documentElement.innerHTML = html;
-
+	
   	Cookies.set('manager_email', "fakestuff");
   	Cookies.set('remember_me', true);
 
 	$('#remember_me').prop('checked', false);
 
-	const forgetManagerInfo = invite.forgetManagerInfo;
-	invite.forgetManagerInfo = jest.fn(() => {
-		forgetManagerInfo();
-	});
-
-	invite.optionallySaveManagerInfo();
-
-	expect(invite.forgetManagerInfo).toBeCalled();
-
-	invite.forgetManagerInfo = forgetManagerInfo;
+	callF1AndExpectF2ToBeCalled("optionallySaveManagerInfo", "forgetManagerInfo")
 })
 
 test("initPage() calls exportsprefillManagerInfo()", () => {
 
-	const prefillManagerInfo = invite.prefillManagerInfo
-	invite.prefillManagerInfo = jest.fn(() => {
-		prefillManagerInfo();
-	});
-	
-	invite.initPage();
-
-	expect(invite.prefillManagerInfo).toBeCalled();
-
-	invite.prefillManagerInfo = prefillManagerInfo;
+	callF1AndExpectF2ToBeCalled("initPage", "prefillManagerInfo")
 
 })
 
 
 test("validateInviteForm() fails on non symantec manager email", () => {
-
-	document.documentElement.innerHTML = html;
 
 	$('#manager_email').val("someone@somwhere.com");
 
@@ -90,8 +78,6 @@ test("validateInviteForm() fails on non symantec manager email", () => {
 
 test("validateInviteForm() allows symantec.com manager email", () => {
 
-	document.documentElement.innerHTML = html;
-
 	$('#manager_email').val("someone@symantec.com");
 
 	const valid = invite.validateInviteForm();
@@ -99,3 +85,56 @@ test("validateInviteForm() allows symantec.com manager email", () => {
 	expect(valid).toBeTruthy();
 })
 
+//TODO: hidden state starts as true??
+test.skip("disableInviteForm() hides the invite form", () => {
+
+	expect($('#invite-form').is(':hidden')).toBeFalsy();
+
+	invite.disableInviteForm();
+
+	expect($('#invite-form').is(':hidden')).toBeTruthy();
+})
+
+test("handleSubmitInviteForm() saves manager info", () => {
+
+	callF1AndExpectF2ToBeCalled("handleSubmitInviteForm", "optionallySaveManagerInfo")
+})
+
+test("handleSubmitInviteForm() validates form", () => {
+
+	callF1AndExpectF2ToBeCalled("handleSubmitInviteForm", "validateInviteForm")
+})
+
+mockValidation = jest.fn().mockImplementation( () => {
+	return true;
+});
+
+test("handleSubmitInviteForm() disables form", () => {
+
+	const saveValidation = invite.validateInviteForm;
+	invite.validateInviteForm = mockValidation;
+	callF1AndExpectF2ToBeCalled("handleSubmitInviteForm", "disableInviteForm")
+	invite.validateInviteForm = saveValidation;
+})
+
+test("handleSubmitInviteForm() submits invitation request", () => {
+
+	const saveValidation = invite.validateInviteForm;
+	invite.validateInviteForm = mockValidation;
+	callF1AndExpectF2ToBeCalled("handleSubmitInviteForm", "sendUserInvite")
+	invite.validateInviteForm = saveValidation;
+})
+
+function callF1AndExpectF2ToBeCalled(caller, callee)
+{
+	const saveCallee = invite[callee];
+	invite[callee] = jest.fn().mockImplementation(() => {
+		saveCallee();
+	});
+
+	invite[caller]();
+
+	expect(invite[callee]).toBeCalled();	
+
+	invite[callee] = saveCallee;
+}

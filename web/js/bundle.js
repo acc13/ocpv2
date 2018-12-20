@@ -124,16 +124,21 @@ function inviteFailed()
 
 function handleSubmitInviteForm(event)
 {
-  event.preventDefault();  
+    
+  if (typeof(process) !== 'undefined' && typeof(process.stdout) !== 'undefined') {
+    //we're in node.js
+  } else {
+    event.preventDefault();
+  }
 	
-  optionallySaveManagerInfo();
+  module.exports.optionallySaveManagerInfo();
 
-  if (!validateInviteForm())
+  if (!module.exports.validateInviteForm())
   {
   	return false;
   }
 
-  disableInviteForm();
+  module.exports.disableInviteForm();
 
   var data = {
     candidateFirstName: $('#first-name').val(),
@@ -142,7 +147,7 @@ function handleSubmitInviteForm(event)
     managerEmail: $('#manager_email').val()
   }
 
-  sendUserInvite(data);
+  module.exports.sendUserInvite(data);
 
 }
 

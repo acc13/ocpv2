@@ -5,13 +5,16 @@
   "main": "index.js",
   "scripts": {
     "test": "jest",
-    "build": "browserify invite.module.js -o ../js/bundle.js"
+    "build": "browserify invite.js | uglifyjs -mc > ../js/bundle.js",
+    "watch": "watchify invite.js -o ../js/bundle.js"
   },
   "author": "Andrew Chang",
   "license": "UNLICENSED",
   "dependencies": {
     "browserify": "^16.2.3",
     "jquery": "^3.1.1",
-    "js-cookie": "^2.2.0"
+    "js-cookie": "^2.2.0",
+    "uglify-js": "^3.4.9",
+    "watchify": "^3.11.0"
   }
 }
