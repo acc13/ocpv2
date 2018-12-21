@@ -2,16 +2,27 @@
 
 const Cookies = require('js-cookie');
 const $ = require('jquery');
+const runtime = require('./runtime-env');
+const dialogs = require('./dialogs.js');
 
-$(document).ready(function(){
 
-  initPage();
+function init()
+{
+  if ($('#invite-form').length) //element exists on page, then we're on the correct page
+  {
+    if (runtime.isBrowser)
+    {
+      console.log("initializing invite.html");
+    }
 
-  $('#invite-form').submit(function (event) {
-    handleSubmitInviteForm(event);
-  });
+    module.exports.__private__.prefillManagerInfo();
 
-});
+    $('#invite-form').submit(function (event) {
+      invite.handleSubmitInviteForm(event);
+    });
+  }
+}
+
 
 function prefillManagerInfo()
 {
@@ -31,7 +42,7 @@ function optionallySaveManagerInfo()
   }
   else
   {
-  	module.exports.forgetManagerInfo();
+  	module.exports.__private__.forgetManagerInfo();
   }
 }
 
@@ -41,46 +52,21 @@ function forgetManagerInfo()
   	Cookies.remove("remember_me", null);	
 }
 
-function initPage()
-{
-	module.exports.prefillManagerInfo();
-}
-
 function validateInviteForm()
 {
 
   if (!($('#manager_email').val().includes("symantec.com")))
   {
-  	myAlert("Manager must have a symantec.com email.");
+  	dialogs.myAlert("Manager must have a symantec.com email.");
   	return false;
   }
 
-  if(!myConfirm("Confirm?")) {
+  if(!dialogs.myConfirm("Confirm?")) {
   	return false;
   }
 
   return true;
 
-}
-
-//quiet dialogs if not running in browser
-function myAlert(message)
-{
-  if (typeof(process) !== 'undefined' && typeof(process.stdout) !== 'undefined') {
-      //to nothing
-  } else {
-      return alert(message);
-  }
-}
-
-//quiet dialogs if not running in browser
-function myConfirm(message)
-{
-  if (typeof(process) !== 'undefined' && typeof(process.stdout) !== 'undefined') {
-    return true;
-  } else {
-    return confirm(message);
-  }
 }
 
 function disableInviteForm()
@@ -123,20 +109,18 @@ function inviteFailed()
 function handleSubmitInviteForm(event)
 {
     
-  if (typeof(process) !== 'undefined' && typeof(process.stdout) !== 'undefined') {
-    //we're in node.js
-  } else {
+  if (runtime.isBrowser) {
     event.preventDefault();
   }
 	
-  module.exports.optionallySaveManagerInfo();
+  module.exports.__private__.optionallySaveManagerInfo();
 
-  if (!module.exports.validateInviteForm())
+  if (!module.exports.__private__.validateInviteForm())
   {
   	return false;
   }
 
-  module.exports.disableInviteForm();
+  module.exports.__private__.disableInviteForm();
 
   var data = {
     candidateFirstName: $('#first-name').val(),
@@ -145,19 +129,23 @@ function handleSubmitInviteForm(event)
     managerEmail: $('#manager_email').val()
   }
 
-  module.exports.sendUserInvite(data);
+  module.exports.__private__.sendUserInvite(data);
 
 }
 
 module.exports = { 
-  prefillManagerInfo: prefillManagerInfo,
-  optionallySaveManagerInfo: optionallySaveManagerInfo,
-  forgetManagerInfo: forgetManagerInfo,
-  initPage: initPage,
-  validateInviteForm: validateInviteForm,
-  disableInviteForm: disableInviteForm,
-  sendUserInvite: sendUserInvite,
-  inviteSucceeded: inviteSucceeded,
-  inviteFailed: inviteFailed,
-  handleSubmitInviteForm: handleSubmitInviteForm
+  init: init,
+
+  __private__: {  //modules requiring this module shall not use these
+    handleSubmitInviteForm: handleSubmitInviteForm,
+    prefillManagerInfo: prefillManagerInfo,
+    optionallySaveManagerInfo: optionallySaveManagerInfo,
+    forgetManagerInfo: forgetManagerInfo,
+    
+    validateInviteForm: validateInviteForm,
+    disableInviteForm: disableInviteForm,
+    sendUserInvite: sendUserInvite,
+    inviteSucceeded: inviteSucceeded,
+    inviteFailed: inviteFailed
+  }
 };
