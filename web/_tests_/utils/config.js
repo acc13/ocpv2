@@ -6,7 +6,7 @@ const runtime = require('./runtime-env');
 function init()
 {
   const stage = getStageName(); 
-  const ocpv2RestAPIId = getOCPv2RestAPIID(stage)
+  const ocpv2RestAPIId = getOCPv2RestAPIID(stage);
   const restAPIBaseURL = "https://" + ocpv2RestAPIId + ".execute-api.us-east-1.amazonaws.com/" + stage;
   const inviteAPIURL = restAPIBaseURL + '/invitation';
   const getRessultsAPIURL = restAPIBaseURL + '/outputtestresult';
@@ -57,7 +57,7 @@ function getOCPv2RestAPIID(stage)
     'test':   "n8p3qg8w4c",
     'stage':  "e7r30esi5h",
     'prod':   "j17gdoueah"
-  }
+  };
 
   let ocpv2RestAPIId = mapStageIds[stage];
 }
@@ -68,4 +68,4 @@ module.exports = {
     getStageName: getStageName,
     extractSubdomain: extractSubdomain    
   }
-}
+};

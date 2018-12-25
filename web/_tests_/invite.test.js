@@ -33,7 +33,7 @@ test("forgetManagerInfo() clears manager email and remember me cookie", () => {
 
   	expect(Cookies.get('manager_email')).toBeUndefined();
   	expect(Cookies.get('remember_me')).toBeUndefined();
-})
+});
 
 test("optionallySaveManagerInfo() saves cookies if checkbox checked", () => {
 	
@@ -46,7 +46,7 @@ test("optionallySaveManagerInfo() saves cookies if checkbox checked", () => {
 
   	expect(Cookies.get('manager_email')).toBe("bar");
   	expect(Cookies.get('remember_me')).toBe("true");
-})
+});
 
 
 test("prefillManagerInfo() fills input from cookie vals if set", () => {
@@ -61,7 +61,7 @@ test("prefillManagerInfo() fills input from cookie vals if set", () => {
 	expect($('#manager_email').val()).toBe("nacho@libre.com");
 	expect($('#remember_me').val()).toBeTruthy();
 
-})
+});
 
 
 test("optionallySaveManagerInfo() calls forgetManagerInfo() if 'remember me' unchecked", () => {
@@ -71,13 +71,13 @@ test("optionallySaveManagerInfo() calls forgetManagerInfo() if 'remember me' unc
 
 	$('#remember_me').prop('checked', false);
 
-	callF1AndExpectF2ToBeCalled(invite.__private__.optionallySaveManagerInfo, "forgetManagerInfo")
-})
+	callF1AndExpectF2ToBeCalled(invite.__private__.optionallySaveManagerInfo, "forgetManagerInfo");
+});
 
 test("init() calls prefillManagerInfo()", () => {
 
-	callF1AndExpectF2ToBeCalled(invite.init, "prefillManagerInfo")
-})
+	callF1AndExpectF2ToBeCalled(invite.init, "prefillManagerInfo");
+});
 
 
 test("validateInviteForm() fails on non symantec manager email", () => {
@@ -87,7 +87,7 @@ test("validateInviteForm() fails on non symantec manager email", () => {
 	const valid = invite.__private__.validateInviteForm();
 
 	expect(valid).toBeFalsy();
-})
+});
 
 
 test("validateInviteForm() allows symantec.com manager email", () => {
@@ -97,7 +97,7 @@ test("validateInviteForm() allows symantec.com manager email", () => {
 	const valid = invite.__private__.validateInviteForm();
 
 	expect(valid).toBeTruthy();
-})
+});
 
 //TODO: hidden state starts as true??
 test.skip("disableInviteForm() hides the invite form", () => {
@@ -107,17 +107,17 @@ test.skip("disableInviteForm() hides the invite form", () => {
 	invite.__private__.disableInviteForm();
 
 	expect($('#invite-form').is(':hidden')).toBeTruthy();
-})
+});
 
 test("handleSubmitInviteForm() saves manager info", () => {
 
-	callF1AndExpectF2ToBeCalled(invite.__private__.handleSubmitInviteForm, "optionallySaveManagerInfo")
-})
+	callF1AndExpectF2ToBeCalled(invite.__private__.handleSubmitInviteForm, "optionallySaveManagerInfo");
+});
 
 test("handleSubmitInviteForm() validates form", () => {
 
-	callF1AndExpectF2ToBeCalled(invite.__private__.handleSubmitInviteForm, "validateInviteForm")
-})
+	callF1AndExpectF2ToBeCalled(invite.__private__.handleSubmitInviteForm, "validateInviteForm");
+});
 
 mockValidation = jest.fn().mockImplementation( () => {
 	return true;
@@ -127,17 +127,17 @@ test("handleSubmitInviteForm() disables form", () => {
 
 	const saveValidation = invite.__private__.validateInviteForm;
 	invite.__private__.validateInviteForm = mockValidation;
-	callF1AndExpectF2ToBeCalled(invite.__private__.handleSubmitInviteForm, "disableInviteForm")
+	callF1AndExpectF2ToBeCalled(invite.__private__.handleSubmitInviteForm, "disableInviteForm");
 	invite.validateInviteForm = saveValidation;
-})
+});
 
 test("handleSubmitInviteForm() submits invitation request", () => {
 
 	const saveValidation = invite.__private__.validateInviteForm;
 	invite.__private__.validateInviteForm = mockValidation;
-	callF1AndExpectF2ToBeCalled(invite.__private__.handleSubmitInviteForm, "sendUserInvite")
+	callF1AndExpectF2ToBeCalled(invite.__private__.handleSubmitInviteForm, "sendUserInvite");
 	invite.__private__.validateInviteForm = saveValidation;
-})
+});
 
 function callF1AndExpectF2ToBeCalled(caller, callee)
 {

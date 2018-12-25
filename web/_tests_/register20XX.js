@@ -1,6 +1,14 @@
 'use strict';
 
-const dialogs = require('./dialogs.js');
+const uuidv4 = require("uuid/v4");
+const $ = require("jquery");
+
+const dialogs = require('./utils/dialogs');
+const s3upload = require('./utils/s3uploadforms');
+const runtime = require('./utils/runtime-env');
+const config = require ('./utils/config');
+
+const formname = "internRegForm";
 
 function init()
 {
@@ -11,12 +19,29 @@ function init()
       console.log("initializing register20XX.html");
     }
 
-	prepareS3UploadForms();
+	module.exports.__private__.prepareS3UploadForms();
 
     $('#internRegForm').submit(function (event) {
-      prepareinternRegForm(event);
+      module.exports.__private__.handleInternRegFormSubmit(event);
     });
   }
+}
+
+function handleInternRegFormSubmit()
+{
+	  if (!module.exports.__private__.validateForm())
+	  {
+	  	return false;
+	  }
+
+	  if (!dialogs.myConfirm("You will have 7 days to solve your coding problem.  Ok to continue?"))
+	  {
+	  	return false;
+	  }
+	  
+	  module.exports.__private__.setDestinationKey(formname);
+
+	  module.exports.__private__.setFormMetadata(formname);
 }
 
 function validateForm()
@@ -26,7 +51,7 @@ function validateForm()
 		$('#full_time_student').is(':checked') &&
 		$('#available_2020').is(':checked');
 
-	const eduEmail = (env != "ocp") ||	//ignore for testing
+	const eduEmail = (config.stage != "ocp") ||	//ignore for testing
 		$('#email').val().endsWith('.edu');
 
 	const valid = checkboxesChecked && eduEmail;
@@ -44,46 +69,18 @@ function validateForm()
 	return valid;
 }
 
-function prepareinternRegForm()
-{
-	  if (!validateForm())
-	  {
-	  	return false;
-	  }
-
-	  if (!dialogs.myConfirm("You will have 7 days to solve your coding problem.  Ok to continue?"))
-	  {
-	  	return false;
-	  }
-
-	  const formName = "internRegForm";
-	  
-	  setDestinationKey(formName);
-
-	  setFormMetadata(formName);
-}
-
 function setDestinationKey(formName)
-{	
+{
 	  //build key
-	  const keyVal = "uploads/internshipRegistration/" + Math.uuid() + getUploadFileNameExt();
+	  const keyVal = "uploads/internshipRegistration/" + uuidv4() + getUploadFileNameExt();
 
-	  debug("keyval: " + keyVal);
-
-	  const form = document.getElementById(formName);
-	  let keys = form.querySelectorAll("[name=key]");
-	  let keyInput = keys[0];
-	  keyInput.value = keyVal;
-
-	  debug("keyInput.value: " + keyInput.value);
+	  $('#${formName} input[name=key]').val(keyVal);
 }
 
 function getUploadFileNameExt()
 {
 	const  resumeFile = $('#resumeFile').val();
 	const ext = resumeFile.split('.').pop();	//pop returns last element of split
-
-	debug("ext: " + ext);
 
 	return "." + ext;
 }
@@ -92,15 +89,21 @@ function getUploadFileNameExt()
 //this json is saved as metadata on the file uploaded to S3
 function setFormMetadata(formName)
 {
-  const myObj = {"candidateFirst" : $('#first-name').val(),
+  const myObj = {
+  	"candidateFirst" : $('#first-name').val(),
     "candidateLast" : $('#last-name').val(),
     "candidateEmail" : $('#email').val(),
     "managerEmail" : "andrew_chang@symantec.com"
   };
 
-  setMeta(formName, myObj);
+  s3upload.setMeta(formName, myObj);
 }
 
 module.exports = { 
-  init: init
-}
+  init: init,
+  __private__: {
+  	prepareS3UploadForms: s3upload.prepareS3UploadForms,
+  	handleInternRegFormSubmit: handleInternRegFormSubmit,	//for mocking
+  	validateForm: validateForm
+  }
+};

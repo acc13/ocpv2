@@ -2,11 +2,12 @@
   "name": "webtests",
   "version": "1.0.0",
   "description": "web unit tests",
-  "main": "index.js",
+  "main": "root.js",
   "scripts": {
     "test": "jest",
-    "build": "browserify -p tinyify index.js > ../js/bundle.js",
-    "watch": "watchify index.js -o ../js/bundle.js"
+    "build": "browserify -p tinyify root.js > ../js/bundle.js",
+    "watch": "watchify root.js -o ../js/bundle.js",
+    "jshint": "jshint --exclude ./node_modules ."
   },
   "author": "Andrew Chang",
   "license": "UNLICENSED",

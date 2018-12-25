@@ -2,9 +2,9 @@
 
 const Cookies = require('js-cookie');
 const $ = require('jquery');
-const runtime = require('./runtime-env');
-const dialogs = require('./dialogs.js');
-
+const runtime = require('./utils/runtime-env');
+const dialogs = require('./utils/dialogs');
+const config = require('./utils/config');
 
 function init()
 {
@@ -16,9 +16,10 @@ function init()
     }
 
     module.exports.__private__.prefillManagerInfo();
+    config.init();
 
     $('#invite-form').submit(function (event) {
-      invite.handleSubmitInviteForm(event);
+      module.exports.__private__.handleSubmitInviteForm(event);
     });
   }
 }
@@ -72,14 +73,14 @@ function validateInviteForm()
 function disableInviteForm()
 {
   $('#invite-form').hide();
-  $('#results').html("Generating problem and emailing candidate...")	
+  $('#results').html("Generating problem and emailing candidate...");
 }
 
 function sendUserInvite(data)
 {
   $.ajax({
     type: 'POST',
-    url: inviteAPIURL,
+    url: config.consts.inviteAPIURL,
     dataType: 'text',
     contentType: 'application/json',
     data: JSON.stringify(data),
@@ -90,7 +91,7 @@ function sendUserInvite(data)
 	error: function(XMLHttpRequest, textStatus, errorThrown) {
 		inviteFailed();
 	}
-  })
+  });
 }
 
 function inviteSucceeded()
@@ -127,7 +128,7 @@ function handleSubmitInviteForm(event)
     candidateLastName: $('#last-name').val(),
     candidateEmail: $('#email').val(),
     managerEmail: $('#manager_email').val()
-  }
+  };
 
   module.exports.__private__.sendUserInvite(data);
 
