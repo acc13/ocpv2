@@ -7,10 +7,10 @@ function init()
 {
   const stage = getStageName(); 
   const ocpv2RestAPIId = getOCPv2RestAPIID(stage);
-  const restAPIBaseURL = "https://" + ocpv2RestAPIId + ".execute-api.us-east-1.amazonaws.com/" + stage;
-  const inviteAPIURL = restAPIBaseURL + '/invitation';
-  const getRessultsAPIURL = restAPIBaseURL + '/outputtestresult';
-  const listInternsAPIURL = restAPIBaseURL + '/interns'; 
+  const restAPIBaseURL = `https://${ocpv2RestAPIId}.execute-api.us-east-1.amazonaws.com/${stage}`;
+  const inviteAPIURL = `${restAPIBaseURL}/invitation`;
+  const getRessultsAPIURL = `${restAPIBaseURL}/outputtestresult`;
+  const listInternsAPIURL = `${restAPIBaseURL}/interns`; 
 
   module.exports.consts = {
     stage, 
@@ -18,6 +18,10 @@ function init()
     getRessultsAPIURL,
     listInternsAPIURL
   };
+
+  module.exports.__private__.consts = module.exports.consts;
+
+  console.log("config.consts: " + JSON.stringify(module.exports.consts));
 }
 
 function getStageName()
@@ -59,12 +63,13 @@ function getOCPv2RestAPIID(stage)
     'prod':   "j17gdoueah"
   };
 
-  let ocpv2RestAPIId = mapStageIds[stage];
+  return mapStageIds[stage];
 }
 
 module.exports = { 
   init: init,
   __private__: {
+    init: init,
     getStageName: getStageName,
     extractSubdomain: extractSubdomain    
   }

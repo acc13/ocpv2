@@ -2,6 +2,10 @@
 
 const dialogs = require('./dialogs');
 
+beforeAll(() => {
+  console.log = () => {};
+});
+
 test("alert doesn't block", () => {
 	dialogs.myAlert();
 });

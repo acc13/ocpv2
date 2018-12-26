@@ -2,7 +2,7 @@
 
 const $ = require('jquery');
 const uploadform = require('./s3uploadforms');
-
+const config = require('./config');
 
 jest
 	.dontMock('fs')
@@ -10,6 +10,10 @@ jest
 
 const html = require('fs').readFileSync('../register2019.html').toString();
 
+beforeAll(() => {
+  console.log = () => {};
+  config.init();
+});
 
 test("prepareS3UploadForms() initializes a simple field (upload form success redirect)", () => {
 	

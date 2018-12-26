@@ -2,7 +2,6 @@
 
 const $ = require("jquery");
 const config = require("./config");
-config.init();
 
 /************************** AUTO-GENERATED FORM SETUP JS **************************/
 function prepareS3UploadForms() {

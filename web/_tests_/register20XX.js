@@ -13,45 +13,44 @@ const formname = "internRegForm";
 function init()
 {
   if ($('#internRegForm').length) //element exists on page, then we're on the correct page
-  {
-    if (runtime.isBrowser)
-    {
-      console.log("initializing register20XX.html");
-    }
+  {    
+    console.log("initializing register20XX.html");
+    
+    config.init();
 
 	module.exports.__private__.prepareS3UploadForms();
 
-    $('#internRegForm').submit(function (event) {
-      module.exports.__private__.handleInternRegFormSubmit(event);
-    });
+    $('#internRegForm').submit(module.exports.__private__.handleInternRegFormSubmit);
   }
 }
 
-function handleInternRegFormSubmit()
+function handleInternRegFormSubmit(event)
 {
-	  if (!module.exports.__private__.validateForm())
-	  {
-	  	return false;
-	  }
+	if (!module.exports.__private__.validateForm(config.consts.stage))
+	{
+		return false;
+	}
 
-	  if (!dialogs.myConfirm("You will have 7 days to solve your coding problem.  Ok to continue?"))
-	  {
-	  	return false;
-	  }
-	  
-	  module.exports.__private__.setDestinationKey(formname);
+	if (!dialogs.myConfirm("You will have 7 days to solve your coding problem.  Ok to continue?"))
+	{
+		return false;
+	}
 
-	  module.exports.__private__.setFormMetadata(formname);
+	module.exports.__private__.setDestinationKey(formname);
+
+	module.exports.__private__.setFormMetadata(formname);
+
+	return true;
 }
 
-function validateForm()
+function validateForm(stage)
 {
 	const checkboxesChecked  = 
 		//both checkboxes required
 		$('#full_time_student').is(':checked') &&
 		$('#available_2020').is(':checked');
 
-	const eduEmail = (config.stage != "ocp") ||	//ignore for testing
+	const eduEmail = (stage != "ocp") ||	//ignore for testing
 		$('#email').val().endsWith('.edu');
 
 	const valid = checkboxesChecked && eduEmail;
@@ -74,36 +73,56 @@ function setDestinationKey(formName)
 	  //build key
 	  const keyVal = "uploads/internshipRegistration/" + uuidv4() + getUploadFileNameExt();
 
-	  $('#${formName} input[name=key]').val(keyVal);
+	  //for some reason string interpolation doesn't work here?
+	  //perhaps the #?
+	  $(`#${formName} input[name=key]`).val(keyVal);
 }
 
 function getUploadFileNameExt()
 {
-	const  resumeFile = $('#resumeFile').val();
+	const  resumeFile = module.exports.__private__.getResumeFileName();
 	const ext = resumeFile.split('.').pop();	//pop returns last element of split
 
 	return "." + ext;
 }
 
+//for mocking
+//because this input element may only be set to empty string
+//else "InvalidStateError: This input element accepts a filename, which may only be programmatically set to the empty string."
+function getResumeFileName()
+{
+	return $('#resumeFile').val();
+}
 
 //this json is saved as metadata on the file uploaded to S3
 function setFormMetadata(formName)
 {
-  const myObj = {
+  const md = {
   	"candidateFirst" : $('#first-name').val(),
     "candidateLast" : $('#last-name').val(),
     "candidateEmail" : $('#email').val(),
     "managerEmail" : "andrew_chang@symantec.com"
   };
 
-  s3upload.setMeta(formName, myObj);
+  module.exports.__private__.mySetMeta(formName, md);
+}
+
+function mySetMeta(formName, md)
+{
+  s3upload.setMeta(formName, md);
 }
 
 module.exports = { 
   init: init,
   __private__: {
+  	init: init,
   	prepareS3UploadForms: s3upload.prepareS3UploadForms,
   	handleInternRegFormSubmit: handleInternRegFormSubmit,	//for mocking
-  	validateForm: validateForm
+  	validateForm: validateForm,
+  	setDestinationKey: setDestinationKey, 
+  	setFormMetadata: setFormMetadata,
+  	getResumeFileName: getResumeFileName,
+  	getUploadFileNameExt: getUploadFileNameExt,
+  	mySetMeta: mySetMeta
   }
 };

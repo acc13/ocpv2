@@ -10,17 +10,13 @@ function init()
 {
   if ($('#invite-form').length) //element exists on page, then we're on the correct page
   {
-    if (runtime.isBrowser)
-    {
-      console.log("initializing invite.html");
-    }
+    console.log("initializing invite.html");
 
-    module.exports.__private__.prefillManagerInfo();
     config.init();
 
-    $('#invite-form').submit(function (event) {
-      module.exports.__private__.handleSubmitInviteForm(event);
-    });
+    module.exports.__private__.prefillManagerInfo();
+
+    $('#invite-form').submit(module.exports.__private__.handleSubmitInviteForm);
   }
 }
 
@@ -138,6 +134,7 @@ module.exports = {
   init: init,
 
   __private__: {  //modules requiring this module shall not use these
+    init: init,
     handleSubmitInviteForm: handleSubmitInviteForm,
     prefillManagerInfo: prefillManagerInfo,
     optionallySaveManagerInfo: optionallySaveManagerInfo,

@@ -5,7 +5,6 @@ const $ = require('jquery');
 
 const config = require('./utils/config');
 const s3upload = require('./utils/s3uploadforms');
-config.init();
 
 function getProblemName()
 {

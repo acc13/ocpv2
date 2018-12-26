@@ -7,6 +7,7 @@
   	"beforeEach": false,
   	"test": false,
   	"expect": false,
+    "beforeAll": beforeAll,
 
   	"document": false,
   	"window": false,

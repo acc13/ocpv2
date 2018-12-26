@@ -2,6 +2,10 @@
 
 const env = require('./runtime-env');
 
+beforeAll(() => {
+  console.log = () => {};
+});
+
 test("isNode is true", () => {
 
 	expect(env.isNode).toBeTruthy();
