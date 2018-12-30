@@ -1,7 +1,7 @@
 {
-  "name": "webtests",
+  "name": "ocp",
   "version": "1.0.0",
-  "description": "web unit tests",
+  "description": "unit tests and build bundle.js for client side javasccript",
   "main": "root.js",
   "scripts": {
     "test": "jest",

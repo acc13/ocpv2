@@ -5,172 +5,170 @@ const $ = require('jquery');
 
 const config = require('./utils/config');
 const s3upload = require('./utils/s3uploadforms');
+const dialogs = require('./utils/dialogs');
+const runtime = require('./utils/runtime-env');
+
+function init()
+{
+  if ($("meta[name='problemName']").length)
+  {
+    console.log("Initializing problem page.");
+    
+    config.init();
+
+    module.exports.__private__.prepareS3UploadForms();
+
+    $('#codeForm').submit(module.exports.__private__.handleSubmitCode);
+    setFormMetaData("codeForm");
+
+    $('#outputForm').submit(module.exports.__private__.handleSubmitOutput);
+    setFormMetaData("outputForm");
+  }
+}
 
 function getProblemName()
 {
-  //this var is set by the base page
+  var problemName = $("meta[name='problemName']").attr("content");
   return problemName;
 }
 
-
 //Submit test output form metadata
-function setCodeMeta(formName, problemName, email)
+function setFormMetaData(formName)
 {
-  const myObj = {"email" : email,
-    "inviteId" : getFilenameNoExtension(),
+  const md = {
+    "pageName" : getPageGuid(),
     "problemName" : getProblemName()
   };
 
-  s3upload.setMeta(formName, myObj);
+  s3upload.setMeta(formName, md);
 }
-
-
-function setOutputMeta(formName, inviteId)
-{
-  const myObj = {
-    "inviteId" : inviteId,
-    "problemName" : getProblemName()
-  };
-
-  s3upload.setMeta(formName, myObj);
-}
-
-
-//Key Generation
-/* key for solution submission */
-//TODO break this up into validation, and prepare key/metadata
-function prepareoutputForm()
-{
-  s3upload.prepareS3UploadForms();
-
-  //validate
-  if(!document.getElementById("outputFile").value)
-  {
-        alert("No file selected.");
-        return false;
-  }
-
-  //build key
-  const keyVal = "uploads/output/" + getFilenameNoExtension() + "/" + getProblemName() + "/" + uuidv4() + ".txt";
-
-  console.log("keyval" + keyVal);
-
-  const formName = "outputForm";
-  const form = document.getElementById(formName);
-  let keys = form.querySelectorAll("[name=key]");
-  let keyInput = keys[0];
-  keyInput.value = keyVal;
-
-  console.log(keyInput.value);
-
-  setOutputMeta(formName, getFilenameNoExtension());
-}
-
 
 //given "http://foo.bar/index.html"
 //returns "index"
-function getFilenameNoExtension()
+//the page name is a GUID that is tied to a candidate invitation
+function getPageGuid()
 {
-  const path = window.location.pathname;
+  const path = module.exports.__private__.getPathName();
   const filename = path.split("/").pop();
   return filename.split('.').slice(0, -1).join('.');
 }
 
+//for test mocking
+function getPathName()
+{
+  return window.location.pathname;
+}
+
+//Key Generation
+/* key for solution submission */
+//TODO break this up into validation, and prepare key/metadata
+function handleSubmitOutput()
+{
+  __private__.buildOutputS3DestinationKey();
+
+  if (!__private__.validateSubmitOutputForm())
+  {
+    return false;
+  }
+}
+
+function validateSubmitOutputForm()
+{
+  const fileName = __private__.getOutputFileName();
+  if(!fileName || fileName.length == 0)
+  {
+        dialogs.myAlert("No file selected.");
+        return false;
+  }
+
+  return true;
+}
+
+//this function must be mocked, because the file input cannot be set programmatically
+function getOutputFileName()
+{
+  const fileName = $("#outputFile").val();
+  return fileName;
+}
+
+function buildOutputS3DestinationKey()
+{  
+  //build key
+  const keyVal = "uploads/output/" + getPageGuid() + "/" + getProblemName() + "/" + uuidv4() + ".txt";
+
+  console.log("destination key: " + keyVal);
+
+  $('#outputForm input[name=key]').val(keyVal);
+}
 
 // TODO break this function up
 // int validation and prepare key/metadata
-function preparecodeForm()
-{
+function handleSubmitCode()
+{  
+  __private__.buildCodeS3DestinationKey();
 
-  s3upload.prepareS3UploadForms();
-  
-  /*
-   * VALIDATION 
-   */
-  const email = getAndValidateEmail();
-  if (!email)
+  if (!__private__.validateSubmitCodeForm())
   {
     return false;
   }
-
-  const fileName = document.getElementById("codeFile").value;
-  if(!fileName)
-  {
-    alert("No file selected.");
-    return false;
-  }
-  
-  if (-1 === fileName.indexOf(".zip"))
-  {
-    alert ("Selected file is not a .zip file.");
-    return false;
-  }  
-
-  //build key
-  const keyVal = "uploads/code/" + getFilenameNoExtension() + "/" + uuidv4() + ".zip";
-
-  console.log("keyval" + keyVal);
-
-  const formName = "codeForm";
-  const form = document.getElementById(formName);
-  let keys = form.querySelectorAll("[name=key]");
-  let keyInput = keys[0];
-  keyInput.value = keyVal;
-
-  console.log("keyInput.value" + keyInput.value);
-
-  setCodeMeta(formName, getProblemName(), email);
 
   return true;
 
 }
 
-
-
-
-//////HANDLING THE OPTIONAL EMAIL FIELD
-function isDynamicPage()
+function validateSubmitCodeForm()
 {
-  //page will have "/tp/" folder in the path
-  //and will be named "<UUID>.html"
-  //TODO this is a brittle pattern...
-  //breaks if the paths change
+  const fileName = __private__.getCodeFileName();
 
-  const path = window.location.pathname;
-  const pageName = path.split("/").pop();
-
-  const example = "0C109B3C-1FC3-4EEB-AF02-D604D476FF74.html";
-  const isDyn = path.indexOf("tp/") !== -1 && pageName.length === example.length;
-
-  return (isDyn);
-}
-
-$(document).ready(function(){
-  if (isDynamicPage())
+  if(!fileName || fileName.length == 0)
   {
-    $("#emaildiv").hide();
+    dialogs.myAlert("No file selected.");
+    return false;
   }
-});
-
-
-function getAndValidateEmail()
-{
-
-  let email = "emailindb";
-  if (!isDynamicPage())
+  
+  if (-1 === fileName.indexOf(".zip"))
   {
-    const emailInput = document.getElementById("email");
-    email = emailInput.value;
-
-    if (!email || email.indexOf("@") == -1)
-    {
-      alert("Please enter a valid email address.");
-      emailInput.className="fixThis";
-      emailInput.focus();
-      return null;
-    }
+    dialogs.myAlert ("Selected file is not a .zip file.\nPlease review the upload directions.");
+    return false;
   }
 
-  return email;
+  return true;
 }
 
+//this function must be mocked, because the file input cannot be set programmatically
+function getCodeFileName()
+{
+  const fileName = $("#codeFile").val();
+  return fileName;
+}
+
+function buildCodeS3DestinationKey()
+{  
+  const keyVal = "uploads/code/" + getPageGuid() + "/" + uuidv4() + ".zip";
+
+  console.log("destination key: " + keyVal);
+
+  $('#codeForm input[name=key]').val(keyVal);
+}
+
+module.exports = {
+  init: init,
+  __private__: {
+    init: init,
+    getProblemName: getProblemName,
+    getPathName: getPathName,
+    getPageGuid: getPageGuid,
+    handleSubmitCode: handleSubmitCode,
+    handleSubmitOutput: handleSubmitOutput,
+    prepareS3UploadForms: s3upload.prepareS3UploadForms,
+    setFormMetaData: setFormMetaData,
+    buildOutputS3DestinationKey: buildOutputS3DestinationKey,
+    buildCodeS3DestinationKey: buildCodeS3DestinationKey,
+    validateSubmitOutputForm: validateSubmitOutputForm,
+    getOutputFileName: getOutputFileName,
+    validateSubmitCodeForm: validateSubmitCodeForm,
+    getCodeFileName: getCodeFileName
+  }
+};
+
+const __private__ = module.exports.__private__;

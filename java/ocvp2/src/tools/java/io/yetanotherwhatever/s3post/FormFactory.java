@@ -8,12 +8,9 @@ public class FormFactory {
         final String SUCCESS_REDIRECT_PAGE = "thanks.html";
         final String KEY_PREFIX = "uploads/code";
         final String ADDITIONAL_FIELDS = "\n" +
-                "\t      <div class='formlabel'>File to upload: <input id='codeFile' name='file' type='file'> </div>\n" +
                 "\t      <br> \n" +
-                "\t      <div class='formlabel' id='emaildiv'>Your email address (preferably the same one as on your resume):\n" +
-                "\t      <br>\n" +
-                "\t      <input id='email' name='email' type='text'>\n" +
-                "\t      <br><br></div>\n";
+                "\t      <div class='formlabel'>File to upload: <input id='codeFile' name='file' type='file'> </div>\n" +
+                "\t      <br> \n";
         final String FORM_ID = "codeForm";
 
         return new SignedS3Form(awsAccessKeyID, awsSecretAccessKey, hostedZone, stack,
@@ -56,6 +53,7 @@ public class FormFactory {
                 "\t\t  <input class=email type=\"email\" id=\"email\" placeholder=\"email@myuniversity.edu\" required/>\n" +
                 "\t\t</p>\n" +
                 "\t\t<div class='formlabel'>Resume: <input id='resumeFile' name='file' type='file' required> </div>\n" +
+                "\t\t<p>Eligibility: </p>\n" +
                 "\t\t<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\n" +
                 "\t\t  <input type=\"checkbox\" id=\"full_time_student\"/>\n" +
                 "\t\t  <label for=\"full_time_student\">I will be enrolled as a full-time student in Fall of 2019.</label>\n" +

@@ -26,33 +26,23 @@ function init()
 
 function getStageName()
 {
-  let stage = "test";
-  if (runtime.isBrowser)
+
+  if (runtime.isNode)
   {
-    const stage = extractSubdomain(window.location.href);
+    console.log("Node modules use 'test' env.");
+    return "test";
   }
 
+  if (runtime.isLocalHtmlPage)
+  {
+    console.log("Local file testing uses 'test' env.");
+    return "test";
+  }
+  
+  let stage = "test";
+  stage = window.location.hostname.split(".")[0];
+  
   return stage;
-}
-
-//returns the name of the environment we are in
-function extractSubdomain(url) {
-    let hostname;
-
-    //find & remove protocol (http, ftp, etc.)
-    //then all trailing paths
-    if (url.indexOf("//") > -1) {
-        hostname = url.split('/')[2];
-    }
-    else {
-        hostname = url.split('/')[0];
-    }
-
-    //find & remove port number
-    hostname = hostname.split(':')[0];
-
-    //just first part of domain name
-    return hostname.split('.')[0];
 }
 
 function getOCPv2RestAPIID(stage)
@@ -70,7 +60,6 @@ module.exports = {
   init: init,
   __private__: {
     init: init,
-    getStageName: getStageName,
-    extractSubdomain: extractSubdomain    
+    getStageName: getStageName
   }
 };

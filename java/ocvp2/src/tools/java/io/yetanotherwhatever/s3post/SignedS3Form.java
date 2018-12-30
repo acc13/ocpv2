@@ -87,11 +87,10 @@ public class SignedS3Form
 
     protected String buildFormHtml()
     {
-        String validation = "prepare"+formId + "()";
         //TBD is stuff that is replaced on a per env (and signing expiry) basis
         String form = "<!-- ************************** AUTO-GENERATED UPLOAD FORM \"" + formId + "\" ************************** -->\n" +
                 "<form id='" + formId + "' action='FFFFFFFFFFFF' method='post'" +
-                " enctype='multipart/form-data' onsubmit='return(" + validation + ");'>\n" +
+                " enctype='multipart/form-data'>\n" +
                 "\t      <input type='hidden' name='key' value='" + keyPrefix + "/${filename}'>\n" +
                 "\t      <input type='hidden' name='acl' value='private'> \n" +
                 "\t      <input type='hidden' name='success_action_redirect' value='FFFFFFFFFFFF'>\n" +

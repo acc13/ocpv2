@@ -8,7 +8,6 @@ jest
 	.dontMock('fs')
 	.dontMock('jquery');
 
-const html = require('fs').readFileSync('../register2019.html').toString();
 
 beforeAll(() => {
   console.log = () => {};
@@ -17,8 +16,9 @@ beforeAll(() => {
 
 test("prepareS3UploadForms() initializes a simple field (upload form success redirect)", () => {
 	
+	const html = require('fs').readFileSync('../register2019.html').toString();
 	document.documentElement.innerHTML = html;
-
+	
   	expect($('#internRegForm input[name=success_action_redirect]').val())
   		.toBe("FFFFFFFFFFFF");
 

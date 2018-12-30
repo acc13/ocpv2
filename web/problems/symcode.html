@@ -203,16 +203,9 @@ td.label
 -->
 </style>
 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<script type="text/javascript" src="../js/bundle.js" ></script>
 
-<script>
-var problemName = "symcode"
-</script>
-
-<script type="text/javascript" src="/js/config.js" ></script>
-<script type="text/javascript" src="/js/utils.js" ></script>
-<script type="text/javascript" src="/js/uploadforms.js" ></script>
-
+<meta name="problemName" content="symcode">
 
 </head>
 
@@ -288,7 +281,7 @@ var problemName = "symcode"
 <p class=MsoNormal>Sub-dividing the bytes into 3-bit blocks, then applying the encoding from the above index table will Symcode the string thusly:
 </p>
 
-<img width="900" border="2px" src="/res/gimble.png">
+<img width="900" border="2px" src="../res/gimble.png">
 
 <p class=MsoNormal>&nbsp;</p>
 
@@ -301,10 +294,10 @@ var problemName = "symcode"
 
 <p class=MsoNormal>The examples for "wabe" and "mimsy" follow, respectively:</p>
 
-<img width="900" border="2px" src="/res/wabe.png">
+<img width="900" border="2px" src="../res/wabe.png">
 <p class=MsoNormal>&nbsp;</p>
 
-<img width="900" border="2px" src="/res/mimsy.png">
+<img width="900" border="2px" src="../res/mimsy.png">
 <p class=MsoNormal>&nbsp;</p>
 
 
@@ -313,7 +306,7 @@ var problemName = "symcode"
 
 <h1>Input</h1>
 
-<p class=MsoNormal><a href="/inputs/symcode-in.txt">The test input file can be downloaded here.</a></p>
+<p class=MsoNormal><a href="../inputs/symcode-in.txt">The test input file can be downloaded here.</a></p>
 
 <p class=MsoNormal>Each line contains an input string
 which must be Symcoded.</p>
@@ -339,8 +332,8 @@ which must be Symcoded.</p>
 
 <div id=uploadSlnDiv class=uploadDiv>
 
-<!-- AUTO-GENERATED TEST OUTPUT FORM -->
-<form id='outputForm' action='FFFFFFFFFFFF' method='post' enctype='multipart/form-data' onsubmit='return(prepareoutputForm());'>
+<!-- ************************** AUTO-GENERATED UPLOAD FORM "outputForm" ************************** -->
+<form id='outputForm' action='FFFFFFFFFFFF' method='post' enctype='multipart/form-data'>
 	      <input type='hidden' name='key' value='uploads/output/${filename}'>
 	      <input type='hidden' name='acl' value='private'> 
 	      <input type='hidden' name='success_action_redirect' value='FFFFFFFFFFFF'>
@@ -351,14 +344,18 @@ which must be Symcoded.</p>
 	       <input type='hidden' name='x-amz-storage-class' value='REDUCED_REDUNDANCY'>
 	       <input type='hidden' name='x-amz-signature' value='FFFFFFFFFFFF'>
 	       <input type='hidden' name='x-amz-meta-data' value=''>
-	      <!-- Include any additional input fields here -->
+
+	      <!-- ADDITIONAL INPUT FIELDS -->
 
       <div class='formlabel'>File to upload: <input id='outputFile' name='file' type='file'> </div>
       
       <br>
-	      <input type='submit' value='Upload File'>
+
+
+	      <!-- END ADDITIONAL INPUT FIELDS -->
+	      <input type='submit' value='Submit'>
     </form>
-<!-- END AUTO-GENERATED TEST OUTPUT FORM -->
+<!-- ************************** END AUTO-GENERATED UPLOAD FORM "outputForm" ************************** -->
 
 
 
@@ -466,8 +463,8 @@ Third Witch	That will be ere the set of sun.
 
 <div id=uploadCodeDiv class=uploadDiv>
 
-<!-- AUTO-GENERATED CODE UPLOAD FORM -->
-<form id='codeForm' action='FFFFFFFFFFFF' method='post' enctype='multipart/form-data' onsubmit='return(preparecodeForm());'>
+<!-- ************************** AUTO-GENERATED UPLOAD FORM "codeForm" ************************** -->
+<form id='codeForm' action='FFFFFFFFFFFF' method='post' enctype='multipart/form-data'>
 	      <input type='hidden' name='key' value='uploads/code/${filename}'>
 	      <input type='hidden' name='acl' value='private'> 
 	      <input type='hidden' name='success_action_redirect' value='FFFFFFFFFFFF'>
@@ -478,17 +475,18 @@ Third Witch	That will be ere the set of sun.
 	       <input type='hidden' name='x-amz-storage-class' value='REDUCED_REDUNDANCY'>
 	       <input type='hidden' name='x-amz-signature' value='FFFFFFFFFFFF'>
 	       <input type='hidden' name='x-amz-meta-data' value=''>
-	      <!-- Include any additional input fields here -->
 
+	      <!-- ADDITIONAL INPUT FIELDS -->
+
+	      <br> 
 	      <div class='formlabel'>File to upload: <input id='codeFile' name='file' type='file'> </div>
 	      <br> 
-	      <div class='formlabel' id='emaildiv'>Your email address (preferably the same one as on your resume):
-	      <br>
-	      <input id='email' name='email' type='text'>
-	      <br><br></div>
-	      <input type='submit' value='Upload File'>
+
+
+	      <!-- END ADDITIONAL INPUT FIELDS -->
+	      <input type='submit' value='Submit'>
     </form>
-<!-- END AUTO-GENERATED CODE UPLOAD FORM -->
+<!-- ************************** END AUTO-GENERATED UPLOAD FORM "codeForm" ************************** -->
 
 
 </div>

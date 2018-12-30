@@ -179,15 +179,10 @@ input.fixThis {border: solid; border-color: red;}
 -->
 </style>
 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<script type="text/javascript" src="../js/bundle.js" ></script>
 
-<script>
-var problemName = "pairs"
-</script>
 
-<script type="text/javascript" src="/js/config.js" ></script>
-<script type="text/javascript" src="/js/utils.js" ></script>
-<script type="text/javascript" src="/js/uploadforms.js" ></script>
+<meta name="problemName" content="pairs">
 
 </head>
 
@@ -338,7 +333,7 @@ var problemName = "pairs"
 
 <h1>Input</h1>
 
-<p class=MsoNormal><a href="/inputs/pairs-in.txt">The test input file can be downloaded here.</a></p>
+<p class=MsoNormal><a href="../inputs/pairs-in.txt">The test input file can be downloaded here.</a></p>
 
 <p class=MsoNormal>Each line contains an input string to pass into <span class=Code>findPair()</span></p>
 
@@ -362,8 +357,8 @@ var problemName = "pairs"
 
 
 <div id=uploadSlnDiv class=uploadDiv>
-	<!-- AUTO-GENERATED TEST OUTPUT FORM -->
-	<form id='outputForm' action='FFFFFFFFFFFF' method='post' enctype='multipart/form-data' onsubmit='return(prepareoutputForm());'>
+<!-- ************************** AUTO-GENERATED UPLOAD FORM "outputForm" ************************** -->
+<form id='outputForm' action='FFFFFFFFFFFF' method='post' enctype='multipart/form-data'>
 	      <input type='hidden' name='key' value='uploads/output/${filename}'>
 	      <input type='hidden' name='acl' value='private'> 
 	      <input type='hidden' name='success_action_redirect' value='FFFFFFFFFFFF'>
@@ -374,14 +369,18 @@ var problemName = "pairs"
 	       <input type='hidden' name='x-amz-storage-class' value='REDUCED_REDUNDANCY'>
 	       <input type='hidden' name='x-amz-signature' value='FFFFFFFFFFFF'>
 	       <input type='hidden' name='x-amz-meta-data' value=''>
-	      <!-- Include any additional input fields here -->
+
+	      <!-- ADDITIONAL INPUT FIELDS -->
 
       <div class='formlabel'>File to upload: <input id='outputFile' name='file' type='file'> </div>
       
       <br>
-	      <input type='submit' value='Upload File'>
+
+
+	      <!-- END ADDITIONAL INPUT FIELDS -->
+	      <input type='submit' value='Submit'>
     </form>
-<!-- END AUTO-GENERATED TEST OUTPUT FORM -->
+<!-- ************************** END AUTO-GENERATED UPLOAD FORM "outputForm" ************************** -->
 
 </div>
 
@@ -462,29 +461,30 @@ var problemName = "pairs"
 
 <div id=submit_code class=uploadDiv>
 
-	<!-- AUTO-GENERATED CODE UPLOAD FORM -->
-	<form id='codeForm' action='FFFFFFFFFFFF' method='post' enctype='multipart/form-data' onsubmit='return(preparecodeForm());'>
-		      <input type='hidden' name='key' value='uploads/code/${filename}'>
-		      <input type='hidden' name='acl' value='private'> 
-		      <input type='hidden' name='success_action_redirect' value='FFFFFFFFFFFF'>
-		      <input type='hidden' name='policy' value='FFFFFFFFFFFF'>
-		       <input type='hidden' name='x-amz-algorithm' value='AWS4-HMAC-SHA256'>
-		       <input type='hidden' name='x-amz-credential' value='FFFFFFFFFFFF'>
-		       <input type='hidden' name='x-amz-date' value='FFFFFFFFFFFF'>
-		       <input type='hidden' name='x-amz-storage-class' value='REDUCED_REDUNDANCY'>
-		       <input type='hidden' name='x-amz-signature' value='FFFFFFFFFFFF'>
-		       <input type='hidden' name='x-amz-meta-data' value=''>
-		      <!-- Include any additional input fields here -->
+<!-- ************************** AUTO-GENERATED UPLOAD FORM "codeForm" ************************** -->
+<form id='codeForm' action='FFFFFFFFFFFF' method='post' enctype='multipart/form-data'>
+	      <input type='hidden' name='key' value='uploads/code/${filename}'>
+	      <input type='hidden' name='acl' value='private'> 
+	      <input type='hidden' name='success_action_redirect' value='FFFFFFFFFFFF'>
+	      <input type='hidden' name='policy' value='FFFFFFFFFFFF'>
+	       <input type='hidden' name='x-amz-algorithm' value='AWS4-HMAC-SHA256'>
+	       <input type='hidden' name='x-amz-credential' value='FFFFFFFFFFFF'>
+	       <input type='hidden' name='x-amz-date' value='FFFFFFFFFFFF'>
+	       <input type='hidden' name='x-amz-storage-class' value='REDUCED_REDUNDANCY'>
+	       <input type='hidden' name='x-amz-signature' value='FFFFFFFFFFFF'>
+	       <input type='hidden' name='x-amz-meta-data' value=''>
 
-		      <div class='formlabel'>File to upload: <input id='codeFile' name='file' type='file'> </div>
-		      <br> 
-		      <div class='formlabel' id='emaildiv'>Your email address (preferably the same one as on your resume):
-		      <br>
-		      <input id='email' name='email' type='text'>
-		      <br><br></div>
-		      <input type='submit' value='Upload File'>
-	    </form>
-	<!-- END AUTO-GENERATED CODE UPLOAD FORM -->
+	      <!-- ADDITIONAL INPUT FIELDS -->
+
+	      <br> 
+	      <div class='formlabel'>File to upload: <input id='codeFile' name='file' type='file'> </div>
+	      <br> 
+
+
+	      <!-- END ADDITIONAL INPUT FIELDS -->
+	      <input type='submit' value='Submit'>
+    </form>
+<!-- ************************** END AUTO-GENERATED UPLOAD FORM "codeForm" ************************** -->
 
 
 </div>

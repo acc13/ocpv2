@@ -31,12 +31,17 @@ public class BuildMyForms {
         try {
             awsAccessKeyID = args[0];
             awsSecretAccessKey = args[1];
-            hostedZone = args[2];
-            stackNames = new ArrayList<>(Arrays.asList(args[3].split(":")));
-            baseUploadBucket = args[4];
+            hostedZone = args[2];   //full domain name of static web pages, ie. yetanotherwhatever.io
+            stackNames = new ArrayList<>(Arrays.asList(args[3].split(":")));    //test:stage:ocp
+            baseUploadBucket = args[4];                 //buckets are named <stage>-upload-<baseuploadbucket>
         } catch (ArrayIndexOutOfBoundsException e) {
+
             System.out.println("Usage: " + System.getProperty("sun.java.command") +
-                    " <access_key_id> <secret_access_key> <hosted_zone> <colon_delimited_stack_names>");
+                    " <access_key_id> <secret_access_key> <hosted_zone> <colon_delimited_stack_names> <bucket-suffix>");
+
+
+            System.out.println("Ex: " + System.getProperty("sun.java.command") +
+                    " my_key_id my_secret yetanotherwhatever.io test:stage:prod yetanotherwhatever");
             System.exit(1);
         }
 

@@ -127,14 +127,10 @@ function prepareS3UploadForms() {
 
 
 //this sets the correct form input that translates into the metadata on the file stored in S3
-function setMeta(formName, myObj)
+function setMeta(formName, metadata)
 {
-  console.log(JSON.stringify(myObj));
-
-  const form = document.getElementById(formName);
-  const meta = form.querySelectorAll("[name=x-amz-meta-data]");
-  let metaInput = meta[0];
-  metaInput.value=JSON.stringify(myObj);
+  console.log(JSON.stringify(metadata));
+  $(`#${formName} input[name=x-amz-meta-data]`).val(JSON.stringify(metadata));
 }
 
 module.exports = {

@@ -83,7 +83,7 @@ test("validateForm() requires both checkboxes checked", () => {
 		[false, true, false],
 		[true, false, false],
 		[true, true, true]
-	]
+	];
 
 	for (let i = 0; i < tests.length; i++)
 	{
@@ -130,7 +130,7 @@ test("setFormMetadata() maps correct values into form metadata", () => {
 
 	reg.mySetMeta = jest.fn().mockImplementation(() => {
 		//do nothing
-	})
+	});
 
 	reg.setFormMetadata('internRegForm');
 
