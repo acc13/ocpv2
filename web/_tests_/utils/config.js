@@ -38,7 +38,8 @@ function getStageName()
     console.log("Local file testing uses 'test' env.");
     return "test";
   }
-  
+
+  //else this is the real, deployed application
   let stage = "test";
   stage = window.location.hostname.split(".")[0];
   

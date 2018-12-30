@@ -128,13 +128,16 @@ test("setDestinationKey() uses prefix 'uploads/internshipRegistration/' and reta
 
 test("setFormMetadata() maps correct values into form metadata", () => {
 
-	reg.mySetMeta = jest.fn().mockImplementation(() => {
+	const saveSetMeta = reg.setMeta;
+	reg.setMeta = jest.fn().mockImplementation(() => {
 		//do nothing
 	});
 
 	reg.setFormMetadata('internRegForm');
 
-	const md = reg.mySetMeta.mock.calls[0][1];
+	const md = reg.setMeta.mock.calls[0][1];
 
 	console.log(JSON.stringify(md));
+
+	reg.setMeta = saveSetMeta;
 });

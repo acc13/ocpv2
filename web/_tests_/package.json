@@ -4,7 +4,7 @@
   "description": "unit tests and build bundle.js for client side javasccript",
   "main": "root.js",
   "scripts": {
-    "test": "jest",
+    "test": "jest --coverage",
     "build": "browserify -p tinyify root.js > ../js/bundle.js",
     "watch": "watchify root.js -o ../js/bundle.js",
     "jshint": "jshint --exclude ./node_modules ."

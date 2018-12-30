@@ -104,12 +104,7 @@ function setFormMetadata(formName)
     "managerEmail" : "andrew_chang@symantec.com"
   };
 
-  module.exports.__private__.mySetMeta(formName, md);
-}
-
-function mySetMeta(formName, md)
-{
-  s3upload.setMeta(formName, md);
+  module.exports.__private__.setMeta(formName, md);
 }
 
 module.exports = { 
@@ -123,6 +118,6 @@ module.exports = {
   	setFormMetadata: setFormMetadata,
   	getResumeFileName: getResumeFileName,
   	getUploadFileNameExt: getUploadFileNameExt,
-  	mySetMeta: mySetMeta
+  	setMeta: s3upload.setMeta
   }
 };

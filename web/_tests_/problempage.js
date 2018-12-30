@@ -37,6 +37,7 @@ function setFormMetaData(formName)
 {
   const md = {
     "pageName" : getPageGuid(),
+    "inviteId" : getPageGuid(), //
     "problemName" : getProblemName()
   };
 
