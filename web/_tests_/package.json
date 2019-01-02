@@ -7,7 +7,7 @@
     "test": "jest --coverage",
     "build": "browserify -p tinyify root.js > ../js/bundle.js",
     "watch": "watchify root.js -o ../js/bundle.js",
-    "jshint": "jshint --exclude ./node_modules ."
+    "jshint": "jshint --exclude ./node_modules,./coverage ."
   },
   "author": "Andrew Chang",
   "license": "UNLICENSED",

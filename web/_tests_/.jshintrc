@@ -1,6 +1,15 @@
 {
   "node": true,
   "esversion": 6,
+  "eqeqeq": true,
+  "freeze": true,
+  "forin": true,
+  "futurehostile": true,
+  "trailingcomma":true,
+  "varstmt": true,
+
+  "browser": true,
+
   "globals": {
   	
   	"jest": false,
@@ -9,9 +18,7 @@
   	"expect": false,
     "beforeAll": false,
 
-  	"document": false,
-  	"window": false,
-  	"alert": false,
-  	"confirm": false
+    "alert": false,
+    "confirm": false
   }
 }

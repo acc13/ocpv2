@@ -54,8 +54,6 @@ function createMockImpl()
 test("handleInternRegFormSubmit() calls setDestinationKey and setFormMetadata", () => {
 	const event = {};
 
-	const mockImpl = createMockImpl();
-
 	event.preventDefault = jest.fn().mockImplementation(() => {});
 
 	const saveSetDestinationKey = reg.setDestinationKey;
@@ -79,10 +77,10 @@ test("validateForm() requires both checkboxes checked", () => {
 	
 	//
 	const tests = [
-		[false, false, false],
-		[false, true, false],
-		[true, false, false],
-		[true, true, true]
+		[false, false, false,],
+		[false, true, false,],
+		[true, false, false,],
+		[true, true, true,],
 	];
 
 	for (let i = 0; i < tests.length; i++)

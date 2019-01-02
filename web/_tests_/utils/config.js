@@ -1,6 +1,5 @@
 'use strict';
 
-const $ = require('jquery');
 const runtime = require('./runtime-env');
 
 function init()
@@ -16,7 +15,7 @@ function init()
     stage, 
     inviteAPIURL,
     getRessultsAPIURL,
-    listInternsAPIURL
+    listInternsAPIURL,
   };
 
   module.exports.__private__.consts = module.exports.consts;
@@ -51,7 +50,7 @@ function getOCPv2RestAPIID(stage)
   const mapStageIds = {
     'test':   "n8p3qg8w4c",
     'stage':  "e7r30esi5h",
-    'prod':   "j17gdoueah"
+    'prod':   "j17gdoueah",
   };
 
   return mapStageIds[stage];
@@ -61,6 +60,6 @@ module.exports = {
   init: init,
   __private__: {
     init: init,
-    getStageName: getStageName
-  }
+    getStageName: getStageName,
+  },
 };

@@ -22,7 +22,7 @@ test("prepareS3UploadForms() initializes a simple field (upload form success red
   	expect($('#internRegForm input[name=success_action_redirect]').val())
   		.toBe("FFFFFFFFFFFF");
 
-	const sub = uploadform.prepareS3UploadForms();
+	uploadform.prepareS3UploadForms();
 	
   	expect($('#internRegForm input[name=success_action_redirect]').val())
   		.toBe("http://test.yetanotherwhatever.io/registration2019complete.html");

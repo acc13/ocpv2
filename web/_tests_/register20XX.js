@@ -5,7 +5,6 @@ const $ = require("jquery");
 
 const dialogs = require('./utils/dialogs');
 const s3upload = require('./utils/s3uploadforms');
-const runtime = require('./utils/runtime-env');
 const config = require ('./utils/config');
 
 const formname = "internRegForm";
@@ -50,7 +49,7 @@ function validateForm(stage)
 		$('#full_time_student').is(':checked') &&
 		$('#available_2020').is(':checked');
 
-	const eduEmail = (stage != "ocp") ||	//ignore for testing
+	const eduEmail = (stage !== "ocp") ||	//ignore for testing
 		$('#email').val().endsWith('.edu');
 
 	const valid = checkboxesChecked && eduEmail;
@@ -101,7 +100,7 @@ function setFormMetadata(formName)
   	"candidateFirst" : $('#first-name').val(),
     "candidateLast" : $('#last-name').val(),
     "candidateEmail" : $('#email').val(),
-    "managerEmail" : "andrew_chang@symantec.com"
+    "managerEmail" : "andrew_chang@symantec.com",
   };
 
   module.exports.__private__.setMeta(formName, md);
@@ -118,6 +117,6 @@ module.exports = {
   	setFormMetadata: setFormMetadata,
   	getResumeFileName: getResumeFileName,
   	getUploadFileNameExt: getUploadFileNameExt,
-  	setMeta: s3upload.setMeta
-  }
+  	setMeta: s3upload.setMeta,
+  },
 };

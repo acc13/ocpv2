@@ -135,5 +135,5 @@ function setMeta(formName, metadata)
 
 module.exports = {
   prepareS3UploadForms: prepareS3UploadForms,
-  setMeta: setMeta
+  setMeta: setMeta,
 };

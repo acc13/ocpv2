@@ -23,7 +23,7 @@ function init()
 
 function prefillManagerInfo()
 {
-	if (Cookies.get("manager_email") != null)
+	if (Cookies.get("manager_email") !== null)
 	{
 		$('#manager_email').val(Cookies.get('manager_email'));
 		$('#remember_me').prop( "checked", Cookies.get('remember_me'));
@@ -84,9 +84,10 @@ function sendUserInvite(data)
     success: function () {
       	inviteSucceeded();
     },
-	error: function(XMLHttpRequest, textStatus, errorThrown) {
-		inviteFailed();
-	}
+  	error: function(XMLHttpRequest, textStatus, errorThrown)
+    {
+  		inviteFailed();
+  	},
   });
 }
 
@@ -119,11 +120,11 @@ function handleSubmitInviteForm(event)
 
   module.exports.__private__.disableInviteForm();
 
-  var data = {
+  const data = {
     candidateFirstName: $('#first-name').val(),
     candidateLastName: $('#last-name').val(),
     candidateEmail: $('#email').val(),
-    managerEmail: $('#manager_email').val()
+    managerEmail: $('#manager_email').val(),
   };
 
   module.exports.__private__.sendUserInvite(data);
@@ -144,6 +145,6 @@ module.exports = {
     disableInviteForm: disableInviteForm,
     sendUserInvite: sendUserInvite,
     inviteSucceeded: inviteSucceeded,
-    inviteFailed: inviteFailed
-  }
+    inviteFailed: inviteFailed,
+  },
 };

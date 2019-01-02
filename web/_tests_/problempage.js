@@ -6,7 +6,6 @@ const $ = require('jquery');
 const config = require('./utils/config');
 const s3upload = require('./utils/s3uploadforms');
 const dialogs = require('./utils/dialogs');
-const runtime = require('./utils/runtime-env');
 
 function init()
 {
@@ -28,7 +27,7 @@ function init()
 
 function getProblemName()
 {
-  var problemName = $("meta[name='problemName']").attr("content");
+  const problemName = $("meta[name='problemName']").attr("content");
   return problemName;
 }
 
@@ -37,8 +36,8 @@ function setFormMetaData(formName)
 {
   const md = {
     "pageName" : getPageGuid(),
-    "inviteId" : getPageGuid(), //
-    "problemName" : getProblemName()
+    "inviteId" : getPageGuid(), //alias for the page name
+    "problemName" : getProblemName(),
   };
 
   s3upload.setMeta(formName, md);
@@ -76,7 +75,7 @@ function handleSubmitOutput()
 function validateSubmitOutputForm()
 {
   const fileName = __private__.getOutputFileName();
-  if(!fileName || fileName.length == 0)
+  if(!fileName || fileName.length === 0)
   {
         dialogs.myAlert("No file selected.");
         return false;
@@ -121,7 +120,7 @@ function validateSubmitCodeForm()
 {
   const fileName = __private__.getCodeFileName();
 
-  if(!fileName || fileName.length == 0)
+  if(!fileName || fileName.length === 0)
   {
     dialogs.myAlert("No file selected.");
     return false;
@@ -168,8 +167,8 @@ module.exports = {
     validateSubmitOutputForm: validateSubmitOutputForm,
     getOutputFileName: getOutputFileName,
     validateSubmitCodeForm: validateSubmitCodeForm,
-    getCodeFileName: getCodeFileName
-  }
+    getCodeFileName: getCodeFileName,
+  },
 };
 
 const __private__ = module.exports.__private__;

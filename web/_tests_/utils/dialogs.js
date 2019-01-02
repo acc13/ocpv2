@@ -22,5 +22,5 @@ function myConfirm(message)
 
 module.exports = {
 	myAlert: myAlert,
-	myConfirm: myConfirm
+	myConfirm: myConfirm,
 };
